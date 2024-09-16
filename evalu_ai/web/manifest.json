@@ -1,6 +1,6 @@
 {
-    "name": "evalu_ai",
-    "short_name": "evalu_ai",
+    "name": "intelligrade",
+    "short_name": "intelligrade",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

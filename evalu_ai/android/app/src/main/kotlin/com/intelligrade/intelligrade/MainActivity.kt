@@ -1,4 +1,4 @@
-package com.example.evalu_ai
+package com.intelligrade.intelligrade
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "evalu_ai" "\0"
+            VALUE "CompanyName", "com.intelligrade" "\0"
+            VALUE "FileDescription", "intelligrade" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "evalu_ai" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "evalu_ai.exe" "\0"
-            VALUE "ProductName", "evalu_ai" "\0"
+            VALUE "InternalName", "intelligrade" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2024 com.intelligrade. All rights reserved." "\0"
+            VALUE "OriginalFilename", "intelligrade.exe" "\0"
+            VALUE "ProductName", "intelligrade" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
