@@ -2,6 +2,7 @@ const http = require('http');
 const url = require('url');
 
 const PORT = 3000;
+const processRequst = require('./javascriptCompiler');
 
 const server = http.createServer((req, res) => {
   console.log('Server has been created');
@@ -18,15 +19,13 @@ const server = http.createServer((req, res) => {
       res.end('JavaScript Server is accessible!\n');
       break;
     case '/compile':
-      // payload will be a list of files
-      let body = '';
-      req.on('data', (chunk) => {
-        body += chunk.toString();
-      });
-      req.on('end', () => {
-        console.log('Received data:', body);
-        res.end(`You sent: ${body}\n`);
-      });
+      // payload will be a list of filess
+      if (req.method === 'POST' && req.headers['content-type'].includes('multipart/form-data')) {
+        processRequst(req, res);
+      } else {
+        res.statusCode = 400;
+        res.end('400 Bad Request\n');
+      }
       break;
     default:
       res.statusCode = 404;
