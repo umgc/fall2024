@@ -1,2 +1,2 @@
 # fall2024
-Fall SWEN 640 Cohort
+Fall SWEN 670 Cohort
