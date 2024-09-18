@@ -7,7 +7,7 @@ import '../../controller/model/beans.dart';
 
 // Singleton class for Moodle API access.
 class MoodleApiSingleton {
-  static const baseUrl = 'http://100.25.213.47';
+  static const baseUrl = 'http://18.117.253.110';//'http://100.25.213.47';
   static const serverUrl = '$baseUrl/webservice/rest/server.php?wstoken=';
   static const jsonFormat = '&moodlewsrestformat=json';
   static const errorKey = 'error';

@@ -45,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'Welcome to IntelliGrade!',
+              'Welcome to EvaluAI!',
               style: TextStyle(
                 fontSize: 24
               )

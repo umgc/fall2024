@@ -1,0 +1,46 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "compiler",
+            "cwd": "compiler",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "dart_ai_interface",
+            "cwd": "dart_ai_interface",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "dart_ai_test_app",
+            "cwd": "dart_ai_test_app",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "evalu_ai",
+            "cwd": "evalu_ai",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "evalu_ai (profile mode)",
+            "cwd": "evalu_ai",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "evalu_ai (release mode)",
+            "cwd": "evalu_ai",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}
