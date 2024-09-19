@@ -1,7 +1,5 @@
-import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
-import 'package:namer_app/content_carousel.dart';
-import 'package:provider/provider.dart';
+import 'content_carousel.dart';
 
 //What we need:
 //Two carousels, one for essays and the other for assessments.
