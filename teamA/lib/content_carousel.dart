@@ -15,21 +15,27 @@ class ContentCarousel extends StatefulWidget{
 //State of the carousel (allows for filtering in the future)
 class _ContentState extends State<ContentCarousel>{
   final String type;
+  //original list of content
+  final List<Widget> _children;
+  //filtered list to be shown
+  var children = <Widget>[];
 
-  var _children = <Widget>[];
-
-  _ContentState(this.type) {
+  _ContentState._(this.type,this._children){
+    children = _children;
+  }
+  
+  factory _ContentState(String type) {
     //generate the full list of cards
     //todo: do this via the Moodle API
     if (type == "assessment"){
-      _children = [CarouselCard('Real Test','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test 2','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test3','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test4','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test5','Test Information\nWould Go\nHere','assessment')];
+      return _ContentState._(type, [CarouselCard('Real Test','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test 2','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test3','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test4','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test5','Test Information\nWould Go\nHere','assessment')]);
     }
     else if (type == 'essay'){
-      _children = [CarouselCard('Real Essay','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test 2','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test3','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test4','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test5','Test Information\nWould Go\nHere','essay')];
+      return _ContentState._(type, [CarouselCard('Real Essay','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test 2','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test3','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test4','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test5','Test Information\nWould Go\nHere','essay')]);
     }
     //todo: add submission type
-    else{
-      _children = [Text('Invalid type input.')];
+    else {
+      return _ContentState._(type, [Text('Invalid type input.')]);
     }
   }
 
@@ -41,9 +47,10 @@ class _ContentState extends State<ContentCarousel>{
     return ConstrainedBox(
       constraints: BoxConstraints(maxHeight: 400), //testing width
       child: CarouselView(
+        backgroundColor: Theme.of(context).primaryColor,
         itemExtent: 600,
         shrinkExtent: 350,
-        children: _children //todo shift to a new var when business logic in place to a less hidden variable that is affected by filtering
+        children: children
       )
     );
   }
@@ -62,8 +69,8 @@ class CarouselCard extends StatelessWidget{
 
   @override
   StatelessWidget build(BuildContext context){
-    return Card(
-      color: Theme.of(context).colorScheme.primary,
+    return Card.filled(
+      color: Theme.of(context).primaryColor,
       child: Scaffold(
         body: Column(
           children:[

@@ -10,15 +10,19 @@ import 'content_carousel.dart';
 
 //Main Page
 class ViewCourseContents extends StatelessWidget {
+  //todo: figure out how to do the super.key and define a internal var
+  //also: vertical scroll
   const ViewCourseContents({super.key});
 
   @override
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(title: Text('Navigator is //todo')),
-      body: Column(
+      body: 
+        Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
+          Text('Insert Course Name Here', style: TextStyle(fontSize: 64),),
           ContentCarousel('assessment'),
           ContentCarousel('essay'),
           Row(
