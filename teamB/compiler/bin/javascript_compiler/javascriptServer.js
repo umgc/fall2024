@@ -2,7 +2,7 @@ const http = require('http');
 const url = require('url');
 
 const PORT = 3000;
-const processRequst = require('./javascriptCompiler');
+const processRequest = require('./javascriptCompiler');
 
 const server = http.createServer((req, res) => {
   console.log('Server has been created');
@@ -21,7 +21,7 @@ const server = http.createServer((req, res) => {
     case '/compile':
       // payload will be a list of filess
       if (req.method === 'POST' && req.headers['content-type'].includes('multipart/form-data')) {
-        processRequst(req, res);
+        processRequest(req, res);
       } else {
         res.statusCode = 400;
         res.end('400 Bad Request\n');
