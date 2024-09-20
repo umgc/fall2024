@@ -9,10 +9,22 @@ import 'content_carousel.dart';
 //Two buttons below that lead to the create essay and create assessment pages.
 
 //Main Page
-class ViewCourseContents extends StatelessWidget {
+class ViewCourseContents extends StatefulWidget {
   //todo: figure out how to do the super.key and define a internal var
+  final String courseName;
   //also: vertical scroll
-  const ViewCourseContents({super.key});
+  ViewCourseContents(this.courseName);
+
+  @override
+  State createState(){
+    return _CourseState(courseName);
+  }
+}
+
+class _CourseState extends State{
+  final String courseName;
+
+  _CourseState(this.courseName);
 
   @override
   Widget build(BuildContext context){
@@ -23,7 +35,7 @@ class ViewCourseContents extends StatelessWidget {
           child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Text('Insert Course Name Here', style: TextStyle(fontSize: 64),),
+            Text(courseName, style: TextStyle(fontSize: 64),),
             ContentCarousel('assessment'),
             ContentCarousel('essay'),
             Row(

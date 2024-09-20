@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "Test App",
-      home: ViewCourseContents(),
+      home: ViewCourseContents('Test Course'),
       theme: ThemeData(
         useMaterial3: true,
         //colors will be handled later
