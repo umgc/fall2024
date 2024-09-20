@@ -19,17 +19,19 @@ class ViewCourseContents extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text('Navigator is //todo')),
       body: 
-        Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Text('Insert Course Name Here', style: TextStyle(fontSize: 64),),
-          ContentCarousel('assessment'),
-          ContentCarousel('essay'),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [CreateButton('assessment'), CreateButton('essay')]
-          )
-        ],
+        SingleChildScrollView(
+          child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Text('Insert Course Name Here', style: TextStyle(fontSize: 64),),
+            ContentCarousel('assessment'),
+            ContentCarousel('essay'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [CreateButton('assessment'), CreateButton('essay')]
+            )
+          ],
+        )
       )
     );
   }

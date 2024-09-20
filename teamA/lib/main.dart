@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
       home: ViewCourseContents(),
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.purple)
+        //colors will be handled later
       ),
       scrollBehavior: CustomScrollBehavior(),
     );
