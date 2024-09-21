@@ -25,3 +25,16 @@ doc/api/
 
 .flutter-plugins
 .flutter-plugins-dependencies
+Example/ios/Runner.xcodeproj/project.pbxproj
+Example/ios/Runner.xcodeproj/project.xcworkspace/contents.xcworkspacedata
+Example/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+Example/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+Example/ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme
+Example/ios/Runner.xcworkspace/contents.xcworkspacedata
+Example/ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+Example/ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+Example/macos/Runner.xcodeproj/project.pbxproj
+Example/macos/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+Example/macos/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme
+Example/macos/Runner.xcworkspace/contents.xcworkspacedata
+Example/macos/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
