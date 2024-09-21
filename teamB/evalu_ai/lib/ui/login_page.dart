@@ -37,13 +37,21 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login to Moodle'),
+        title: const Text('Login'),
+        backgroundColor: Colors.deepPurple[200],
+        leading: Icon(Icons.computer_outlined),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 500, vertical: 10),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Image(
+                image: NetworkImage(
+                    'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=2922&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
+                    width: 400,
+                    height: 400,
+              ),
             Text(
               'Welcome to EvaluAI!',
               style: TextStyle(
@@ -83,6 +91,9 @@ class _LoginPageState extends State<LoginPage> {
                 }
               },
               child: const Text('Login'),
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.deepPurple[200]),
+                ),
             ),
             const SizedBox(height: 16.0),
             TextButton(
