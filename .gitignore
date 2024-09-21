@@ -25,3 +25,17 @@ doc/api/
 
 .flutter-plugins
 .flutter-plugins-dependencies
+.vs
+.vs/slnx.sqlite
+.vs/fall2024/FileContentIndex/d967f948-99e6-4a9c-b9ed-acf14b3b68fd.vsidx
+.vs/fall2024/v17/Browse.VC.db
+.vs/fall2024/v17/Browse.VC.db-shm
+.vs/fall2024/v17/Browse.VC.db-wal
+.vs/fall2024/v17/Browse.VC.opendb
+Example/linux/flutter/generated_plugin_registrant.cc
+Example/linux/flutter/generated_plugin_registrant.h
+Example/linux/flutter/generated_plugins.cmake
+Example/macos/Flutter/GeneratedPluginRegistrant.swift
+Example/windows/flutter/generated_plugin_registrant.cc
+Example/windows/flutter/generated_plugin_registrant.h
+Example/windows/flutter/generated_plugins.cmake
