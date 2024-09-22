@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:namer_app/Views/essay_edit_page.dart';
 
 //Provides a carousel of either assessments, essays, or submission
 class ContentCarousel extends StatefulWidget{
