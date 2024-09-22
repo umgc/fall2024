@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:namer_app/Views/essay_edit_page.dart';
-import 'content_carousel.dart';
+import '../content_carousel.dart';
 
 //What we need:
 //Two carousels, one for essays and the other for assessments.

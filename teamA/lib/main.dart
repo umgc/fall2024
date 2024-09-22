@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:namer_app/Views/essay_edit_page.dart';
-import 'course_content.dart';
+import 'Views/course_content.dart';
 
 void main() {
   runApp(MyApp());
@@ -53,8 +53,7 @@ class _DevLaunch extends State {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text('Dev Launch Page')),
-        body: Column(
-        children: [
+        body: Column(children: [
           ElevatedButton(
               child: const Text('Open Edit Essay'),
               onPressed: () {
@@ -63,12 +62,13 @@ class _DevLaunch extends State {
                   MaterialPageRoute(builder: (context) => EssayEditPage()),
                 );
               }),
-                        ElevatedButton(
+          ElevatedButton(
               child: const Text('Open Contents Carousel'),
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ViewCourseContents("Test Course")),
+                  MaterialPageRoute(
+                      builder: (context) => ViewCourseContents("Test Course")),
                 );
               })
         ]));
