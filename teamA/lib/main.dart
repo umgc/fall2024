@@ -7,12 +7,12 @@ void main() {
 }
 
 //click and drag for intuitiveness
-class CustomScrollBehavior extends ScrollBehavior{
+class CustomScrollBehavior extends ScrollBehavior {
   @override
-  Set<PointerDeviceKind> get dragDevices => { 
-    PointerDeviceKind.touch,
-    PointerDeviceKind.mouse,
-  };
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      };
 }
 
 //below is an app builder, leave it here for now
@@ -28,11 +28,14 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         //colors will be handled later
       ),
-      scrollBehavior: CustomScrollBehavior(),  
+      scrollBehavior: CustomScrollBehavior(),
+      routes: {
+        '/login': (context) => const LoginPage(),
+        '/grading': (context) => const GradingPage(),
+        '/create': (context) => const CreatePage(),
+        '/viewExams': (context) => const ViewExamPage(),
+        '/settings': (context) => Setting(themeModeNotifier: _themeModeNotifier)
+      },
     );
   }
-
-  
 }
-
-
