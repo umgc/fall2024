@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:dotenv/dotenv.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intelligrade/api/llm/llm_api.dart';
 import 'package:intelligrade/api/llm/prompt_engine.dart';

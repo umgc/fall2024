@@ -112,7 +112,7 @@ class _GradingPageState extends State<GradingPage> {
   Future<void> pickGradingFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: false);
     if (result != null) {
-      _gradingFile = FileNameAndBytes(result!.files.single.name, result!.files.single.bytes!);
+      _gradingFile = FileNameAndBytes(result.files.single.name, result.files.single.bytes!);
     }
     // _gradingFileName = result?.files.single.name ?? _gradingFileName;
     // _gradingFileBytes = result?.files.single.bytes ?? _gradingFileBytes;

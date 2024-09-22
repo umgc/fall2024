@@ -6,15 +6,15 @@ import 'package:intelligrade/controller/model/beans.dart';
 
 import '../controller/html_converter.dart';
 
-class ViewExamPage extends StatefulWidget {
-  const ViewExamPage({super.key});
+class DashBoardPage extends StatefulWidget {
+  const DashBoardPage({super.key});
   static MainController controller = MainController();
 
   @override
-  _ViewExamPageState createState() => _ViewExamPageState();
+  _DashBoardPageState createState() => _DashBoardPageState();
 }
 
-class _ViewExamPageState extends State<ViewExamPage> {
+class _DashBoardPageState extends State<DashBoardPage> {
   List<Quiz?> quizzes = []; // Initialize as an empty list
   bool _isUserLoggedIn = false;
 
@@ -27,7 +27,7 @@ class _ViewExamPageState extends State<ViewExamPage> {
 
   Future<void> _fetchQuizzes() async {
     try {
-      quizzes = ViewExamPage.controller.listAllAssessments();
+      quizzes = DashBoardPage.controller.listAllAssessments();
       setState(() {});
     } catch (e) {
       if (kDebugMode) {
@@ -38,7 +38,7 @@ class _ViewExamPageState extends State<ViewExamPage> {
   }
 
   Future<void> _checkUserLoginStatus() async {
-    _isUserLoggedIn = await ViewExamPage.controller.isUserLoggedIn();
+    _isUserLoggedIn = await DashBoardPage.controller.isUserLoggedIn();
     setState(() {});
   }
 
@@ -86,7 +86,7 @@ class _ViewExamPageState extends State<ViewExamPage> {
                                     setState(() {
                                       isRegenerating = true;
                                     });
-                                    bool result = await ViewExamPage.controller
+                                    bool result = await DashBoardPage.controller
                                         .regenerateQuestions(
                                             selectedQuestions, quiz);
                                     setState(() {
@@ -281,7 +281,7 @@ class _ViewExamPageState extends State<ViewExamPage> {
               child: const Text('Save'),
               onPressed: () async {
                 try {
-                  ViewExamPage.controller.updateFileLocally(quiz);                  
+                  DashBoardPage.controller.updateFileLocally(quiz);                  
                   _fetchQuizzes(); // Refresh quiz list
                   Navigator.of(context).pop();
                   _showQuizDetails(quiz);
@@ -332,7 +332,7 @@ class _ViewExamPageState extends State<ViewExamPage> {
 
     if (confirmDelete == true) {
       try {
-        ViewExamPage.controller.deleteLocalFile(filename);
+        DashBoardPage.controller.deleteLocalFile(filename);
         _fetchQuizzes(); // Refresh quiz list
       } catch (e) {
         if (kDebugMode) {
@@ -344,7 +344,7 @@ class _ViewExamPageState extends State<ViewExamPage> {
 
   void _downloadQuiz(Quiz quiz, bool includeAnswers) async {
     try {
-      await ViewExamPage.controller
+      await DashBoardPage.controller
           .downloadAssessmentAsPdf(quiz.name ?? '', includeAnswers);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Quiz downloaded successfully')),
@@ -361,7 +361,7 @@ class _ViewExamPageState extends State<ViewExamPage> {
 
   Future<void> _postQuizToMoodle(Quiz quiz) async {
     try {
-      List<Course> courses = await ViewExamPage.controller.getCourses();
+      List<Course> courses = await DashBoardPage.controller.getCourses();
       String? selectedCourseId = await showDialog<String>(
         context: context,
         builder: (BuildContext context) {
@@ -385,7 +385,7 @@ class _ViewExamPageState extends State<ViewExamPage> {
       );
 
       if (selectedCourseId != null) {
-        await ViewExamPage.controller
+        await DashBoardPage.controller
             .postAssessmentToMoodle(quiz, selectedCourseId);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Quiz posted to Moodle successfully')),
@@ -405,7 +405,7 @@ class _ViewExamPageState extends State<ViewExamPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const AppHeader(
-        title: "View Created Exams",
+        title: "View Created Exams",//maybe change
       ),
       body: quizzes.isEmpty
           ? Center(

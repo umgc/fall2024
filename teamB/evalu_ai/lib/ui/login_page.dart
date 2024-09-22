@@ -39,27 +39,27 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         title: const Text('Login'),
         backgroundColor: Colors.deepPurple[200],
-        leading: Icon(Icons.computer_outlined),
+        leading: const Icon(Icons.computer_outlined),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 500, vertical: 10),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Image(
+            const Image(
                 image: NetworkImage(
                     'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=2922&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
                     width: 400,
                     height: 400,
               ),
-            Text(
+            const Text(
               'Welcome to EvaluAI!',
               style: TextStyle(
                 fontSize: 24
               )
             ),
             const SizedBox(height: 40.0),
-            Text(
+            const Text(
               'Please enter your Moodle credentials.'
             ),
             const SizedBox(height: 26.0),
@@ -85,20 +85,20 @@ class _LoginPageState extends State<LoginPage> {
                   _passwordController.text,
                 );
                 if (wasSuccessful) {
-                  Navigator.pushReplacementNamed(context, '/viewExams');
+                  Navigator.pushReplacementNamed(context, '/dashboard');
                 } else {
                   _showLoginFailedDialog();
                 }
               },
-              child: const Text('Login'),
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.deepPurple[200]),
+                backgroundColor: WidgetStateProperty.all(Colors.deepPurple[200]),
                 ),
+              child: const Text('Login'),
             ),
             const SizedBox(height: 16.0),
             TextButton(
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/viewExams');
+                Navigator.pushReplacementNamed(context, '/dashboard');
               },
               child: const Text('Proceed without Moodle'),
             ),
