@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'content_carousel.dart';
+import '../content_carousel.dart';
 
 //What we need:
 //Two carousels, one for essays and the other for assessments.
