@@ -72,6 +72,9 @@ class _EssayEditPageState extends State<EssayEditPage> {
                         color: Theme.of(context).colorScheme.primary),
                     showSaveIcon: true,
                     //  borderColor: Colors.grey.shade300,
+                    onRowSaved: (value) {
+                      print(value);
+                    },
                     borderColor: Theme.of(context).colorScheme.primaryContainer,
                     onSubmitted: (value) {
                       //new line
