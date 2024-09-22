@@ -28,7 +28,11 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         //colors will be handled later
       ),
-      scrollBehavior: CustomScrollBehavior(),
+      scrollBehavior: CustomScrollBehavior(),  
     );
   }
+
+  
 }
+
+
