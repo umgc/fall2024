@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:namer_app/Views/essay_edit_page.dart';
+import 'package:namer_app/Views/quiz_generator.dart';
 import 'Views/course_content.dart';
 
 void main() {
@@ -70,7 +71,16 @@ class _DevLaunch extends State {
                   MaterialPageRoute(
                       builder: (context) => ViewCourseContents("Test Course")),
                 );
-              })
+              }),
+          ElevatedButton(
+            child: const Text('Open Essay Generator'),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CreateAssessment("Johnny Test")),
+                  );
+            })
         ]));
   }
 }
