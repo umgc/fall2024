@@ -10,20 +10,22 @@ class LoginApp extends StatelessWidget {
     return MaterialApp(
       title: 'Login App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        scaffoldBackgroundColor:
-            Colors.blue, // Set the scaffold background color
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.blue, // Set the AppBar background color
+        // Enable Material 3, flutter
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          // The colorScheme generated from the seed color: purple
+          seedColor: Colors.deepPurple.shade200,
         ),
       ),
-      debugShowCheckedModeBanner: false, // This disables the debug banner
-      home: LoginScreen(),
+      debugShowCheckedModeBanner: false,
+      home: const LoginScreen(),
     );
   }
 }
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -34,15 +36,23 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
+      // Use background color from colorScheme
+
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
-        // Title section (optional)
-        //title: Text('Learning Lens'),
-        backgroundColor:
-            Colors.blue, // Ensures AppBar has the same color as the body
+        backgroundColor: colorScheme
+
+            // Use primaryContainer color for the AppBar
+            .primaryContainer,
       ),
       body: Container(
-        color: Colors.blue, // Set background color to blue
+        color: colorScheme
+
+            // Use primaryContainer for the body background
+            .primaryContainer,
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -51,20 +61,30 @@ class _LoginScreenState extends State<LoginScreen> {
             Text(
               'Welcome to Learning Lens Application!',
               style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: colorScheme
+
+                    // Text color based on the primaryContainer contrast color
+                    .onPrimaryContainer,
+              ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             // Instruction Section
             Text(
               'Please, enter your username and password below and click Login, to access the Dashboard.',
-              style: TextStyle(fontSize: 16, color: Colors.white),
+              style: TextStyle(
+                fontSize: 16,
+                color: colorScheme
+
+                    // Text color for instructions
+                    .onPrimaryContainer,
+              ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 32),
+            const SizedBox(height: 32),
 
             // Username Input
             TextField(
@@ -72,10 +92,14 @@ class _LoginScreenState extends State<LoginScreen> {
               decoration: InputDecoration(
                 labelText: 'Username',
                 hintText: 'Enter your username',
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
+
+                // Input field background
+                fillColor: colorScheme.surface,
+                filled: true,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             // Password Input
             TextField(
@@ -83,21 +107,29 @@ class _LoginScreenState extends State<LoginScreen> {
               decoration: InputDecoration(
                 labelText: 'Password',
                 hintText: 'Enter your password',
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
+
+                // Input field background
+                fillColor: colorScheme.surface,
+                filled: true,
               ),
               obscureText: true,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             // Moodle URL (optional if needed)
             TextField(
               decoration: InputDecoration(
                 labelText: 'Moodle URL',
                 hintText: 'https://moodle.example.com',
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
+
+                // Input field background
+                fillColor: colorScheme.surface,
+                filled: true,
               ),
             ),
-            SizedBox(height: 32),
+            const SizedBox(height: 32),
 
             // Login Button
             ElevatedButton(
@@ -105,10 +137,20 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Add logic to handle login if needed
                 print('Login button pressed');
               },
-              child: Text('Login'),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: colorScheme
+
+                    // Button text color based on onPrimary
+                    .onPrimary,
+                backgroundColor: colorScheme
+
+                    // Button background color based on primary
+                    .primary,
+              ),
+              child: const Text('Login'),
             ),
 
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             // Forgot Password Link
             TextButton(
@@ -118,7 +160,10 @@ class _LoginScreenState extends State<LoginScreen> {
               },
               child: Text(
                 'Forgot your Password?',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(
+                    color: colorScheme
+                        // Link text color based on onPrimaryContainer
+                        .onPrimaryContainer),
               ),
             ),
           ],
