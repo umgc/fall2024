@@ -405,99 +405,152 @@ class _DashBoardPageState extends State<DashBoardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const AppHeader(
-        title: "View Created Exams",//maybe change
+        title: "Dashboard",//maybe change
+        //backgroundColor: Colors.deepPurple[200],
       ),
-      body: quizzes.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text('No saved exams yet.'),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/create');
-                    },
-                    child: const Text('Create Exam'),
-                  ),
-                ],
+       body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Row (
+            children: <Widget>[
+              Container(
+                color: Colors.deepPurple[100],
+                width: 250,
+                child: NavigationMenu(),
               ),
-            )
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: quizzes.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        Quiz quiz = quizzes[index] ?? Quiz();
-                        return Card(
-                          elevation: 4,
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          child: ListTile(
-                            title: Text(quiz.name ?? 'Unnamed Quiz'),
-                            subtitle:
-                                Text(quiz.description ?? 'No description'),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Tooltip(
-                                  message: _isUserLoggedIn
-                                      ? 'Post to Moodle'
-                                      : 'Login to Moodle to be able to post exams',
-                                  child: IconButton(
-                                    icon: const Icon(Icons.upload,
-                                        color: Colors.green),
-                                    onPressed: _isUserLoggedIn
-                                        ? () => _postQuizToMoodle(quiz)
-                                        : null,
-                                  ),
-                                ),
-                                Tooltip(
-                                  message: 'Download as pdf',
-                                  child: PopupMenuButton<bool>(
-                                    icon: const Icon(Icons.download,
-                                        color: Colors.blue),
-                                    tooltip: '',
-                                    onSelected: (bool includeAnswers) {
-                                      _downloadQuiz(quiz, includeAnswers);
-                                    },
-                                    itemBuilder: (BuildContext context) =>
-                                        <PopupMenuEntry<bool>>[
-                                      const PopupMenuItem<bool>(
-                                        value: true,
-                                        child: Text('Download with Answers'),
-                                      ),
-                                      const PopupMenuItem<bool>(
-                                        value: false,
-                                        child: Text('Download without Answers'),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Tooltip(
-                                  message: 'Delete',
-                                  child: IconButton(
-                                    icon: const Icon(Icons.delete,
-                                        color: Colors.red),
-                                    onPressed: () {
-                                      _deleteQuiz(quiz.name ?? '');
-                                    },
-                                  ),
-                                )
-                              ],
-                            ),
-                            onTap: () {
-                              _showQuizDetails(quiz);
-                            },
-                          ),
-                        );
+              quizzes.isEmpty
+              ? Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('No saved exams yet.'),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, '/create');
                       },
+                      child: const Text('Create Exam'),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+              )
+            : Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: quizzes.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          Quiz quiz = quizzes[index] ?? Quiz();
+                          return Card(
+                            elevation: 4,
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            child: ListTile(
+                              title: Text(quiz.name ?? 'Unnamed Quiz'),
+                              subtitle:
+                                  Text(quiz.description ?? 'No description'),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Tooltip(
+                                    message: _isUserLoggedIn
+                                        ? 'Post to Moodle'
+                                        : 'Login to Moodle to be able to post exams',
+                                    child: IconButton(
+                                      icon: const Icon(Icons.upload,
+                                          color: Colors.green),
+                                      onPressed: _isUserLoggedIn
+                                          ? () => _postQuizToMoodle(quiz)
+                                          : null,
+                                    ),
+                                  ),
+                                  Tooltip(
+                                    message: 'Download as pdf',
+                                    child: PopupMenuButton<bool>(
+                                      icon: const Icon(Icons.download,
+                                          color: Colors.blue),
+                                      tooltip: '',
+                                      onSelected: (bool includeAnswers) {
+                                        _downloadQuiz(quiz, includeAnswers);
+                                      },
+                                      itemBuilder: (BuildContext context) =>
+                                          <PopupMenuEntry<bool>>[
+                                        const PopupMenuItem<bool>(
+                                          value: true,
+                                          child: Text('Download with Answers'),
+                                        ),
+                                        const PopupMenuItem<bool>(
+                                          value: false,
+                                          child: Text('Download without Answers'),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Tooltip(
+                                    message: 'Delete',
+                                    child: IconButton(
+                                      icon: const Icon(Icons.delete,
+                                          color: Colors.red),
+                                      onPressed: () {
+                                        _deleteQuiz(quiz.name ?? '');
+                                      },
+                                    ),
+                                  )
+                                ],
+                              ),
+                              onTap: () {
+                                _showQuizDetails(quiz);
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+              ],
+            );
+          }
+        )       
     );
   }
+  
 }
+
+//Navigation bar
+class NavigationMenu extends StatelessWidget {
+    @override
+    Widget build(BuildContext context) {
+      return ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          ListTile(
+            title: Text('Dash'),
+            onTap: () {
+              //Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: Text('Settings'),
+            onTap: () {
+              //Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/settings');
+            },
+          ),
+          ListTile(
+            title: Text('Create Assignment'),
+            onTap: () {
+              //Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: Text('Chatbot'),
+            onTap: () {
+              //Navigator.pop(context);
+            },
+          ),
+        ],
+      );
+    }
+  }
