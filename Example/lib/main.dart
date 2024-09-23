@@ -12,7 +12,7 @@ class CourseList extends StatelessWidget {
     return const MaterialApp(
       home: Scaffold(
         body: Center(
-          child: Text('Courses List'),
+          child: Text('Courses List Test'),
         ),
       ),
     );
