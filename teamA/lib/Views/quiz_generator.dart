@@ -1,7 +1,7 @@
 
 
 import 'package:flutter/material.dart';
-
+import 'package:namer_app/general_form.dart';
 class CreateAssessment extends StatefulWidget {
 
   final String userName;
@@ -14,36 +14,34 @@ class CreateAssessment extends StatefulWidget {
   }
 }
 
+
 class _AssessmentState extends State {
   final String userName;
-
   _AssessmentState(this.userName);
 
-  @override
+
+ @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Scaffold ( 
       appBar: AppBar(title: Text('Create Assessment')),
-      body: SingleChildScrollView(
-        child: GridView.count(
-          primary: false,
-          padding: const EdgeInsets.all(20),
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          crossAxisCount: 2,
-          children: <Widget>[
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Text("Assessment Details", style: TextStyle(fontSize: 64),),
-                TextField(
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Assessment Name'
-                  ),
-                )
-              ],
-            )
-          ],
+      body: Form (
+        child: Padding (
+          padding: EdgeInsets.all(16),
+          child: Column (
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [ColumnEntry ('Assessment Details', 
+              [
+                RowEntry('Assessment Name', 'Please Enter a Valid Name', 'string', true),
+                RowEntry('Description', '', 'string', false),
+                RowEntry('Total Multiple Choice Questions', '', 'number', true),
+                RowEntry('Total True / False Questions', '', 'number', true),
+                RowEntry('Total Short Answer Questions', '', 'number', true),
+              ]),
+              ColumnEntry('Help Text', [
+                RowEntry('Test', '', 'string', false)
+              ])
+            ]
+          )
         )
       )
     );
