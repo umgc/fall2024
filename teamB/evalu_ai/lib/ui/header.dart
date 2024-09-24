@@ -18,112 +18,101 @@ class AppHeader extends StatefulWidget implements PreferredSizeWidget {
 class _AppHeaderState extends State<AppHeader> {
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      title: Text(widget.title),
-      actions: [
-        Tooltip(
-          message: 'Create Exam',
-          child: IconButton(
-            icon: const Icon(Icons.create),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, '/create');
-            },
+    return Container(
+      decoration: const BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.blueGrey,
+            width: 0.5,
           ),
         ),
-        Tooltip(
-          message: 'View Created Exams',
-          child: IconButton(
-            icon: const Icon(Icons.view_list),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, '/viewExams');
-            },
+      ),
+      child: AppBar(
+        title: Text(
+          widget.title,
+          style: TextStyle(
+            color: Colors.deepPurple[200],
           ),
         ),
-        Tooltip(
-          message: 'Grade Exam',
-          child: IconButton(
-            icon: const Icon(Icons.assignment),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, '/grading');
-            },
-          ),
-        ),
-        FutureBuilder<bool>(
-          future: AppHeader.controller.isUserLoggedIn(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return IconButton(
-                icon: const Icon(Icons.error),
-                onPressed: () {},
-              );
-            } else {
-              bool isLoggedIn = snapshot.data ?? false;
-              return Tooltip(
-                message: isLoggedIn ? 'Logout' : 'Login',
-                child: IconButton(
-                  icon: isLoggedIn
-                      ? const Icon(Icons.logout)
-                      : const Icon(Icons.login),
-                  onPressed: () async {
-                    if (isLoggedIn) {
-                      bool? confirmLogout = await showDialog<bool>(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text('Confirm Logout'),
-                            content: const Text(
-                                'Are you sure you want to logout of Moodle?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop(false);
-                                },
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop(true);
-                                },
-                                child: const Text('Logout'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                      if (confirmLogout == true) {
-                        AppHeader.controller.logoutFromMoodle();
-                        setState(
-                            () {}); // Repaint the page to show the login button
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Successfully logged out of Moodle',
-                              style: TextStyle(color: Colors.green),
-                            ),
-                          ),
+        leading: const Icon(Icons.computer_outlined),
+        actions: [
+          FutureBuilder<bool>(
+            future: AppHeader.controller.isUserLoggedIn(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return IconButton(
+                  icon: const Icon(Icons.error),
+                  onPressed: () {},
+                );
+              } else {
+                bool isLoggedIn = snapshot.data ?? false;
+                return Tooltip(
+                  message: isLoggedIn ? 'Logout' : 'Login',
+                  child: IconButton(
+                    icon: isLoggedIn
+                        ? const Icon(Icons.logout)
+                        : const Icon(Icons.login),
+                    onPressed: () async {
+                      if (isLoggedIn) {
+                        bool? confirmLogout = await showDialog<bool>(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text('Confirm Logout'),
+                              content: const Text(
+                                  'Are you sure you want to logout of Moodle?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop(false);
+                                  },
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop(true);
+                                  },
+                                  child: const Text('Logout'),
+                                ),
+                              ],
+                            );
+                          },
                         );
+                        if (confirmLogout == true) {
+                          AppHeader.controller.logoutFromMoodle();
+                          setState(
+                              () {}); // Repaint the page to show the login button
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Successfully logged out of Moodle',
+                                style: TextStyle(color: Colors.green),
+                              ),
+                            ),
+                          );
+                        }
+                      } else {
+                        Navigator.pushReplacementNamed(context, '/login');
                       }
-                    } else {
-                      Navigator.pushReplacementNamed(context, '/login');
-                    }
-                  },
-                ),
-              );
-            }
-          },
-        ),
-        Tooltip(
-          message: 'Settings',
-          child: IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, '/settings');
+                    },
+                  ),
+                );
+              }
             },
           ),
-        ),
-      ],
+          Tooltip(
+            message: 'Settings',
+            child: IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/settings');
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intelligrade/ui/header.dart';
+import 'package:intelligrade/ui/custom_navigation_bar.dart';
 import 'package:intelligrade/controller/main_controller.dart';
 import 'package:intelligrade/controller/model/beans.dart';
 
@@ -408,15 +409,21 @@ class _DashBoardPageState extends State<DashBoardPage> {
     return Scaffold(
         appBar: const AppHeader(
           title: "Dashboard", //maybe change
-          //backgroundColor: Colors.deepPurple[200],
         ),
         body: LayoutBuilder(builder: (context, constraints) {
           return Row(
             children: <Widget>[
               Container(
-                color: Colors.deepPurple[100],
+                //color: Colors.deepPurple[100],
                 width: 250,
-                child: NavigationMenu(),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.blueGrey,
+                    width: 0.5,
+                  ),
+                  //borderRadius: BorderRadius.circular(10),
+                ),
+                child: CustomNavigationBar(),
               ),
               quizzes.isEmpty
                   ? Expanded(
@@ -520,42 +527,5 @@ class _DashBoardPageState extends State<DashBoardPage> {
             ],
           );
         }));
-  }
-}
-
-//Navigation bar
-class NavigationMenu extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: EdgeInsets.zero,
-      children: <Widget>[
-        ListTile(
-          title: Text('Dash'),
-          onTap: () {
-            //Navigator.pop(context);
-          },
-        ),
-        ListTile(
-          title: Text('Settings'),
-          onTap: () {
-            //Navigator.pop(context);
-            Navigator.pushReplacementNamed(context, '/settings');
-          },
-        ),
-        ListTile(
-          title: Text('Create Assignment'),
-          onTap: () {
-            //Navigator.pop(context);
-          },
-        ),
-        ListTile(
-          title: Text('Chatbot'),
-          onTap: () {
-            //Navigator.pop(context);
-          },
-        ),
-      ],
-    );
   }
 }
