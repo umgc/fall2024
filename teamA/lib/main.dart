@@ -151,21 +151,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
 
             const SizedBox(height: 16),
-
-            // Forgot Password Link
-            TextButton(
-              onPressed: () {
-                // Add logic to handle password recovery if needed
-                print('Forgot Password clicked');
-              },
-              child: Text(
-                'Forgot your Password?',
-                style: TextStyle(
-                    color: colorScheme
-                        // Link text color based on onPrimaryContainer
-                        .onPrimaryContainer),
-              ),
-            ),
           ],
         ),
       ),
