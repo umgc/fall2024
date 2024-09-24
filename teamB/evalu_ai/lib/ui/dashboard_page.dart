@@ -43,175 +43,177 @@ class _DashBoardPageState extends State<DashBoardPage> {
   }
 
   void _showQuizDetails(Quiz quiz) {
-  List<int> selectedQuestions = [];
-  bool regenerateMode = false;
-  bool isRegenerating = false;
+    List<int> selectedQuestions = [];
+    bool regenerateMode = false;
+    bool isRegenerating = false;
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            title: Text(quiz.name ?? 'Quiz Details'),
-            content: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.edit, color: Colors.black),
-                        label: const Text('Edit'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          _editQuiz(quiz);
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.refresh, color: Colors.black),
-                        label: const Text('Regenerate Questions'),
-                        onPressed: !regenerateMode
-                            ? () {
-                                setState(() {
-                                  regenerateMode = true;
-                                });
-                              }
-                            : selectedQuestions.isEmpty
-                                ? null
-                                : () async {
-                                    setState(() {
-                                      isRegenerating = true;
-                                    });
-                                    bool result = await DashBoardPage.controller
-                                        .regenerateQuestions(
-                                            selectedQuestions, quiz);
-                                    setState(() {
-                                      isRegenerating = false;
-                                      regenerateMode = false;
-                                      selectedQuestions.clear();
-                                    });
-                                    if (result) {
-                                      _fetchQuizzes(); // Refresh quiz list
-                                      Navigator.of(context).pop();
-                                      _showQuizDetails(quiz);
-                                    }
-                                  },
-                        style: ButtonStyle(
-                          backgroundColor: WidgetStateProperty.resolveWith<
-                              Color>((Set<WidgetState> states) {
-                            if (states.contains(WidgetState.disabled)) {
-                              return const Color.fromARGB(255, 220, 220, 220);
-                            }
-                            return const Color.fromARGB(255, 212, 236, 255);
-                          }),
-                        ),
-                      ),
-                      if (regenerateMode) const SizedBox(width: 8),
-                      if (regenerateMode)
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(quiz.name ?? 'Quiz Details'),
+              content: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
                         ElevatedButton.icon(
-                          icon: const Icon(Icons.cancel, color: Colors.black),
-                          label: const Text('Cancel Regenerate'),
+                          icon: const Icon(Icons.edit, color: Colors.black),
+                          label: const Text('Edit'),
                           onPressed: () {
-                            setState(() {
-                              regenerateMode = false;
-                              selectedQuestions.clear();
-                            });
+                            Navigator.of(context).pop();
+                            _editQuiz(quiz);
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(255, 255, 124, 115),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.refresh, color: Colors.black),
+                          label: const Text('Regenerate Questions'),
+                          onPressed: !regenerateMode
+                              ? () {
+                                  setState(() {
+                                    regenerateMode = true;
+                                  });
+                                }
+                              : selectedQuestions.isEmpty
+                                  ? null
+                                  : () async {
+                                      setState(() {
+                                        isRegenerating = true;
+                                      });
+                                      bool result = await DashBoardPage
+                                          .controller
+                                          .regenerateQuestions(
+                                              selectedQuestions, quiz);
+                                      setState(() {
+                                        isRegenerating = false;
+                                        regenerateMode = false;
+                                        selectedQuestions.clear();
+                                      });
+                                      if (result) {
+                                        _fetchQuizzes(); // Refresh quiz list
+                                        Navigator.of(context).pop();
+                                        _showQuizDetails(quiz);
+                                      }
+                                    },
+                          style: ButtonStyle(
+                            backgroundColor:
+                                WidgetStateProperty.resolveWith<Color>(
+                                    (Set<WidgetState> states) {
+                              if (states.contains(WidgetState.disabled)) {
+                                return const Color.fromARGB(255, 220, 220, 220);
+                              }
+                              return const Color.fromARGB(255, 212, 236, 255);
+                            }),
                           ),
                         ),
-                    ],
-                  ),
-                  if (regenerateMode)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 16.0),
-                      child: Text(
-                        'Select questions to regenerate:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                        if (regenerateMode) const SizedBox(width: 8),
+                        if (regenerateMode)
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.cancel, color: Colors.black),
+                            label: const Text('Cancel Regenerate'),
+                            onPressed: () {
+                              setState(() {
+                                regenerateMode = false;
+                                selectedQuestions.clear();
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 255, 124, 115),
+                            ),
+                          ),
+                      ],
                     ),
-                  for (int i = 0; i < quiz.questionList.length; i++)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              if (regenerateMode)
-                                Checkbox(
-                                  value: selectedQuestions.contains(i),
-                                  onChanged: (bool? value) {
-                                    setState(() {
-                                      if (value == true) {
-                                        selectedQuestions.add(i);
-                                      } else {
-                                        selectedQuestions.remove(i);
-                                      }
-                                    });
-                                  },
-                                ),
-                              Expanded(
-                                child: Text(
-                                  'Question ${i + 1}: ${HtmlConverter.convert(quiz.questionList[i].questionText)}',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              if (isRegenerating &&
-                                  selectedQuestions.contains(i))
-                                const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.0,
+                    if (regenerateMode)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 16.0),
+                        child: Text(
+                          'Select questions to regenerate:',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    for (int i = 0; i < quiz.questionList.length; i++)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                if (regenerateMode)
+                                  Checkbox(
+                                    value: selectedQuestions.contains(i),
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        if (value == true) {
+                                          selectedQuestions.add(i);
+                                        } else {
+                                          selectedQuestions.remove(i);
+                                        }
+                                      });
+                                    },
+                                  ),
+                                Expanded(
+                                  child: Text(
+                                    'Question ${i + 1}: ${HtmlConverter.convert(quiz.questionList[i].questionText)}',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          for (int j = 0;
-                              j < quiz.questionList[i].answerList.length;
-                              j++)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Text(
-                                '${String.fromCharCode('a'.codeUnitAt(0) + j)}) ${quiz.questionList[i].answerList[j].answerText}',
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    color: quiz.questionList[i].answerList[j]
-                                                .fraction ==
-                                            '100'
-                                        ? Colors.green
-                                        : Colors.red),
-                              ),
+                                if (isRegenerating &&
+                                    selectedQuestions.contains(i))
+                                  const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.0,
+                                    ),
+                                  ),
+                              ],
                             ),
-                        ],
+                            const SizedBox(height: 10),
+                            for (int j = 0;
+                                j < quiz.questionList[i].answerList.length;
+                                j++)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: Text(
+                                  '${String.fromCharCode('a'.codeUnitAt(0) + j)}) ${quiz.questionList[i].answerList[j].answerText}',
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: quiz.questionList[i].answerList[j]
+                                                  .fraction ==
+                                              '100'
+                                          ? Colors.green
+                                          : Colors.red),
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('Close'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    },
-  );
-}
-
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Close'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
   void _editQuiz(Quiz quiz) async {
     List<List<TextEditingController>> controllers =
@@ -281,7 +283,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
               child: const Text('Save'),
               onPressed: () async {
                 try {
-                  DashBoardPage.controller.updateFileLocally(quiz);                  
+                  DashBoardPage.controller.updateFileLocally(quiz);
                   _fetchQuizzes(); // Refresh quiz list
                   Navigator.of(context).pop();
                   _showQuizDetails(quiz);
@@ -404,13 +406,12 @@ class _DashBoardPageState extends State<DashBoardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppHeader(
-        title: "Dashboard",//maybe change
-        //backgroundColor: Colors.deepPurple[200],
-      ),
-       body: LayoutBuilder(
-        builder: (context, constraints) {
-          return Row (
+        appBar: const AppHeader(
+          title: "Dashboard", //maybe change
+          //backgroundColor: Colors.deepPurple[200],
+        ),
+        body: LayoutBuilder(builder: (context, constraints) {
+          return Row(
             children: <Widget>[
               Container(
                 color: Colors.deepPurple[100],
@@ -418,139 +419,143 @@ class _DashBoardPageState extends State<DashBoardPage> {
                 child: NavigationMenu(),
               ),
               quizzes.isEmpty
-              ? Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('No saved exams yet.'),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/create');
-                      },
-                      child: const Text('Create Exam'),
-                    ),
-                  ],
-                ),
-              )
-            : Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: quizzes.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          Quiz quiz = quizzes[index] ?? Quiz();
-                          return Card(
-                            elevation: 4,
-                            margin: const EdgeInsets.symmetric(vertical: 8),
-                            child: ListTile(
-                              title: Text(quiz.name ?? 'Unnamed Quiz'),
-                              subtitle:
-                                  Text(quiz.description ?? 'No description'),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Tooltip(
-                                    message: _isUserLoggedIn
-                                        ? 'Post to Moodle'
-                                        : 'Login to Moodle to be able to post exams',
-                                    child: IconButton(
-                                      icon: const Icon(Icons.upload,
-                                          color: Colors.green),
-                                      onPressed: _isUserLoggedIn
-                                          ? () => _postQuizToMoodle(quiz)
-                                          : null,
-                                    ),
-                                  ),
-                                  Tooltip(
-                                    message: 'Download as pdf',
-                                    child: PopupMenuButton<bool>(
-                                      icon: const Icon(Icons.download,
-                                          color: Colors.blue),
-                                      tooltip: '',
-                                      onSelected: (bool includeAnswers) {
-                                        _downloadQuiz(quiz, includeAnswers);
-                                      },
-                                      itemBuilder: (BuildContext context) =>
-                                          <PopupMenuEntry<bool>>[
-                                        const PopupMenuItem<bool>(
-                                          value: true,
-                                          child: Text('Download with Answers'),
+                  ? Expanded(
+                      //widthFactor: 5,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('No saved exams yet.'),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.pushReplacementNamed(
+                                  context, '/create');
+                            },
+                            child: const Text('Create Exam'),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: quizzes.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                Quiz quiz = quizzes[index] ?? Quiz();
+                                return Card(
+                                  elevation: 4,
+                                  margin:
+                                      const EdgeInsets.symmetric(vertical: 8),
+                                  child: ListTile(
+                                    title: Text(quiz.name ?? 'Unnamed Quiz'),
+                                    subtitle: Text(
+                                        quiz.description ?? 'No description'),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Tooltip(
+                                          message: _isUserLoggedIn
+                                              ? 'Post to Moodle'
+                                              : 'Login to Moodle to be able to post exams',
+                                          child: IconButton(
+                                            icon: const Icon(Icons.upload,
+                                                color: Colors.green),
+                                            onPressed: _isUserLoggedIn
+                                                ? () => _postQuizToMoodle(quiz)
+                                                : null,
+                                          ),
                                         ),
-                                        const PopupMenuItem<bool>(
-                                          value: false,
-                                          child: Text('Download without Answers'),
+                                        Tooltip(
+                                          message: 'Download as pdf',
+                                          child: PopupMenuButton<bool>(
+                                            icon: const Icon(Icons.download,
+                                                color: Colors.blue),
+                                            tooltip: '',
+                                            onSelected: (bool includeAnswers) {
+                                              _downloadQuiz(
+                                                  quiz, includeAnswers);
+                                            },
+                                            itemBuilder:
+                                                (BuildContext context) =>
+                                                    <PopupMenuEntry<bool>>[
+                                              const PopupMenuItem<bool>(
+                                                value: true,
+                                                child: Text(
+                                                    'Download with Answers'),
+                                              ),
+                                              const PopupMenuItem<bool>(
+                                                value: false,
+                                                child: Text(
+                                                    'Download without Answers'),
+                                              ),
+                                            ],
+                                          ),
                                         ),
+                                        Tooltip(
+                                          message: 'Delete',
+                                          child: IconButton(
+                                            icon: const Icon(Icons.delete,
+                                                color: Colors.red),
+                                            onPressed: () {
+                                              _deleteQuiz(quiz.name ?? '');
+                                            },
+                                          ),
+                                        )
                                       ],
                                     ),
+                                    onTap: () {
+                                      _showQuizDetails(quiz);
+                                    },
                                   ),
-                                  Tooltip(
-                                    message: 'Delete',
-                                    child: IconButton(
-                                      icon: const Icon(Icons.delete,
-                                          color: Colors.red),
-                                      onPressed: () {
-                                        _deleteQuiz(quiz.name ?? '');
-                                      },
-                                    ),
-                                  )
-                                ],
-                              ),
-                              onTap: () {
-                                _showQuizDetails(quiz);
+                                );
                               },
                             ),
-                          );
-                        },
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-              ],
-            );
-          }
-        )       
-    );
+            ],
+          );
+        }));
   }
-  
 }
 
 //Navigation bar
 class NavigationMenu extends StatelessWidget {
-    @override
-    Widget build(BuildContext context) {
-      return ListView(
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          ListTile(
-            title: Text('Dash'),
-            onTap: () {
-              //Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            title: Text('Settings'),
-            onTap: () {
-              //Navigator.pop(context);
-              Navigator.pushReplacementNamed(context, '/settings');
-            },
-          ),
-          ListTile(
-            title: Text('Create Assignment'),
-            onTap: () {
-              //Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            title: Text('Chatbot'),
-            onTap: () {
-              //Navigator.pop(context);
-            },
-          ),
-        ],
-      );
-    }
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: EdgeInsets.zero,
+      children: <Widget>[
+        ListTile(
+          title: Text('Dash'),
+          onTap: () {
+            //Navigator.pop(context);
+          },
+        ),
+        ListTile(
+          title: Text('Settings'),
+          onTap: () {
+            //Navigator.pop(context);
+            Navigator.pushReplacementNamed(context, '/settings');
+          },
+        ),
+        ListTile(
+          title: Text('Create Assignment'),
+          onTap: () {
+            //Navigator.pop(context);
+          },
+        ),
+        ListTile(
+          title: Text('Chatbot'),
+          onTap: () {
+            //Navigator.pop(context);
+          },
+        ),
+      ],
+    );
   }
+}
