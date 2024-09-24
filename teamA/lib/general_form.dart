@@ -10,7 +10,7 @@ class EntryForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     
-    throw UnimplementedError();
+    return Row(children: columns);
   }
 }
 
@@ -23,25 +23,25 @@ class ColumnEntry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    resizeChildren(rows, MediaQuery.sizeOf(context).height, MediaQuery.sizeOf(context).width);
-    return Column (mainAxisSize: MainAxisSize.min, children: rows);
+    return Container (
+      height: 150.0 * rows.length,
+      width: 600,
+      padding: EdgeInsets.all(10),
+      child : Column(mainAxisSize: MainAxisSize.min, children: rows)
+    );
   }
 
-  void resizeChildren(List<RowEntry> rows, double height, double width) {
-    for (final row in rows) {
-      row.height=100;
-      row.width=10;
-    }
-  }
 }
 
 
 class RowEntry extends StatelessWidget {
-  final String title, validationMessage, type;
+  final String title, message, type;
   final bool needsValidation;
-  double height=0, width=0, padding=0;
+  final double height, width, padding;
 
-  RowEntry(this.title, this.validationMessage, this.type, this.needsValidation);
+  RowEntry(this.title, this.message, 
+            this.type, this.needsValidation,
+            this.height, this.width, this.padding);
 
   @override
   Widget build(BuildContext context) {
@@ -58,45 +58,39 @@ class RowEntry extends StatelessWidget {
           );
   }
 
-  Container entry(String type) {
-    if (type == 'string') {
-      return Container (
-        padding: EdgeInsets.only(top: padding, bottom: padding),
-        height: height,
-        width: width,
-        child: Row (
+  List<DropdownMenuEntry> getMenuEntries() {
+    final splitList = message.split(',');
+    List<DropdownMenuEntry> entries = <DropdownMenuEntry>[];
+    for (String entry in splitList) {
+      print(entry);
+      entries.add(DropdownMenuEntry(value: entry, label: entry));
+    }
+    return entries;
+  }
+
+  Container wrapper(Widget widget) {
+    return Container (
+      padding: EdgeInsets.only(top: padding, bottom: padding),
+      height: height,
+      width: width,
+      child: Row (
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Flexible (
-            child: TextFormField (
-              validator: (value) {
-                if (needsValidation && (value == null || value.isEmpty)) {
-                  return validationMessage;
-                } return null;
-              },
-              decoration: InputDecoration (
-                border: OutlineInputBorder(),
-                labelText: title
-              ),
-            )
+            child: widget,
           )
-        ]
-      )
-      );
-    }
+        ],
+      ),
+    );
+  }
 
-    else if (type == 'number') {
-      return Container (
-        padding: EdgeInsets.only(top: padding, bottom: padding),
-        child: Row (
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Flexible (
-              child: TextFormField (
-                inputFormatters: [ FilteringTextInputFormatter.digitsOnly ],
+  Container entry(String type) {
+    if (type == 'textentry') {
+      return wrapper ( 
+              TextFormField (
                 validator: (value) {
                   if (needsValidation && (value == null || value.isEmpty)) {
-                    return 'Please enter a number';
+                    return 'Please add a value to $title';
                   } return null;
                 },
                 decoration: InputDecoration (
@@ -104,10 +98,37 @@ class RowEntry extends StatelessWidget {
                   labelText: title
                 ),
               )
-            )
-          ]
-        )
       );
+    }
+
+    else if (type == 'number') {
+      return wrapper (
+              TextFormField (
+              inputFormatters: [ FilteringTextInputFormatter.digitsOnly ],
+              validator: (value) {
+                if (needsValidation && (value == null || value.isEmpty)) {
+                  return 'Please enter a number for $title';
+                } return null;
+              },
+              decoration: InputDecoration (
+                border: OutlineInputBorder(),
+                labelText: title
+              ),
+            )
+      );
+    }
+    else if (type == 'string') {
+      return wrapper(Text(message));
+    }
+    else if (type == 'selectbox') {
+      return wrapper(DropdownMenu(dropdownMenuEntries: getMenuEntries(),));
+    }
+    else if (type == 'button') {
+      return wrapper(
+        ElevatedButton (
+          onPressed: null,
+          child: Text(title)
+          ));
     }
     else {
       return Container(child:Row());

@@ -17,6 +17,7 @@ class CreateAssessment extends StatefulWidget {
 
 class _AssessmentState extends State {
   final String userName;
+  final String helpText = "Choose a total number of questions equal to four or five times the number of students in the course to guarantee unique quizzes per student";
   _AssessmentState(this.userName);
 
 
@@ -27,21 +28,21 @@ class _AssessmentState extends State {
       body: Form (
         child: Padding (
           padding: EdgeInsets.all(16),
-          child: Column (
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [ColumnEntry ('Assessment Details', 
+          child: EntryForm ([
+            ColumnEntry ('Assessment Details', 
               [
-                RowEntry('Assessment Name', 'Please Enter a Valid Name', 'string', true),
-                RowEntry('Description', '', 'string', false),
-                RowEntry('Total Multiple Choice Questions', '', 'number', true),
-                RowEntry('Total True / False Questions', '', 'number', true),
-                RowEntry('Total Short Answer Questions', '', 'number', true),
+                RowEntry('Assessment Name', 'Please Enter a Valid Name', 'textentry', true, 100, 500, 10),
+                RowEntry('Description', '', 'textentry', false, 100, 500, 10),
+                RowEntry('Total Multiple Choice Questions', '', 'number', true, 100, 500, 10),
+                RowEntry('Total True / False Questions', '', 'number', true, 100, 500, 10),
+                RowEntry('Total Short Answer Questions', '', 'number', true, 100, 500, 10),
               ]),
               ColumnEntry('Help Text', [
-                RowEntry('Test', '', 'string', false)
+                RowEntry('HelpText', helpText, 'string', false, 100, 500, 10),
+                RowEntry('LLM Service Provider', 'OpenAI,LLAMA,Third Option', 'selectbox', false, 100, 500, 10),
+                RowEntry('Submit', '', 'button', false, 100, 500, 10),
               ])
-            ]
-          )
+          ])
         )
       )
     );
