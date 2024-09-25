@@ -33,6 +33,7 @@ class _AssessmentState extends State {
               [
                 RowEntry('Assessment Name', 'Please Enter a Valid Name', 'textentry', true, 100, 500, 10),
                 RowEntry('Description', '', 'textentry', false, 100, 500, 10),
+                RowEntry('Information Source', '', 'textentry', false, 100, 500, 10),
                 RowEntry('Total Multiple Choice Questions', '', 'number', true, 100, 500, 10),
                 RowEntry('Total True / False Questions', '', 'number', true, 100, 500, 10),
                 RowEntry('Total Short Answer Questions', '', 'number', true, 100, 500, 10),
