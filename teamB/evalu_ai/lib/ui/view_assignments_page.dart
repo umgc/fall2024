@@ -1,23 +1,27 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intelligrade/controller/html_converter.dart';
+import 'package:intelligrade/controller/main_controller.dart';
+import 'package:intelligrade/controller/model/beans.dart'
+    show AssignmentForm, Course, QuestionType, Quiz;
 import 'package:intelligrade/ui/header.dart';
 import 'package:intelligrade/ui/custom_navigation_bar.dart';
-import 'package:intelligrade/controller/main_controller.dart';
-import 'package:intelligrade/controller/model/beans.dart';
 
-import '../controller/html_converter.dart';
+class ViewAssignmentsPage extends StatefulWidget {
+  const ViewAssignmentsPage({super.key});
 
-class DashBoardPage extends StatefulWidget {
-  const DashBoardPage({super.key});
   static MainController controller = MainController();
 
   @override
-  _DashBoardPageState createState() => _DashBoardPageState();
+  _ViewAssignmentsPage createState() => _ViewAssignmentsPage();
 }
 
-class _DashBoardPageState extends State<DashBoardPage> {
+class _ViewAssignmentsPage extends State<ViewAssignmentsPage> {
   List<Quiz?> quizzes = []; // Initialize as an empty list
   bool _isUserLoggedIn = false;
+  String? typeFilterSelection;
 
   @override
   void initState() {
@@ -28,7 +32,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
 
   Future<void> _fetchQuizzes() async {
     try {
-      quizzes = DashBoardPage.controller.listAllAssessments();
+      quizzes = ViewAssignmentsPage.controller.listAllAssessments();
       setState(() {});
     } catch (e) {
       if (kDebugMode) {
@@ -39,7 +43,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
   }
 
   Future<void> _checkUserLoginStatus() async {
-    _isUserLoggedIn = await DashBoardPage.controller.isUserLoggedIn();
+    _isUserLoggedIn = await ViewAssignmentsPage.controller.isUserLoggedIn();
     setState(() {});
   }
 
@@ -87,7 +91,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
                                       setState(() {
                                         isRegenerating = true;
                                       });
-                                      bool result = await DashBoardPage
+                                      bool result = await ViewAssignmentsPage
                                           .controller
                                           .regenerateQuestions(
                                               selectedQuestions, quiz);
@@ -284,7 +288,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
               child: const Text('Save'),
               onPressed: () async {
                 try {
-                  DashBoardPage.controller.updateFileLocally(quiz);
+                  ViewAssignmentsPage.controller.updateFileLocally(quiz);
                   _fetchQuizzes(); // Refresh quiz list
                   Navigator.of(context).pop();
                   _showQuizDetails(quiz);
@@ -335,7 +339,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
 
     if (confirmDelete == true) {
       try {
-        DashBoardPage.controller.deleteLocalFile(filename);
+        ViewAssignmentsPage.controller.deleteLocalFile(filename);
         _fetchQuizzes(); // Refresh quiz list
       } catch (e) {
         if (kDebugMode) {
@@ -347,7 +351,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
 
   void _downloadQuiz(Quiz quiz, bool includeAnswers) async {
     try {
-      await DashBoardPage.controller
+      await ViewAssignmentsPage.controller
           .downloadAssessmentAsPdf(quiz.name ?? '', includeAnswers);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Quiz downloaded successfully')),
@@ -364,7 +368,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
 
   Future<void> _postQuizToMoodle(Quiz quiz) async {
     try {
-      List<Course> courses = await DashBoardPage.controller.getCourses();
+      List<Course> courses = await ViewAssignmentsPage.controller.getCourses();
       String? selectedCourseId = await showDialog<String>(
         context: context,
         builder: (BuildContext context) {
@@ -388,7 +392,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
       );
 
       if (selectedCourseId != null) {
-        await DashBoardPage.controller
+        await ViewAssignmentsPage.controller
             .postAssessmentToMoodle(quiz, selectedCourseId);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Quiz posted to Moodle successfully')),
@@ -407,11 +411,10 @@ class _DashBoardPageState extends State<DashBoardPage> {
   @override
   Widget build(BuildContext context) {
     final int selectedIndex =
-        ModalRoute.of(context)?.settings.arguments as int? ??
-            0; //capture index for nav bar
+        ModalRoute.of(context)?.settings.arguments as int? ?? 0;
     return Scaffold(
         appBar: const AppHeader(
-          title: "Dashboard", //maybe change
+          title: "View Assignments",
         ),
         body: LayoutBuilder(builder: (context, constraints) {
           return Row(
@@ -429,9 +432,62 @@ class _DashBoardPageState extends State<DashBoardPage> {
               quizzes.isEmpty
                   ? Expanded(
                       child: Column(
-                        mainAxisSize: MainAxisSize.max,
+                        //mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          Row(
+                            //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            // ignore: prefer_const_literals_to_create_immutables
+                            children: [
+                              Expanded(
+                                child: SizedBox(
+                                  height: 50,
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextField(
+                                          //onChanged: //_handleSearch,
+                                          decoration: InputDecoration(
+                                            border: OutlineInputBorder(),
+                                            hintText: "Search",
+                                          ),
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.search),
+                                        onPressed: () {
+                                          // Action to perform when the icon is pressed
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8.0), // Optional padding
+                                child: DropdownButton<String>(
+                                  value: typeFilterSelection,
+                                  hint: Text('Select an option'),
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      typeFilterSelection =
+                                          newValue; // Update the selected value
+                                    });
+                                  },
+                                  items: <String>['Quiz', 'Essay', 'Code']
+                                      .map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 100),
                           const Text('No saved exams yet.'),
                           ElevatedButton(
                             onPressed: () {
@@ -447,6 +503,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
+                          const SizedBox(height: 16),
                           Expanded(
                             child: ListView.builder(
                               itemCount: quizzes.length,

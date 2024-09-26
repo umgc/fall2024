@@ -7,7 +7,8 @@ import '../../controller/model/beans.dart';
 
 // Singleton class for Moodle API access.
 class MoodleApiSingleton {
-  static const baseUrl = 'http://18.117.253.110';//'http://100.25.213.47';
+  static const baseUrl =
+      'https://www.swen670moodle.site/'; //'https://www.swen670moodle.site/';//'http://18.117.253.110';//'http://100.25.213.47';
   static const serverUrl = '$baseUrl/webservice/rest/server.php?wstoken=';
   static const jsonFormat = '&moodlewsrestformat=json';
   static const errorKey = 'error';
@@ -34,8 +35,7 @@ class MoodleApiSingleton {
   // Log in to Moodle and retrieve the user token. Throws HttpException if login failed.
   Future<void> login(String username, String password) async {
     final response = await http.get(Uri.parse(
-        '$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app'
-    ));
+        '$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app'));
     Map<String, dynamic> data = jsonDecode(response.body);
     if (response.statusCode != 200) {
       throw HttpException(response.body);
@@ -55,12 +55,13 @@ class MoodleApiSingleton {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
 
     final response = await http.get(Uri.parse(
-        '$serverUrl$_userToken$jsonFormat&wsfunction=core_course_get_courses'
-    ));
+        '$serverUrl$_userToken$jsonFormat&wsfunction=core_course_get_courses'));
     if (response.statusCode != 200) {
       throw HttpException(response.body);
     }
-    List<Course> courses = (jsonDecode(response.body) as List).map((i) => Course.fromJson(i)).toList();
+    List<Course> courses = (jsonDecode(response.body) as List)
+        .map((i) => Course.fromJson(i))
+        .toList();
     return courses;
   }
 
@@ -69,8 +70,7 @@ class MoodleApiSingleton {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
 
     final http.Response response = await http.post(Uri.parse(
-      '$serverUrl$_userToken$jsonFormat&wsfunction=local_quizgen_import_questions&courseid=$courseid&questionxml=$quizXml'
-    ));
+        '$serverUrl$_userToken$jsonFormat&wsfunction=local_quizgen_import_questions&courseid=$courseid&questionxml=$quizXml'));
     if (response.statusCode != 200) {
       throw HttpException(response.body);
     }

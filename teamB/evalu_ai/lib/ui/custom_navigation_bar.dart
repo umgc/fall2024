@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intelligrade/controller/main_controller.dart';
 
 class CustomNavigationBar extends StatefulWidget {
+  final int selectedIndex;
+
   // Change to StatefulWidget
-  const CustomNavigationBar({Key? key}) : super(key: key);
+  const CustomNavigationBar({super.key, required this.selectedIndex});
 
   static MainController controller = MainController();
 
@@ -12,7 +14,13 @@ class CustomNavigationBar extends StatefulWidget {
 }
 
 class _CustomNavigationBarState extends State<CustomNavigationBar> {
-  int _selectedIndex = 0; // Track the selected index
+  late int _selectedIndex; // Track the selected index
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.selectedIndex; // Initialize with the passed index
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +62,7 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
       title: Text(
         title,
         style: TextStyle(
-          color: Colors.black,
+          color: isSelected ? Colors.deepPurple : Colors.black,
         ),
       ),
       leading: Icon(
@@ -72,13 +80,16 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
         // Navigation logic based on selected item
         switch (index) {
           case 0:
-            Navigator.pushReplacementNamed(context, '/dashboard');
+            Navigator.pushReplacementNamed(context, '/dashboard',
+                arguments: index);
             break;
           case 1:
-            Navigator.pushReplacementNamed(context, '/create');
+            Navigator.pushReplacementNamed(context, '/create',
+                arguments: index);
             break;
           case 2:
-            // Add navigation logic for View Assignment here
+            Navigator.pushReplacementNamed(context, '/viewAssignments',
+                arguments: index);
             break;
           case 3:
             // Add navigation logic for Chatbot Assistance here
