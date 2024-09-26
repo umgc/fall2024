@@ -1,34 +1,22 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
-final ColorScheme customColorScheme = ColorScheme(
-  primary: Color(0xFF6A5A99), // Purple color as primary
-  onPrimary: Color(0xFFFFFFFF), // White text on primary
-  primaryContainer: Color(0xFFEDE6FF), // Light lavender
-  onPrimaryContainer: Color(0xFF2D004A), // Dark purple
-  secondary: Color(0xFF6A5A99), // Using similar purple as secondary
-  onSecondary: Colors.white, // White on secondary
-  background: Color(0xFFF5F5F5), // Light grey background
-  onBackground: Colors.black, // Black text on background
-  surface: Color(0xFFFFFFFF), // White surface color
-  onSurface: Colors.black, // Black text on surface
-  error: Colors.red, // Error color red
-  onError: Colors.white, // White on error
-  brightness: Brightness.light, // Light mode
-);
-
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: true, // Keeps the debug banner for now
-      home: TeacherDashboard(),
+      home: const TeacherDashboard(),
       theme: ThemeData(
-        colorScheme: customColorScheme, // Apply the custom color scheme
-        useMaterial3: true, // If you want to use Material 3 design
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF6A5A99), // Custom primary color
+        ),
       ),
       title: 'Learning Lens',
     );
@@ -36,35 +24,35 @@ class MyApp extends StatelessWidget {
 }
 
 class TeacherDashboard extends StatelessWidget {
+  const TeacherDashboard({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Learning Lens'),
-        backgroundColor: Theme.of(context)
-            .colorScheme
-            .primaryContainer, // Use primary container color
+        title: const Text('Learning Lens'),
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         actions: [
           IconButton(
-            icon: Icon(Icons.account_circle,
-                color: Theme.of(context).colorScheme.onPrimaryContainer),
+            icon: Icon(
+              Icons.account_circle,
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
+            ),
             onPressed: () {
               // Handle profile/account actions here
             },
           ),
         ],
       ),
-      backgroundColor: Theme.of(context)
-          .colorScheme
-          .background, // Use background color from scheme
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth > 600) {
             // Large screen (desktop or large tablet)
-            return _buildDesktopLayout(context);
+            return _buildDesktopLayout(context, constraints);
           } else {
             // Small screen (mobile)
-            return _buildMobileLayout(context);
+            return _buildMobileLayout(context, constraints);
           }
         },
       ),
@@ -72,69 +60,80 @@ class TeacherDashboard extends StatelessWidget {
   }
 
   // Desktop layout
-  Widget _buildDesktopLayout(BuildContext context) {
+  Widget _buildDesktopLayout(BuildContext context, BoxConstraints constraints) {
+    final double screenWidth = constraints.maxWidth;
+
+    // Base sizes for left and right buttons
+    double baseButtonSize = screenWidth * 0.15;
+    double baseButtonFontSize = screenWidth * 0.015;
+    double baseDescriptionFontSize = screenWidth * 0.015;
+
+    // Sizes for the middle button (larger than others)
+    double middleButtonSize = baseButtonSize * 1.2; // 20% larger
+    double middleButtonFontSize = baseButtonFontSize * 1.2;
+    double middleDescriptionFontSize = baseDescriptionFontSize * 1.1;
+
+    // Clamp the sizes to reasonable minimum and maximum values
+    baseButtonSize = baseButtonSize.clamp(80.0, 150.0);
+    baseButtonFontSize = baseButtonFontSize.clamp(12.0, 18.0);
+    baseDescriptionFontSize = baseDescriptionFontSize.clamp(12.0, 18.0);
+
+    middleButtonSize = middleButtonSize.clamp(96.0, 180.0);
+    middleButtonFontSize = middleButtonFontSize.clamp(14.0, 20.0);
+    middleDescriptionFontSize = middleDescriptionFontSize.clamp(13.0, 20.0);
+
+    // Title font size
+    double titleFontSize = screenWidth * 0.03;
+    titleFontSize = titleFontSize.clamp(20.0, 32.0);
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
               'Teacher Dashboard',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: titleFontSize,
                 fontWeight: FontWeight.normal,
-                color: Theme.of(context).colorScheme.onBackground,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
-            SizedBox(height: 40), // Space between the title and buttons
+            const SizedBox(height: 40),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Column(
-                  children: [
-                    Text(
-                      'Teacher can view available courses here.',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).colorScheme.onBackground,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    _buildDashboardButton(
-                        context, 'Courses', 150), // Smaller button
-                  ],
+                // Left button
+                _buildResponsiveColumn(
+                  context,
+                  'Teacher can view available courses here.',
+                  'Courses',
+                  baseDescriptionFontSize,
+                  baseButtonSize,
+                  baseButtonFontSize,
                 ),
-                SizedBox(width: 20),
-                Column(
-                  children: [
-                    Text(
-                      'Teacher creates/views assessments.',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).colorScheme.onBackground,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    _buildDashboardButton(
-                        context, 'Assessments', 180), // Larger middle button
-                  ],
+                SizedBox(width: screenWidth * 0.02), // 2% of screen width
+
+                // Middle button (larger)
+                _buildResponsiveColumn(
+                  context,
+                  'Teacher creates/views assessments.',
+                  'Assessments',
+                  middleDescriptionFontSize,
+                  middleButtonSize,
+                  middleButtonFontSize,
                 ),
-                SizedBox(width: 20),
-                Column(
-                  children: [
-                    Text(
-                      'Teacher can view, grade, and create essays.',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).colorScheme.onBackground,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    _buildDashboardButton(
-                        context, 'Essays', 150), // Smaller button
-                  ],
+                SizedBox(width: screenWidth * 0.02),
+
+                // Right button
+                _buildResponsiveColumn(
+                  context,
+                  'Teacher can view, grade, and create essays.',
+                  'Essays',
+                  baseDescriptionFontSize,
+                  baseButtonSize,
+                  baseButtonFontSize,
                 ),
               ],
             ),
@@ -145,107 +144,156 @@ class TeacherDashboard extends StatelessWidget {
   }
 
   // Mobile layout
-  Widget _buildMobileLayout(BuildContext context) {
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'Teacher Dashboard',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.normal,
-                color: Theme.of(context).colorScheme.onBackground,
+  Widget _buildMobileLayout(BuildContext context, BoxConstraints constraints) {
+    final double screenWidth = constraints.maxWidth;
+
+    // Base sizes for buttons
+    double baseButtonSize = screenWidth * 0.4;
+    double baseButtonFontSize = screenWidth * 0.045;
+    double baseDescriptionFontSize = screenWidth * 0.04;
+
+    // Sizes for the middle button (larger than others)
+    double middleButtonSize = baseButtonSize * 1.1; // 10% larger
+    double middleButtonFontSize = baseButtonFontSize * 1.1;
+    double middleDescriptionFontSize = baseDescriptionFontSize * 1.05;
+
+    // Clamp the sizes to reasonable minimum and maximum values
+    baseButtonSize = baseButtonSize.clamp(80.0, 140.0);
+    baseButtonFontSize = baseButtonFontSize.clamp(12.0, 16.0);
+    baseDescriptionFontSize = baseDescriptionFontSize.clamp(12.0, 16.0);
+
+    middleButtonSize = middleButtonSize.clamp(88.0, 154.0);
+    middleButtonFontSize = middleButtonFontSize.clamp(13.0, 18.0);
+    middleDescriptionFontSize = middleDescriptionFontSize.clamp(13.0, 17.0);
+
+    // Title font size
+    double titleFontSize = screenWidth * 0.06;
+    titleFontSize = titleFontSize.clamp(18.0, 24.0);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Teacher Dashboard',
+                style: TextStyle(
+                  fontSize: titleFontSize,
+                  fontWeight: FontWeight.normal,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
-            ),
-            SizedBox(height: 20), // Space between the title and buttons
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Column(
-                  children: [
-                    Text(
-                      'View available courses.',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).colorScheme.onBackground,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    _buildDashboardButton(
-                        context, 'Courses', 120), // Smaller for mobile
-                  ],
-                ),
-                SizedBox(height: 20),
-                Column(
-                  children: [
-                    Text(
-                      'Create or view assessments.',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).colorScheme.onBackground,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    _buildDashboardButton(context, 'Assessments',
-                        140), // Adjust button size for mobile
-                  ],
-                ),
-                SizedBox(height: 20),
-                Column(
-                  children: [
-                    Text(
-                      'View or grade essays.',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).colorScheme.onBackground,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    _buildDashboardButton(
-                        context, 'Essays', 120), // Adjust for mobile
-                  ],
-                ),
-              ],
-            ),
-          ],
+              const SizedBox(height: 20),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // First button
+                  _buildResponsiveColumn(
+                    context,
+                    'View available courses.',
+                    'Courses',
+                    baseDescriptionFontSize,
+                    baseButtonSize,
+                    baseButtonFontSize,
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Middle button (larger)
+                  _buildResponsiveColumn(
+                    context,
+                    'Create or view assessments.',
+                    'Assessments',
+                    middleDescriptionFontSize,
+                    middleButtonSize,
+                    middleButtonFontSize,
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Third button
+                  _buildResponsiveColumn(
+                    context,
+                    'View or grade essays.',
+                    'Essays',
+                    baseDescriptionFontSize,
+                    baseButtonSize,
+                    baseButtonFontSize,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
+  // Responsive Column for both layouts
+  Widget _buildResponsiveColumn(
+    BuildContext context,
+    String description,
+    String title,
+    double descriptionFontSize,
+    double buttonSize,
+    double buttonFontSize,
+  ) {
+    return Column(
+      children: [
+        SizedBox(
+          width: buttonSize * 1.5, // Ensure text doesn't overflow
+          child: Text(
+            description,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: descriptionFontSize,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        _buildDashboardButton(
+          context,
+          title,
+          buttonSize,
+          buttonFontSize,
+        ),
+      ],
+    );
+  }
+
   // Widget to build circular buttons
   Widget _buildDashboardButton(
-      BuildContext context, String title, double size) {
+    BuildContext context,
+    String title,
+    double size,
+    double fontSize,
+  ) {
     return Container(
-      height: size, // Dynamic size based on parameter
+      height: size,
       width: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white, // Outer white border color
         boxShadow: [
           BoxShadow(
-            color: Colors.grey[500]!, // Medium grey shadow around white border
-            offset: Offset(4, 4),
+            color: Colors.grey[500]!,
+            offset: const Offset(4, 4),
             blurRadius: 15,
             spreadRadius: 1,
           ),
         ],
       ),
       child: Container(
-        margin: EdgeInsets.all(10), // Space for white border
+        margin: EdgeInsets.all(size * 0.1), // Adjusted for responsive border
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Theme.of(context)
-              .colorScheme
-              .primary, // Inner purple circle using primary color
+          color: Theme.of(context).colorScheme.primary,
           boxShadow: [
             BoxShadow(
-              color: Colors.grey[600]!, // Grey shadow for inner circle
-              offset: Offset(4, 4),
+              color: Colors.grey[600]!,
+              offset: const Offset(4, 4),
               blurRadius: 10,
               spreadRadius: 1,
             ),
@@ -256,20 +304,20 @@ class TeacherDashboard extends StatelessWidget {
             // Add button functionality here
           },
           style: ElevatedButton.styleFrom(
-            shape: CircleBorder(),
+            shape: const CircleBorder(),
             backgroundColor: Colors.transparent,
-            padding:
-                EdgeInsets.all(24), // Transparent to show purple background
-            shadowColor: Colors.transparent, // No additional shadow
+            padding: EdgeInsets.all(size * 0.15), // Responsive padding
+            shadowColor: Colors.transparent,
           ),
-          child: Text(
-            title,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context)
-                  .colorScheme
-                  .onPrimary, // Use onPrimary for text color
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
             ),
           ),
         ),
