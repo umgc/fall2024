@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:namer_app/Views/essay_edit_page.dart';
+import 'Views/dashboard.dart';
+import 'Views/essay_edit_page.dart';
 import 'Views/course_content.dart';
 import 'Views/essay_generation.dart';
 
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         '/Content': (context) => ViewCourseContents('Test Course'),
         '/EssayGenerationPage': (context) => EssayGeneration(title: 'Essay Generation'),
         // '/create': (context) => const CreatePage(),
+        '/dashboard': (context) => TeacherDashboard(),
         // '/viewExams': (context) => const ViewExamPage(),
         // '/settings': (context) => Setting(themeModeNotifier: _themeModeNotifier)
       },
@@ -80,6 +82,14 @@ class _DevLaunch extends State {
                   context,
                   MaterialPageRoute(
                       builder: (context) => EssayGeneration(title: 'Essay Generation')),
+                  );
+              }),
+          ElevatedButton(
+              child: const Text('Teacher Dashboard'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => TeacherDashboard()),
                 );
               })
         ]));
