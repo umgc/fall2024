@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'Views/dashboard.dart';
 import 'Views/essay_edit_page.dart';
 import 'Views/course_content.dart';
+import 'Views/send_essay_to_moodle.dart';
 
 void main() {
   runApp(MyApp());
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
         '/EssayEditPage': (context) => EssayEditPage(),
         '/Content': (context) => ViewCourseContents('Test Course'),
         '/dashboard': (context) => TeacherDashboard(),
+        '/send_essay_to_moodle': (context) => EssayAssignmentSettings(),
         // '/viewExams': (context) => const ViewExamPage(),
         // '/settings': (context) => Setting(themeModeNotifier: _themeModeNotifier)
       },
@@ -78,6 +80,15 @@ class _DevLaunch extends State {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => TeacherDashboard()),
+                );
+              }),
+          ElevatedButton(
+              child: const Text('Send essay to Moodle'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => EssayAssignmentSettings()),
                 );
               })
         ]));
