@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
         '/EssayEditPage': (context) => EssayEditPage(),
         '/Content': (context) => ViewCourseContents('Test Course'),
         '/EssayGenerationPage': (context) => EssayGeneration(title: 'Essay Generation'),
-        '/QuizGenerationPage': (context) => quiz_generator('Tester'),
+        '/QuizGenerationPage': (context) => CreateAssessment('Tester'),
         // '/create': (context) => const CreatePage(),
         '/dashboard': (context) => TeacherDashboard(),
         // '/viewExams': (context) => const ViewExamPage(),
@@ -99,18 +99,10 @@ class _DevLaunch extends State {
               onPressed: () {
                 Navigator.push( 
                   context, 
-                  MaterialPageRoute(builder: (context) => quiz_generator())
-                )
+                  MaterialPageRoute(builder: (context) => CreateAssessment('Tester'))
+                );
               },
             )
-              child: const Text('Open Essay Generator'),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CreateAssessment("Johnny Test")),
-                  );
-            })
         ]));
   }
 }

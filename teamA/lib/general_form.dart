@@ -58,16 +58,6 @@ class RowEntry extends StatelessWidget {
           );
   }
 
-  List<DropdownMenuEntry> getMenuEntries() {
-    final splitList = message.split(',');
-    List<DropdownMenuEntry> entries = <DropdownMenuEntry>[];
-    for (String entry in splitList) {
-      print(entry);
-      entries.add(DropdownMenuEntry(value: entry, label: entry));
-    }
-    return entries;
-  }
-
   Container wrapper(Widget widget) {
     return Container (
       padding: EdgeInsets.only(top: padding, bottom: padding),
@@ -121,7 +111,20 @@ class RowEntry extends StatelessWidget {
       return wrapper(Text(message));
     }
     else if (type == 'selectbox') {
-      return wrapper(DropdownMenu(dropdownMenuEntries: getMenuEntries(),));
+      List<String> values = message.split(',');
+      String dropdownValue = values.first;
+      return wrapper(DropdownButton( 
+        onChanged: (String? value) {
+            dropdownValue = value!;
+        },
+        value: dropdownValue,
+        items: values.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String> (
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+      ));
     }
     else if (type == 'button') {
       return wrapper(
