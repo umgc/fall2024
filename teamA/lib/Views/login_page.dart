@@ -157,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen>
             // Login Button
             ElevatedButton(
               onPressed: () async {
-                var wasSuccessful = await LoginScreen.controller.log
+                var wasSuccessful = await LoginScreen.controller.loginToMoodle
                 (
                   _usernameController.text,
                   _passwordController.text,

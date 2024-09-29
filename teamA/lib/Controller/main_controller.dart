@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import '../Api/moodle_api_singleton';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:html' as html;
+import 'beans.dart';
 
 class MainController 
 {
@@ -61,7 +62,8 @@ class MainController
     }
   }
 
-  Future<bool> isUserLoggedIn() async {
+  Future<bool> isUserLoggedIn() async 
+  {
     return isLoggedIn;
   }
 }
