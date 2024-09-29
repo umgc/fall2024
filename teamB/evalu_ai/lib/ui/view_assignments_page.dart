@@ -435,57 +435,140 @@ class _ViewAssignmentsPage extends State<ViewAssignmentsPage> {
                         //mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Row(
-                            //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            // ignore: prefer_const_literals_to_create_immutables
-                            children: [
-                              Expanded(
-                                child: SizedBox(
-                                  height: 50,
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: TextField(
-                                          //onChanged: //_handleSearch,
-                                          decoration: InputDecoration(
-                                            border: OutlineInputBorder(),
-                                            hintText: "Search",
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.black, // Border color
+                                width: 1, // Border width
+                              ),
+                              borderRadius:
+                                  BorderRadius.circular(60), // Circular border
+                            ),
+                            padding: EdgeInsets.all(
+                                16), // Padding inside the container
+                            child: Row(
+                              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              // ignore: prefer_const_literals_to_create_immutables
+                              children: [
+                                Expanded(
+                                  child: SizedBox(
+                                    height: 50,
+                                    child: Row(
+                                      // ignore: prefer_const_literals_to_create_immutables
+                                      children: [
+                                        Expanded(
+                                          child: TextField(
+                                            //onChanged: //_handleSearch,
+                                            decoration: InputDecoration(
+                                              border: OutlineInputBorder(),
+                                              hintText: "Search",
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      IconButton(
-                                        icon: Icon(Icons.search),
-                                        onPressed: () {
-                                          // Action to perform when the icon is pressed
-                                        },
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 8.0), // Optional padding
-                                child: DropdownButton<String>(
-                                  value: typeFilterSelection,
-                                  hint: Text('Select an option'),
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      typeFilterSelection =
-                                          newValue; // Update the selected value
-                                    });
-                                  },
-                                  items: <String>['Quiz', 'Essay', 'Code']
-                                      .map<DropdownMenuItem<String>>(
-                                          (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
+                                SizedBox(width: 20),
+                                Padding(
+                                  //filter dropdown types
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 8.0), // Optional padding
+                                  child: DropdownButton<String>(
+                                    value: typeFilterSelection,
+                                    hint: Text('Type'),
+                                    onChanged: (String? newValue) {
+                                      setState(() {
+                                        typeFilterSelection =
+                                            newValue; // Update the selected value
+                                      });
+                                    },
+                                    items: <String>['Quiz', 'Essay', 'Code']
+                                        .map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(value),
+                                      );
+                                    }).toList(),
+                                  ),
                                 ),
-                              ),
-                            ],
+                                SizedBox(width: 20),
+                                Padding(
+                                  //filter dropdown for subject
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 8.0), // Optional padding
+                                  child: DropdownButton<String>(
+                                    value: typeFilterSelection,
+                                    hint: Text('Subject'),
+                                    onChanged: (String? newValue) {
+                                      setState(() {
+                                        typeFilterSelection =
+                                            newValue; // Update the selected value
+                                      });
+                                    },
+                                    items: <String>[
+                                      'Math',
+                                      'Chemistry',
+                                      'Biology',
+                                      'Computer Science',
+                                      'Literature',
+                                      'History',
+                                      'Language Arts',
+                                    ].map<DropdownMenuItem<String>>(
+                                        (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(value),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                                SizedBox(width: 20),
+                                Padding(
+                                  //filter dropdown for status
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 8.0), // Optional padding
+                                  child: DropdownButton<String>(
+                                    value: typeFilterSelection,
+                                    hint: Text('Status'),
+                                    onChanged: (String? newValue) {
+                                      setState(() {
+                                        typeFilterSelection =
+                                            newValue; // Update the selected value
+                                      });
+                                    },
+                                    items: <String>[
+                                      'In-progress',
+                                      'Completed',
+                                      'Not Submitted',
+                                      'Not Finalized',
+                                      'Submitted',
+                                      'Finalized',
+                                    ].map<DropdownMenuItem<String>>(
+                                        (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(value),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                                SizedBox(width: 20),
+                                CircleAvatar(
+                                  backgroundColor: Colors
+                                      .deepPurple[200], // Background color
+                                  child: IconButton(
+                                    icon: Icon(Icons.search),
+                                    color: Colors.deepPurple,
+                                    onPressed: () {
+                                      // Action to perform when the icon is pressed
+                                    },
+                                  ),
+                                ),
+                                Spacer(),
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 100),
                           const Text('No saved exams yet.'),
