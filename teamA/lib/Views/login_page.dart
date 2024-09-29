@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '/controller/main_controller.dart';
+import '../main.dart';
+import '../Views/dashboard.dart';
 
 class LoginApp extends StatelessWidget 
 {
@@ -157,13 +159,12 @@ class _LoginScreenState extends State<LoginScreen>
             // Login Button
             ElevatedButton(
               onPressed: () async {
-                var wasSuccessful = await LoginScreen.controller.loginToMoodle
-                (
-                  _usernameController.text,
-                  _passwordController.text,
-                );
+                var wasSuccessful = await LoginScreen.controller.loginToMoodle(_usernameController.text, _passwordController.text);
                 if (wasSuccessful) {
-                  Navigator.pushReplacementNamed(context, '/viewExams');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => TeacherDashboard())
+                );
                 } else {
                   _showLoginFailedDialog();
                 }

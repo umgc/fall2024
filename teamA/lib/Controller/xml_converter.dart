@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:intelligrade/controller/html_converter.dart';
+import 'html_converter.dart';
 import 'package:xml/xml.dart';
 
 import 'beans.dart';

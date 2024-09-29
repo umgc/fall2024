@@ -2,13 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-
-import '../../controller/model/beans.dart';
+import 'package:namer_app/Controller/beans.dart';
 
 // Singleton class for Moodle API access.
 class MoodleApiSingleton 
 {
-  static const baseUrl = 'https://swen670moodle.site';
+  static const baseUrl = 'https://www.swen670moodle.site';
   static const serverUrl = '$baseUrl/webservice/rest/server.php?wstoken=';
   static const jsonFormat = '&moodlewsrestformat=json';
   static const errorKey = 'error';
