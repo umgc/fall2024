@@ -121,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
             TextField(
               decoration: InputDecoration(
                 labelText: 'Moodle URL',
-                hintText: 'https://moodle.example.com',
+                hintText: 'https://www.swen670moodle.site/',
                 border: const OutlineInputBorder(),
 
                 // Input field background
