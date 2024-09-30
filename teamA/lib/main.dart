@@ -4,6 +4,8 @@ import 'Views/dashboard.dart';
 import 'Views/essay_edit_page.dart';
 import 'Views/course_content.dart';
 import 'Views/send_essay_to_moodle.dart';
+import 'Views/essay_generation.dart';
+import 'Views/quiz_generator.dart';
 
 void main() {
   runApp(MyApp());
@@ -35,6 +37,10 @@ class MyApp extends StatelessWidget {
       routes: {
         '/EssayEditPage': (context) => EssayEditPage(),
         '/Content': (context) => ViewCourseContents('Test Course'),
+        '/EssayGenerationPage': (context) =>
+            EssayGeneration(title: 'Essay Generation'),
+        '/QuizGenerationPage': (context) => CreateAssessment('Tester'),
+        // '/create': (context) => const CreatePage(),
         '/dashboard': (context) => TeacherDashboard(),
         '/send_essay_to_moodle': (context) => EssayAssignmentSettings(),
         // '/viewExams': (context) => const ViewExamPage(),
@@ -75,6 +81,16 @@ class _DevLaunch extends State {
                 );
               }),
           ElevatedButton(
+              child: const Text('Open Essay Generation'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          EssayGeneration(title: 'Essay Generation')),
+                );
+              }),
+          ElevatedButton(
               child: const Text('Teacher Dashboard'),
               onPressed: () {
                 Navigator.push(
@@ -90,7 +106,16 @@ class _DevLaunch extends State {
                   MaterialPageRoute(
                       builder: (context) => EssayAssignmentSettings()),
                 );
-              })
+              }),
+          ElevatedButton(
+            child: const Text('Quiz Generator'),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => CreateAssessment('Tester')));
+            },
+          )
         ]));
   }
 }

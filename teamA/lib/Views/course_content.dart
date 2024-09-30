@@ -33,16 +33,16 @@ class _CourseState extends State{
       body: 
         SingleChildScrollView(
           child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Text(courseName, style: TextStyle(fontSize: 64),),
-            ContentCarousel('assessment'),
-            ContentCarousel('essay'),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [CreateButton('assessment'), CreateButton('essay')]
-            )
-          ],
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Text(courseName, style: TextStyle(fontSize: 64),),
+              ContentCarousel('assessment'),
+              ContentCarousel('essay'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [CreateButton('assessment'), CreateButton('essay')]
+              )
+            ],
         )
       )
     );

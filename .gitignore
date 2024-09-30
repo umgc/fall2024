@@ -25,16 +25,5 @@ doc/api/
 
 .flutter-plugins
 .flutter-plugins-dependencies
-Intelligrade/TeamB/IntelliGrade/ios/Runner.xcodeproj/project.pbxproj
-Intelligrade/TeamB/IntelliGrade/ios/Runner.xcodeproj/project.xcworkspace/contents.xcworkspacedata
-Intelligrade/TeamB/IntelliGrade/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
-Intelligrade/TeamB/IntelliGrade/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
-Intelligrade/TeamB/IntelliGrade/ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme
-Intelligrade/TeamB/IntelliGrade/ios/Runner.xcworkspace/contents.xcworkspacedata
-Intelligrade/TeamB/IntelliGrade/ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
-Intelligrade/TeamB/IntelliGrade/ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
-Intelligrade/TeamB/IntelliGrade/macos/Runner.xcodeproj/project.pbxproj
-Intelligrade/TeamB/IntelliGrade/macos/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
-Intelligrade/TeamB/IntelliGrade/macos/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme
-Intelligrade/TeamB/IntelliGrade/macos/Runner.xcworkspace/contents.xcworkspacedata
-Intelligrade/TeamB/IntelliGrade/macos/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+Intelligrade/TeamB/IntelliGrade/ios/Runner*
+.vs/*
