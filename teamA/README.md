@@ -1,4 +1,4 @@
-# my_apps
+# namer_app
 
 A new Flutter project.
 

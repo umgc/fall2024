@@ -1,6 +1,6 @@
 {
-    "name": "my_apps",
-    "short_name": "my_apps",
+    "name": "namer_app",
+    "short_name": "namer_app",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
