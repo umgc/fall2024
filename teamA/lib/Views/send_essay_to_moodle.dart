@@ -5,20 +5,6 @@ void main() {
   runApp(MyApp());
 }
 
-const ColorScheme customColorScheme = ColorScheme(
-  primary: Color(0xFF6A5A99), // Purple color as primary
-  onPrimary: Color(0xFFFFFFFF), // White text on primary
-  primaryContainer: Color(0xFFEDE6FF), // Light lavender
-  onPrimaryContainer: Color(0xFF2D004A), // Dark purple
-  secondary: Color(0xFF6A5A99), // Using similar purple as secondary
-  onSecondary: Colors.white, // Black text on background
-  surface: Color(0xFFFFFFFF), // White surface color
-  onSurface: Colors.black, // Black text on surface
-  error: Colors.red, // Error color red
-  onError: Colors.white, // White on error
-  brightness: Brightness.light, // Light mode
-);
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -26,7 +12,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false, // Removed the debug banner
       home: EssayAssignmentSettings(),
       theme: ThemeData(
-        colorScheme: customColorScheme, // Apply the custom color scheme
         useMaterial3: true, // Using Material 3 design
       ),
       title: 'Learning Lens',
@@ -41,12 +26,31 @@ class EssayAssignmentSettings extends StatefulWidget {
 }
 
 class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
-  // Date selection variables
-  String selectedDay = '01';
-  String selectedMonth = 'January';
-  String selectedYear = '2024';
-  String selectedHour = '00';
-  String selectedMinute = '00';
+  // Date selection variables for "Allow submissions from"
+  String selectedDaySubmission = '01';
+  String selectedMonthSubmission = 'January';
+  String selectedYearSubmission = '2024';
+  String selectedHourSubmission = '00';
+  String selectedMinuteSubmission = '00';
+
+  // Date selection variables for "Due date"
+  String selectedDayDue = '01';
+  String selectedMonthDue = 'January';
+  String selectedYearDue = '2024';
+  String selectedHourDue = '00';
+  String selectedMinuteDue = '00';
+
+  // Date selection variables for "Remind me to grade by"
+  String selectedDayRemind = '01';
+  String selectedMonthRemind = 'January';
+  String selectedYearRemind = '2024';
+  String selectedHourRemind = '00';
+  String selectedMinuteRemind = '00';
+
+  // Checkbox states
+  bool isSubmissionEnabled = true;
+  bool isDueDateEnabled = true;
+  bool isRemindEnabled = true;
 
   List<String> days =
       List.generate(31, (index) => (index + 1).toString().padLeft(2, '0'));
@@ -88,22 +92,22 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
             .primaryContainer, // Use primary container color
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(14.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Page Title Centered Below the AppBar
             Center(
               child: Padding(
-                padding: const EdgeInsets.only(top: 16.0),
+                padding: const EdgeInsets.only(top: 14.0),
                 child: Text(
                   'Send Essay to Moodle',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
               ),
             ),
-            SizedBox(height: 32),
+            SizedBox(height: 20),
 
             // Course Name
             SectionTitle(title: 'General'),
@@ -114,7 +118,7 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 12),
 
             // Assignment Name
             TextField(
@@ -124,12 +128,12 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 12),
 
             // Description with Quill Rich Text Editor
             SectionTitle(title: 'Description'),
             Container(
-              height: 300, // Increased height for better usability
+              height: 250, // Increased height for better usability
               padding: EdgeInsets.all(8.0),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
@@ -143,50 +147,154 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                   Expanded(
                     child: quill.QuillEditor(
                       controller: _quillController,
-                      //  readOnly:false, // Enable editing
                       scrollController: ScrollController(),
                       focusNode: FocusNode(),
-                      // autoFocus: false,
-                      // expands: false,
-                      // padding: EdgeInsets.zero,
                     ),
                   ),
                 ],
               ),
             ),
 
-            SizedBox(height: 32),
+            SizedBox(height: 20),
 
             // Availability
             SectionTitle(title: 'Availability'),
-            SizedBox(height: 16),
+            SizedBox(height: 14),
+
+            // Allow submissions from
             Row(
               children: [
-                Checkbox(value: true, onChanged: (value) {}),
+                Checkbox(
+                  value: isSubmissionEnabled,
+                  onChanged: (value) {
+                    setState(() {
+                      isSubmissionEnabled = value!;
+                    });
+                  },
+                ),
                 Text('Enable'),
                 SizedBox(width: 10),
-                _buildDropdown('Allow submissions from'),
+                _buildDropdown(
+                    'Allow submissions from',
+                    selectedDaySubmission,
+                    selectedMonthSubmission,
+                    selectedYearSubmission,
+                    selectedHourSubmission,
+                    selectedMinuteSubmission,
+                    isSubmissionEnabled, (String? newValue) {
+                  setState(() {
+                    selectedDaySubmission = newValue!;
+                  });
+                }, (String? newValue) {
+                  setState(() {
+                    selectedMonthSubmission = newValue!;
+                  });
+                }, (String? newValue) {
+                  setState(() {
+                    selectedYearSubmission = newValue!;
+                  });
+                }, (String? newValue) {
+                  setState(() {
+                    selectedHourSubmission = newValue!;
+                  });
+                }, (String? newValue) {
+                  setState(() {
+                    selectedMinuteSubmission = newValue!;
+                  });
+                }),
               ],
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 14),
+
+            // Due date
             Row(
               children: [
-                Checkbox(value: true, onChanged: (value) {}),
+                Checkbox(
+                  value: isDueDateEnabled,
+                  onChanged: (value) {
+                    setState(() {
+                      isDueDateEnabled = value!;
+                    });
+                  },
+                ),
                 Text('Enable'),
                 SizedBox(width: 10),
-                _buildDropdown('Due date'),
+                _buildDropdown(
+                    'Due date',
+                    selectedDayDue,
+                    selectedMonthDue,
+                    selectedYearDue,
+                    selectedHourDue,
+                    selectedMinuteDue,
+                    isDueDateEnabled, (String? newValue) {
+                  setState(() {
+                    selectedDayDue = newValue!;
+                  });
+                }, (String? newValue) {
+                  setState(() {
+                    selectedMonthDue = newValue!;
+                  });
+                }, (String? newValue) {
+                  setState(() {
+                    selectedYearDue = newValue!;
+                  });
+                }, (String? newValue) {
+                  setState(() {
+                    selectedHourDue = newValue!;
+                  });
+                }, (String? newValue) {
+                  setState(() {
+                    selectedMinuteDue = newValue!;
+                  });
+                }),
               ],
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 14),
+
+            // Remind me to grade by
             Row(
               children: [
-                Checkbox(value: true, onChanged: (value) {}),
+                Checkbox(
+                  value: isRemindEnabled,
+                  onChanged: (value) {
+                    setState(() {
+                      isRemindEnabled = value!;
+                    });
+                  },
+                ),
                 Text('Enable'),
                 SizedBox(width: 10),
-                _buildDropdown('Remind me to grade by'),
+                _buildDropdown(
+                    'Remind me to grade by',
+                    selectedDayRemind,
+                    selectedMonthRemind,
+                    selectedYearRemind,
+                    selectedHourRemind,
+                    selectedMinuteRemind,
+                    isRemindEnabled, (String? newValue) {
+                  setState(() {
+                    selectedDayRemind = newValue!;
+                  });
+                }, (String? newValue) {
+                  setState(() {
+                    selectedMonthRemind = newValue!;
+                  });
+                }, (String? newValue) {
+                  setState(() {
+                    selectedYearRemind = newValue!;
+                  });
+                }, (String? newValue) {
+                  setState(() {
+                    selectedHourRemind = newValue!;
+                  });
+                }, (String? newValue) {
+                  setState(() {
+                    selectedMinuteRemind = newValue!;
+                  });
+                }),
               ],
             ),
-            SizedBox(height: 32),
+            SizedBox(height: 20),
 
             // Two Buttons at the Bottom
             Row(
@@ -212,43 +320,37 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
     );
   }
 
-  // Dropdown Builder
-  Widget _buildDropdown(String label) {
+  // Dropdown Builder for each section
+  Widget _buildDropdown(
+      String label,
+      String selectedDay,
+      String selectedMonth,
+      String selectedYear,
+      String selectedHour,
+      String selectedMinute,
+      bool isEnabled,
+      ValueChanged<String?> onDayChanged,
+      ValueChanged<String?> onMonthChanged,
+      ValueChanged<String?> onYearChanged,
+      ValueChanged<String?> onHourChanged,
+      ValueChanged<String?> onMinuteChanged) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label),
         Row(
           children: [
-            _buildDropdownButton(days, selectedDay, (String? newValue) {
-              setState(() {
-                selectedDay = newValue!;
-              });
-            }),
+            _buildDropdownButton(days, selectedDay, onDayChanged, isEnabled),
             SizedBox(width: 8),
-            _buildDropdownButton(months, selectedMonth, (String? newValue) {
-              setState(() {
-                selectedMonth = newValue!;
-              });
-            }),
+            _buildDropdownButton(
+                months, selectedMonth, onMonthChanged, isEnabled),
             SizedBox(width: 8),
-            _buildDropdownButton(years, selectedYear, (String? newValue) {
-              setState(() {
-                selectedYear = newValue!;
-              });
-            }),
+            _buildDropdownButton(years, selectedYear, onYearChanged, isEnabled),
             SizedBox(width: 8),
-            _buildDropdownButton(hours, selectedHour, (String? newValue) {
-              setState(() {
-                selectedHour = newValue!;
-              });
-            }),
+            _buildDropdownButton(hours, selectedHour, onHourChanged, isEnabled),
             SizedBox(width: 8),
-            _buildDropdownButton(minutes, selectedMinute, (String? newValue) {
-              setState(() {
-                selectedMinute = newValue!;
-              });
-            }),
+            _buildDropdownButton(
+                minutes, selectedMinute, onMinuteChanged, isEnabled),
           ],
         ),
       ],
@@ -257,10 +359,11 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
 
   // Dropdown Button Builder
   Widget _buildDropdownButton(List<String> items, String selectedValue,
-      ValueChanged<String?> onChanged) {
+      ValueChanged<String?> onChanged, bool isEnabled) {
     return DropdownButton<String>(
       value: selectedValue,
-      onChanged: onChanged,
+      onChanged:
+          isEnabled ? onChanged : null, // Disable dropdown if not enabled
       items: items.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
