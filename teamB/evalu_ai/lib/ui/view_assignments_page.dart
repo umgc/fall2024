@@ -460,7 +460,9 @@ class _ViewAssignmentsPage extends State<ViewAssignmentsPage> {
                                           child: TextField(
                                             //onChanged: //_handleSearch,
                                             decoration: InputDecoration(
-                                              border: OutlineInputBorder(),
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(50),
+                                              ),
                                               hintText: "Search",
                                             ),
                                           ),
@@ -566,11 +568,10 @@ class _ViewAssignmentsPage extends State<ViewAssignmentsPage> {
                                     },
                                   ),
                                 ),
-                                Spacer(),
                               ],
                             ),
                           ),
-                          const SizedBox(height: 100),
+                          const SizedBox(height: 300),
                           const Text('No saved exams yet.'),
                           ElevatedButton(
                             onPressed: () {
@@ -579,6 +580,7 @@ class _ViewAssignmentsPage extends State<ViewAssignmentsPage> {
                             },
                             child: const Text('Create Exam'),
                           ),
+                          const SizedBox(height: 400),
                         ],
                       ),
                     )
