@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'essay_generation.dart';
+import 'quiz_generator.dart';
+//import 'course.dart'; // Import the Courses page when available
 
 void main() {
   runApp(const MyApp());
@@ -264,6 +267,7 @@ class TeacherDashboard extends StatelessWidget {
   }
 
   // Widget to build circular buttons
+  // Widget to build circular buttons
   Widget _buildDashboardButton(
     BuildContext context,
     String title,
@@ -301,7 +305,31 @@ class TeacherDashboard extends StatelessWidget {
         ),
         child: ElevatedButton(
           onPressed: () {
-            // Add button functionality here
+            // Button functionality based on title
+            if (title == 'Courses') {
+              /*  Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CoursesPage(), // Navigate to Courses page (once created)
+              ),
+            );*/
+            } else if (title == 'Assessments') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      CreateAssessment(''), // Passing empty userName
+                ),
+              );
+            } else if (title == 'Essays') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const EssayGeneration(title: 'Essay Generation'),
+                ),
+              );
+            }
           },
           style: ElevatedButton.styleFrom(
             shape: const CircleBorder(),
