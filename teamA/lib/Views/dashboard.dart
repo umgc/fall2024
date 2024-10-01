@@ -267,7 +267,6 @@ class TeacherDashboard extends StatelessWidget {
   }
 
   // Widget to build circular buttons
-  // Widget to build circular buttons
   Widget _buildDashboardButton(
     BuildContext context,
     String title,
