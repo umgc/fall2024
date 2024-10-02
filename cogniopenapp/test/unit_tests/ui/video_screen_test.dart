@@ -19,7 +19,7 @@ void main() {
 
   testWidgets('W-3: video screen loads correctly ',
       (WidgetTester tester) async {
-    await tester.pumpWidget(MaterialApp(
+    await tester.pumpWidget(const MaterialApp(
       home: VideoScreen(), //Video Screen
     ));
 

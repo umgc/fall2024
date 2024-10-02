@@ -15,7 +15,7 @@ final mockPosition = Position(
     speed: 0.0,
     speedAccuracy: 0.0);
 
-final mockPlacemark = Placemark(
+const mockPlacemark = Placemark(
     administrativeArea: 'Maryland',
     country: 'United States',
     isoCountryCode: 'US',

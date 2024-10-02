@@ -15,6 +15,8 @@ import 'package:flutter/material.dart';
 
 // Main HomeScreen widget which is a stateless widget.
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -82,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
         extendBody: true,
         // Setting up the app bar at the top of the screen
         appBar: AppBar(
-          backgroundColor: const Color(0x440000), // Set appbar background color
+          backgroundColor: const Color(0x00440000), // Set appbar background color
           elevation: 0.0,
           centerTitle: true, // This centers the title
           automaticallyImplyLeading: false,

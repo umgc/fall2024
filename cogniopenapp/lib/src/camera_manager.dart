@@ -104,7 +104,7 @@ class CameraManager {
   void startAutoRecording() async {
     if (isAutoRecording) {
       // Delay for camera initialization
-      Future.delayed(Duration(milliseconds: 1500), () {
+      Future.delayed(const Duration(milliseconds: 1500), () {
         FormatUtils.logBigMessage("AUTO VIDEO RECORDING HAS STARTED");
 
         startRecordingInBackground();

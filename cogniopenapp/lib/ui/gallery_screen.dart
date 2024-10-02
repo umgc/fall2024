@@ -29,10 +29,12 @@ double _crossAxisCount = 2.0; // Default options for grid columns
 double _fontSize = 16.0;
 double _iconSize = 40.0;
 double _sizedBoxSpacing = 8;
-final double _defaultFontSize = 20.0;
+const double _defaultFontSize = 20.0;
 
 // Define a StatefulWidget for the GalleryScreen
 class GalleryScreen extends StatefulWidget {
+  const GalleryScreen({super.key});
+
   Widget build(BuildContext context) {
     // Scaffold widget for the Gallery screen
     return Scaffold(
@@ -274,7 +276,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
   AppBar _buildAppBar() {
     return AppBar(
-      backgroundColor: const Color(0x440000),
+      backgroundColor: const Color(0x00440000),
       elevation: 0.0,
       iconTheme: const IconThemeData(
         color: Colors.black54, //change your color here
@@ -461,7 +463,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
       return Container();
     }
     return Container(
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       color: Colors.black.withOpacity(0.5), // Adjust opacity and color
       child: Center(
         child: Text(
@@ -626,7 +628,7 @@ class _FullObjectViewState extends State<FullObjectView> {
             Navigator.of(context).pop();
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => GalleryScreen()),
+              MaterialPageRoute(builder: (context) => const GalleryScreen()),
             );
           },
         ), // Remove the BackButton
@@ -649,7 +651,7 @@ class _FullObjectViewState extends State<FullObjectView> {
               Navigator.of(context).pop();
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => GalleryScreen()),
+                MaterialPageRoute(builder: (context) => const GalleryScreen()),
               );
             },
           ),
@@ -685,10 +687,10 @@ class _FullObjectViewState extends State<FullObjectView> {
                             80), // Used to provide an invisible barrier for the objects
                     addSpacingSizedBox(),
                     if (widget.activeMedia.title.isNotEmpty)
-                      returnTextBox("Title", '${widget.activeMedia.title}'),
+                      returnTextBox("Title", widget.activeMedia.title),
                     addSpacingSizedBox(),
                     returnTextBox("Timestamp",
-                        '${FormatUtils.getDateString(widget.activeMedia.timestamp)}'),
+                        FormatUtils.getDateString(widget.activeMedia.timestamp)),
                     addSpacingSizedBox(),
                     if (widget.activeMedia is Audio)
                       createAudioControlButtons(),
@@ -867,7 +869,7 @@ class _FullObjectViewState extends State<FullObjectView> {
           ),
           Text(
             contents,
-            style: TextStyle(fontSize: _defaultFontSize),
+            style: const TextStyle(fontSize: _defaultFontSize),
             textAlign: TextAlign.center,
           ),
         ],
@@ -886,7 +888,7 @@ class _FullObjectViewState extends State<FullObjectView> {
       builder: (BuildContext context) {
         Media? updatedMedia;
         return AlertDialog(
-          title: Text('Edit Media'),
+          title: const Text('Edit Media'),
           content: StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
               return Column(
@@ -907,7 +909,7 @@ class _FullObjectViewState extends State<FullObjectView> {
               },
             ),
             TextButton(
-              child: Text('Save'),
+              child: const Text('Save'),
               onPressed: () async {
                 if (media is Photo) {
                   updatedMedia = await DataService.instance.updatePhoto(

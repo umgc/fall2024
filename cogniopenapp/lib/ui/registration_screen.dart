@@ -7,15 +7,17 @@ import 'package:path_provider/path_provider.dart';
 import 'onboardingScreen.dart';
 
 class RegistrationScreen extends StatefulWidget {
+  const RegistrationScreen({super.key});
+
   @override
   _RegistrationScreenState createState() => _RegistrationScreenState();
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController _firstNameController = TextEditingController();
-  TextEditingController _lastNameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   bool _useFaceID = true;
   bool _isButtonActive = false;
 
@@ -45,7 +47,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       extendBodyBehindAppBar: true,
       extendBody: true,
       appBar: AppBar(
-        backgroundColor: const Color(0x440000), // Set appbar background color
+        backgroundColor: const Color(0x00440000), // Set appbar background color
         elevation: 0.0,
         centerTitle: true,
         leading: const BackButton(color: Colors.black54),
@@ -72,7 +74,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 5,
                     blurRadius: 7,
-                    offset: Offset(0, 3),
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
@@ -90,7 +92,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     children: [
                       TextFormField(
                         controller: _firstNameController,
-                        decoration: InputDecoration(labelText: 'First Name'),
+                        decoration: const InputDecoration(labelText: 'First Name'),
                         validator: (value) {
                           if (value!.isEmpty) {
                             return 'Please enter your first name';
@@ -100,7 +102,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       ),
                       TextFormField(
                         controller: _lastNameController,
-                        decoration: InputDecoration(labelText: 'Last Name'),
+                        decoration: const InputDecoration(labelText: 'Last Name'),
                         validator: (value) {
                           if (value!.isEmpty) {
                             return 'Please enter your last name';
@@ -110,7 +112,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       ),
                       TextFormField(
                         controller: _emailController,
-                        decoration: InputDecoration(labelText: 'Email Address'),
+                        decoration: const InputDecoration(labelText: 'Email Address'),
                         validator: (value) {
                           if (value!.isEmpty) {
                             return 'Please enter your email';
@@ -121,10 +123,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           }
                           return null;
                         },
-                      ),                    SizedBox(height: 10),
+                      ),                    const SizedBox(height: 10),
                     Row(
                       children: [
-                        Text("Use Biometric Authentication"),
+                        const Text("Use Biometric Authentication"),
                         Switch(
                           value: _useFaceID,
                           onChanged: (value) {
@@ -135,7 +137,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     ElevatedButton(
                       onPressed: _isButtonActive
                           ? () async {
@@ -144,24 +146,24 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               '${_firstNameController.text}, ${_lastNameController.text}, ${_emailController.text}, ${_useFaceID.toString()}';
                           print("User Data: $userData");
                           await writeUserData(userData);
-                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => OnboardingScreen()));
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const OnboardingScreen()));
                         }
 
                       }
                           : null,
-                      child: Text("Create Account"),
+                      child: const Text("Create Account"),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         TextButton(
                           onPressed: () {},
-                          child: Text("Privacy Policy"),
+                          child: const Text("Privacy Policy"),
                         ),
                         TextButton(
                           onPressed: () {},
-                          child: Text("Terms and Conditions"),
+                          child: const Text("Terms and Conditions"),
                         ),
                       ],
                     ),
