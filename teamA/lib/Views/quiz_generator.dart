@@ -1,10 +1,6 @@
-
-
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:namer_app/general_form.dart';
+import 'package:namer_app/api/llm/prompt_engine.dart';
 class CreateAssessment extends StatefulWidget {
 
   final String userName;
@@ -74,7 +70,10 @@ class _AssessmentState extends State<CreateAssessment> {
                         SizedBox(height: paddingHeight),
                         Text("Choose a total number of questions equal to four or five times the number of students in the course to guarantee unique quizzes per student"),
                         SizedBox(height: paddingHeight),
-                        LLMSelector._(),
+                        LLMSelectorDropdown(
+                          selectedLLM: 'ChatGPT',
+                          onChanged: (newValue) {},
+                        ),
                         SizedBox(height: paddingHeight),
                         SubmitButton._('Submit', [nameController, descriptionController, multipleChoiceController, trueFalseController, shortAnswerController], _formKey)
                       ],
@@ -95,6 +94,12 @@ class SubmitButton extends StatelessWidget {
 
   SubmitButton._(this.buttonText, this.fields, this.formKey);
 
+  void _submitToLLM() {
+    if(formKey.currentState!.validate()) {
+      print(formKey.currentState!.context.widget.toStringDeep());
+    }
+  }
+
   bool _evaluateInputs() {
     formKey.currentState!.validate();
     return true;
@@ -103,7 +108,7 @@ class SubmitButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: _evaluateInputs, child: Text(buttonText));
+      onPressed: _submitToLLM, child: Text(buttonText));
   }
 }
 
@@ -160,29 +165,34 @@ class TextEntry extends StatelessWidget {
   }
 }
 
+class LLMSelectorDropdown extends StatelessWidget {
 
-class LLMSelector extends StatelessWidget {
+  final String selectedLLM;
+  final ValueChanged<String?> onChanged;
 
-  LLMSelector._();
+  const LLMSelectorDropdown({
+    Key? key,
+    required this.selectedLLM,
+    required this.onChanged
+  }) : super(key : key);
+
+  void _handleValueChanged(String? newValue) {
+    onChanged(newValue);
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<String> dropdownValues = ['ChatGPT', 'LLAMA', 'Perplexity'];
-    String dropdownValue = dropdownValues.first;
-    return DropdownButton(
-        onChanged: (String? value) {
-          print("Dropdown Value Before: $dropdownValue");
-          print("Value: $value");
-          dropdownValue = value!;
-          print("Dropdown Value After: $dropdownValue");
-        },
-        value: dropdownValue,
-        items: dropdownValues.map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String> (
-            value: value,
-            child: Text(value),
-          );
-        }).toList(),
-      );
+    return DropdownButtonFormField<String>(
+      decoration: const InputDecoration(labelText: "Select Model"),
+      value: selectedLLM,
+      items: ['ChatGPT', 'LLAMA', 'Perplexity'].map((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+      onChanged: _handleValueChanged,
+    );
   }
+
 }
