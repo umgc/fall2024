@@ -1,4 +1,4 @@
-import 'package:intelligrade/controller/model/beans.dart';
+import 'package:namer_app/Controller/beans.dart';
 
 class PromptEngine {
   static const prompt_quizgen_choice =
