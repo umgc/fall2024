@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:namer_app/Controller/beans.dart';
 import 'package:namer_app/api/llm/prompt_engine.dart';
 class CreateAssessment extends StatefulWidget {
 
@@ -18,6 +19,7 @@ class _AssessmentState extends State<CreateAssessment> {
   double paddingHeight = 16.0, paddingWidth=32;
   TextEditingController nameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  TextEditingController sourceController = TextEditingController();
   TextEditingController multipleChoiceController = TextEditingController();
   TextEditingController trueFalseController = TextEditingController();
   TextEditingController shortAnswerController = TextEditingController();
@@ -51,6 +53,8 @@ class _AssessmentState extends State<CreateAssessment> {
                         TextEntry._('Assessment Name', true, nameController),
                         SizedBox(height: paddingHeight),
                         TextEntry._('Description', false, descriptionController, isTextArea: true,),
+                        SizedBox(height: paddingHeight),
+                        TextEntry._('Question Source', false, sourceController),
                         SizedBox(height: paddingHeight),
                         NumberEntry._('Total Multiple Choice Questions', true, multipleChoiceController),
                         SizedBox(height: paddingHeight),
@@ -95,6 +99,15 @@ class SubmitButton extends StatelessWidget {
   SubmitButton._(this.buttonText, this.fields, this.formKey);
 
   void _submitToLLM() {
+    AssignmentForm af = new AssignmentForm(
+      questionType: QuestionType.shortanswer, 
+      subject: 'Algebra',
+      topic: 'Pythagorean Theorem', 
+      gradeLevel: 'Sophomore', 
+      title: 'All about the Pythagorean Theorem', 
+      questionCount: 3, 
+      maximumGrade: 100);
+    print(PromptEngine.generatePrompt(af));
     if(formKey.currentState!.validate()) {
       print(formKey.currentState!.context.widget.toStringDeep());
     }
