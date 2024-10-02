@@ -1,11 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:http/http.dart' as http; // Add HTTP package for API requests
+import 'dart:convert'; // Add JSON handling for API response
+import 'dart:io';
 
 void main() {
+  // HttpOverrides.global = MyHttpOverrides();
+
   runApp(MyApp());
 }
 
+/*class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context) 
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+*/
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,6 +36,8 @@ class MyApp extends StatelessWidget {
 }
 
 class EssayAssignmentSettings extends StatefulWidget {
+  const EssayAssignmentSettings({super.key});
+
   @override
   _EssayAssignmentSettingsState createState() =>
       _EssayAssignmentSettingsState();
@@ -40,17 +58,9 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   String selectedHourDue = '00';
   String selectedMinuteDue = '00';
 
-  // Date selection variables for "Remind me to grade by"
-  String selectedDayRemind = '01';
-  String selectedMonthRemind = 'January';
-  String selectedYearRemind = '2024';
-  String selectedHourRemind = '00';
-  String selectedMinuteRemind = '00';
-
   // Checkbox states
   bool isSubmissionEnabled = true;
   bool isDueDateEnabled = true;
-  bool isRemindEnabled = true;
 
   List<String> days =
       List.generate(31, (index) => (index + 1).toString().padLeft(2, '0'));
@@ -74,11 +84,59 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   List<String> minutes =
       List.generate(60, (index) => index.toString().padLeft(2, '0'));
 
-  TextEditingController _courseNameController = TextEditingController();
-  TextEditingController _assignmentNameController = TextEditingController();
+  final TextEditingController _courseNameController = TextEditingController();
+  final TextEditingController _assignmentNameController =
+      TextEditingController();
 
   // Quill Editor controller
-  quill.QuillController _quillController = quill.QuillController.basic();
+  final quill.QuillController _quillController = quill.QuillController.basic();
+
+  // Function to create the assignment and send it to Moodle
+  Future<void> createAssignment(
+      String token,
+      String courseName,
+      String assignmentName,
+      String description,
+      String dueDate,
+      String startDate) async {
+    const String url = 'webservice/rest/server.php';
+    const fullUrl = 'https://www.swen670moodle.site/$url'; // Full URL
+    debugPrint('Sending request to: $fullUrl');
+    debugPrint('Course: $courseName, Assignment: $assignmentName');
+    try {
+      final response = await http.post(
+        Uri.parse(fullUrl),
+        body: {
+          'wstoken': token,
+          'wsfunction': 'local_learninglens_create_assignment',
+          'moodlewsrestformat': 'json',
+          'courseid': '5', // You can dynamically set course ID here
+          'sectionid': '1',
+          'enddate': dueDate,
+          'startdate': startDate,
+          'description': description,
+          'rubricJson': '0', // Set to 0 to skip rubric for now
+          'assignmentName': assignmentName,
+        },
+      );
+
+      debugPrint('Response status code: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        debugPrint('Response data: $responseData');
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Assignment sent to Moodle successfully!')));
+      } else {
+        debugPrint('Request failed with status: ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to send assignment to Moodle.')));
+      }
+    } catch (error) {
+      debugPrint('Error occurred while sending request: $error');
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('An error occurred: $error')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -249,51 +307,6 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                 }),
               ],
             ),
-            SizedBox(height: 14),
-
-            // Remind me to grade by
-            Row(
-              children: [
-                Checkbox(
-                  value: isRemindEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      isRemindEnabled = value!;
-                    });
-                  },
-                ),
-                Text('Enable'),
-                SizedBox(width: 10),
-                _buildDropdown(
-                    'Remind me to grade by',
-                    selectedDayRemind,
-                    selectedMonthRemind,
-                    selectedYearRemind,
-                    selectedHourRemind,
-                    selectedMinuteRemind,
-                    isRemindEnabled, (String? newValue) {
-                  setState(() {
-                    selectedDayRemind = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedMonthRemind = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedYearRemind = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedHourRemind = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedMinuteRemind = newValue!;
-                  });
-                }),
-              ],
-            ),
             SizedBox(height: 20),
 
             // Two Buttons at the Bottom
@@ -302,7 +315,32 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // Handle Send to Moodle action
+                    // Capture the form data
+                    String courseName = _courseNameController.text;
+                    String assignmentName = _assignmentNameController.text;
+                    String description =
+                        _quillController.document.toPlainText();
+                    String dueDate =
+                        '$selectedDayDue $selectedMonthDue $selectedYearDue $selectedHourDue:$selectedMinuteDue';
+                    String allowSubmissionFrom =
+                        '$selectedDaySubmission $selectedMonthSubmission $selectedYearSubmission $selectedHourSubmission:$selectedMinuteSubmission';
+
+                    // Log the captured data for debugging
+                    debugPrint('Course Name: $courseName');
+                    debugPrint('Assignment Name: $assignmentName');
+                    debugPrint('Description: $description');
+                    debugPrint('Due Date: $dueDate');
+                    debugPrint('Allow Submission From: $allowSubmissionFrom');
+
+                    // Call createAssignment function to send the data to Moodle
+                    createAssignment(
+                      '130bde328dbbbe61eaea301c5ad2dcc8', // Add my token
+                      courseName,
+                      assignmentName,
+                      description,
+                      dueDate,
+                      allowSubmissionFrom,
+                    );
                   },
                   child: Text('Send to Moodle'),
                 ),
