@@ -2,38 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:http/http.dart' as http; // Add HTTP package for API requests
 import 'dart:convert'; // Add JSON handling for API response
-import 'dart:io';
-
-void main() {
-  // HttpOverrides.global = MyHttpOverrides();
-
-  runApp(MyApp());
-}
-
-/*class MyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context) 
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
-  }
-}
-*/
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false, // Removed the debug banner
-      home: EssayAssignmentSettings(),
-      theme: ThemeData(
-        useMaterial3: true, // Using Material 3 design
-      ),
-      title: 'Learning Lens',
-    );
-  }
-}
 
 class EssayAssignmentSettings extends StatefulWidget {
   const EssayAssignmentSettings({super.key});
@@ -58,9 +26,17 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   String selectedHourDue = '00';
   String selectedMinuteDue = '00';
 
+  // Date selection variables for "Remind me to grade by"
+  String selectedDayRemind = '01';
+  String selectedMonthRemind = 'January';
+  String selectedYearRemind = '2024';
+  String selectedHourRemind = '00';
+  String selectedMinuteRemind = '00';
+
   // Checkbox states
   bool isSubmissionEnabled = true;
   bool isDueDateEnabled = true;
+  bool isRemindEnabled = true;
 
   List<String> days =
       List.generate(31, (index) => (index + 1).toString().padLeft(2, '0'));
@@ -84,17 +60,27 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   List<String> minutes =
       List.generate(60, (index) => index.toString().padLeft(2, '0'));
 
-  final TextEditingController _courseNameController = TextEditingController();
   final TextEditingController _assignmentNameController =
       TextEditingController();
 
   // Quill Editor controller
   final quill.QuillController _quillController = quill.QuillController.basic();
 
+  // List of courses with their corresponding course IDs
+  Map<String, String> courses = {
+    'Select a course': '',
+    'Course 1': '5',
+    'Course 2': '6',
+    'Course 3': '7'
+  };
+
+  // Selected course
+  String selectedCourse = 'Select a course';
+
   // Function to create the assignment and send it to Moodle
   Future<void> createAssignment(
       String token,
-      String courseName,
+      String courseId, // Now using courseId
       String assignmentName,
       String description,
       String dueDate,
@@ -102,7 +88,7 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
     const String url = 'webservice/rest/server.php';
     const fullUrl = 'https://www.swen670moodle.site/$url'; // Full URL
     debugPrint('Sending request to: $fullUrl');
-    debugPrint('Course: $courseName, Assignment: $assignmentName');
+    debugPrint('Course ID: $courseId, Assignment: $assignmentName');
     try {
       final response = await http.post(
         Uri.parse(fullUrl),
@@ -110,7 +96,7 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
           'wstoken': token,
           'wsfunction': 'local_learninglens_create_assignment',
           'moodlewsrestformat': 'json',
-          'courseid': '5', // You can dynamically set course ID here
+          'courseid': courseId, // Use dynamic course ID here
           'sectionid': '1',
           'enddate': dueDate,
           'startdate': startDate,
@@ -167,18 +153,30 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
             ),
             SizedBox(height: 20),
 
-            // Course Name
+            // Course Dropdown with black outline
             SectionTitle(title: 'General'),
-            TextField(
-              controller: _courseNameController,
+            DropdownButtonFormField<String>(
+              value: selectedCourse,
               decoration: InputDecoration(
                 labelText: 'Course name',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(), // Add black outline
               ),
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedCourse = newValue!;
+                });
+              },
+              items: courses.keys.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              isExpanded: true,
             ),
             SizedBox(height: 12),
 
-            // Assignment Name
+            // Assignment Name TextField
             TextField(
               controller: _assignmentNameController,
               decoration: InputDecoration(
@@ -215,7 +213,7 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
 
             SizedBox(height: 20),
 
-            // Availability
+            // Availability Section
             SectionTitle(title: 'Availability'),
             SizedBox(height: 14),
 
@@ -307,6 +305,51 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                 }),
               ],
             ),
+            SizedBox(height: 14),
+
+            // Remind me to grade by
+            Row(
+              children: [
+                Checkbox(
+                  value: isRemindEnabled,
+                  onChanged: (value) {
+                    setState(() {
+                      isRemindEnabled = value!;
+                    });
+                  },
+                ),
+                Text('Enable'),
+                SizedBox(width: 10),
+                _buildDropdown(
+                    'Remind me to grade by',
+                    selectedDayRemind,
+                    selectedMonthRemind,
+                    selectedYearRemind,
+                    selectedHourRemind,
+                    selectedMinuteRemind,
+                    isRemindEnabled, (String? newValue) {
+                  setState(() {
+                    selectedDayRemind = newValue!;
+                  });
+                }, (String? newValue) {
+                  setState(() {
+                    selectedMonthRemind = newValue!;
+                  });
+                }, (String? newValue) {
+                  setState(() {
+                    selectedYearRemind = newValue!;
+                  });
+                }, (String? newValue) {
+                  setState(() {
+                    selectedHourRemind = newValue!;
+                  });
+                }, (String? newValue) {
+                  setState(() {
+                    selectedMinuteRemind = newValue!;
+                  });
+                }),
+              ],
+            ),
             SizedBox(height: 20),
 
             // Two Buttons at the Bottom
@@ -316,7 +359,8 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                 ElevatedButton(
                   onPressed: () {
                     // Capture the form data
-                    String courseName = _courseNameController.text;
+                    String courseId = courses[selectedCourse] ??
+                        ''; // Get course ID from the map
                     String assignmentName = _assignmentNameController.text;
                     String description =
                         _quillController.document.toPlainText();
@@ -326,7 +370,7 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                         '$selectedDaySubmission $selectedMonthSubmission $selectedYearSubmission $selectedHourSubmission:$selectedMinuteSubmission';
 
                     // Log the captured data for debugging
-                    debugPrint('Course Name: $courseName');
+                    debugPrint('Course ID: $courseId');
                     debugPrint('Assignment Name: $assignmentName');
                     debugPrint('Description: $description');
                     debugPrint('Due Date: $dueDate');
@@ -334,8 +378,8 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
 
                     // Call createAssignment function to send the data to Moodle
                     createAssignment(
-                      '130bde328dbbbe61eaea301c5ad2dcc8', // Add my token
-                      courseName,
+                      '130bde328dbbbe61eaea301c5ad2dcc8', // Add your token
+                      courseId,
                       assignmentName,
                       description,
                       dueDate,
