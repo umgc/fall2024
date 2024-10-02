@@ -25,5 +25,5 @@ doc/api/
 
 .flutter-plugins
 .flutter-plugins-dependencies
-Intelligrade/TeamB/IntelliGrade/ios/Runner*
 .vs/*
+.vscode/
