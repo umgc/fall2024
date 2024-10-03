@@ -2,6 +2,7 @@ import 'package:cogniopenapp/src/database/model/media_type.dart';
 import 'package:cogniopenapp/src/utils/permission_manager.dart';
 import 'package:cogniopenapp/ui/assistant_screen.dart';
 import 'package:cogniopenapp/ui/home_screen.dart';
+import 'package:cogniopenapp/ui/settings_screen.dart';
 import 'package:cogniopenapp/ui/significant_objects_screen.dart';
 import 'package:cogniopenapp/ui/video_screen.dart';
 import 'package:flutter/material.dart';
@@ -66,7 +67,7 @@ class UiUtils {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const SignificantObjectScreen()));
+                    builder: (context) => const SettingsScreen()));
           }
         });
   }
