@@ -104,8 +104,10 @@ class SubmitButton extends StatelessWidget {
       subject: 'Algebra',
       topic: 'Pythagorean Theorem', 
       gradeLevel: 'Sophomore', 
-      title: 'All about the Pythagorean Theorem', 
-      questionCount: 3, 
+      title: 'All about the Pythagorean Theorem',
+      trueFalseCount: 1,
+      shortAnswerCount: 1,
+      multipleChoiceCount: 1,
       maximumGrade: 100);
     print(PromptEngine.generatePrompt(af));
     if(formKey.currentState!.validate()) {
