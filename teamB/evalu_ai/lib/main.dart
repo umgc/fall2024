@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intelligrade/ui/assignment_details_page.dart';
 import 'package:intelligrade/ui/create_page.dart';
 import 'package:intelligrade/ui/setting_page.dart';
 import 'package:intelligrade/ui/dashboard_page.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
             '/create': (context) => const CreatePage(),
             '/dashboard': (context) => const DashBoardPage(),
             '/viewAssignments': (context) => const ViewAssignmentsPage(),
+            '/assignemntDetails': (context) => const AssignmentDetailsPage(),
             '/settings': (context) =>
                 Setting(themeModeNotifier: _themeModeNotifier)
           },
