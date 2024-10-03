@@ -2,7 +2,9 @@ import 'package:xml/xml.dart';
 import 'dart:typed_data';
 
 // Tags and attributes used in Moodle XML. Useful for preventing typos.
-class XmlConsts {
+class XmlConsts 
+{
+  // Quiz tags
   static const quiz = 'quiz';
   static const question = 'question';
   static const name = 'name';
@@ -23,6 +25,14 @@ class XmlConsts {
   static const graderinfo = 'graderinfo';
   static const promptUsed = 'promptused';
 
+  // Essay Rubric Tags
+  static const rubric = 'rubric';
+  static const title = 'title';
+  static const subject = 'subject';
+  static const gradeLevel = 'gradeLevel';
+  static const maxPoints = 'maxPoints';
+  static const criteria = 'criteria';
+  static const points = 'points';
 
   // not tags but useful constants
   static const multichoice = 'multichoice';
@@ -30,6 +40,102 @@ class XmlConsts {
   static const shortanswer = 'shortanswer';
   static const essay = 'essay';
   static const html = 'html';
+}
+
+// A generated rubric containing criteria for an essay prompt.
+class Rubric 
+{
+  String title;
+  String subject;
+  String gradeLevel;
+  int maxPoints;
+  List<RubricCriteria> criteriaList;
+
+  Rubric({
+    required this.title,
+    required this.subject,
+    required this.gradeLevel,
+    required this.maxPoints,
+    required this.criteriaList,
+  });
+
+  // Factory constructor to create a Rubric from XML
+  factory Rubric.fromXmlString(String xmlStr) 
+  {
+    final document = XmlDocument.parse(xmlStr);
+    final rubricElement = document.getElement(XmlConsts.rubric);
+
+    return Rubric(
+      title: rubricElement?.getElement(XmlConsts.title)?.innerText ?? 'Untitled',
+      subject: rubricElement?.getElement(XmlConsts.subject)?.innerText ?? 'Unknown',
+      gradeLevel: rubricElement?.getElement(XmlConsts.gradeLevel)?.innerText ?? 'Unknown',
+      maxPoints: int.parse(rubricElement?.getElement(XmlConsts.maxPoints)?.innerText ?? '0'),
+      criteriaList: rubricElement
+          ?.findElements(XmlConsts.criteria)
+          .map((e) => RubricCriteria.fromXml(e))
+          .toList() ?? [],
+    );
+  }
+
+    // Convert the Rubric object to an XML string
+  String toXmlString() {
+    final builder = XmlBuilder();
+    builder.element(XmlConsts.rubric, nest: () {
+      builder.element(XmlConsts.title, nest: title);
+      builder.element(XmlConsts.subject, nest: subject);
+      builder.element(XmlConsts.gradeLevel, nest: gradeLevel);
+      builder.element(XmlConsts.maxPoints, nest: maxPoints.toString());
+
+      for (var criteria in criteriaList) {
+        builder.element(XmlConsts.criteria, nest: criteria.toXml);
+      }
+    });
+    return builder.buildDocument().toXmlString(pretty: true);
+  }
+
+  @override
+  String toString() {
+    return toXmlString();
+  }
+}
+
+// Specific Rubric Criteria
+class RubricCriteria 
+{
+  String description;
+  int points;
+  String feedback;
+
+  RubricCriteria({
+    required this.description,
+    required this.points,
+    this.feedback = '',
+  });
+
+  // Factory constructor to create criteria from XML
+  factory RubricCriteria.fromXml(XmlElement criteriaElement) 
+  {
+    return RubricCriteria(
+      description: criteriaElement.getElement(XmlConsts.description)?.innerText ?? 'Unknown',
+      points: int.parse(criteriaElement.getElement(XmlConsts.points)?.innerText ?? '0'),
+      feedback: criteriaElement.getElement(XmlConsts.feedback)?.innerText ?? '',
+    );
+  }
+
+  // Convert the criteria to XML format
+  void toXml(XmlBuilder builder) 
+  {
+    builder.element(XmlConsts.description, nest: description);
+    builder.element(XmlConsts.points, nest: points.toString());
+    builder.element(XmlConsts.feedback, nest: feedback);
+  }
+
+  @override
+  String toString() {
+    final builder = XmlBuilder();
+    toXml(builder);
+    return builder.buildFragment().toXmlString();
+  }
 }
 
 // A Moodle quiz containing a list of questions.
