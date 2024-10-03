@@ -474,11 +474,8 @@ class _AudioScreenState extends State<AudioScreen> {
                           children: [
                             AvatarGlow(
                               glowColor: Colors.red,
-                              endRadius: 100.0,
                               duration: Duration(milliseconds: 2000),
                               repeat: true,
-                              showTwoGlows: true,
-                              repeatPauseDuration: Duration(milliseconds: 100),
                               child: Material(
                                 // Replace this child with your own
                                 elevation: 8.0,
@@ -625,11 +622,8 @@ class _AudioScreenState extends State<AudioScreen> {
                       else
                         AvatarGlow(
                           glowColor: Colors.blue,
-                          endRadius: 100.0,
                           duration: Duration(milliseconds: 2000),
                           repeat: true,
-                          showTwoGlows: true,
-                          repeatPauseDuration: Duration(milliseconds: 100),
                           child: Material(
                             // Replace this child with your own
                             elevation: 8.0,

@@ -32,10 +32,10 @@ dependencies:
     sdk: flutter
   
   # A Flutter geocoding plugin which provides easy geocoding and reverse-geocoding features. 
-  geocoding: ^2.1.1
+  geocoding: ^3.0.0
   
   # A Flutter geolocation plugin which provides easy access to platform specific location services.
-  geolocator: ^10.1.0
+  geolocator: ^12.0.0
 
   # A Flutter plugin to integrate maps powered by various map providers (like OpenStreetMap, Mapbox, etc.) in the application.
   flutter_map: ^4.0.0
@@ -45,7 +45,7 @@ dependencies:
   latlong2: ^0.8.0
 
   # A Flutter plugin for iOS, Android and Web allowing access to the device cameras.
-  camera: ^0.10.5+5
+  camera: ^0.11.0+2
   
   # A Flutter plugin for iOS, Android and Web for playing back video on a Widget surface.
   video_player: ^2.7.2
@@ -56,7 +56,7 @@ dependencies:
   # A Flutter plugin for finding commonly used locations on the filesystem. Supports Android, iOS, Linux, macOS and Windows. Not all methods are supported on all platforms.
   #path_provider: ^2.1.1
 
-  avatar_glow: ^2.0.2
+  avatar_glow: ^3.0.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -66,16 +66,16 @@ dependencies:
   flutter_dotenv: ^5.1.0
   flutter_speed_dial: ^7.0.0
   chat_gpt_flutter: ^1.0.13
-  audioplayers: ^5.2.0
+  audioplayers: ^6.1.0
   local_auth: ^2.1.7
   flutter_sound: ^9.2.13
   assets_audio_player: ^3.1.1
   permission_handler: ^11.0.1
-  speech_to_text: ^6.3.0
+  speech_to_text: ^7.0.0
   audio_waveforms: ^1.0.4
   path_provider: ^2.1.1
   path: ^1.8.3
-  flutter_tts: ^3.8.3
+  flutter_tts: ^4.0.2
   aws_kinesis_api: ^2.0.0
   aws_sns_api: ^2.0.0
   aws_s3_api: ^2.0.0
@@ -87,8 +87,8 @@ dependencies:
   mockito: ^5.4.2
   plugin_platform_interface: ^2.1.6
   path_provider_platform_interface: ^2.1.1
-  moment_dart: ^1.1.0
-  external_path: ^1.0.3
+  moment_dart: ^2.2.1+beta.0
+  external_path: ^2.0.1
   gallery_saver: ^2.3.2
   image_picker: ^1.0.4
   timeago: ^3.5.0
@@ -99,6 +99,7 @@ dependencies:
 
 
   intl: any
+  form_field_validator: ^1.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -111,7 +112,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^5.0.0
   build_runner: ^2.4.6
   sqflite_common_ffi: ^2.3.0
 
