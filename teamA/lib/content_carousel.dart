@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import "Controller/beans.dart";
 
 //Provides a carousel of either assessments, essays, or submission
 class ContentCarousel extends StatefulWidget{

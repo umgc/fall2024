@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
       routes: {
         'LoginPage': (context) => LoginApp(),
         '/EssayEditPage': (context) => EssayEditPage(),
-        '/Content': (context) => ViewCourseContents('Test Course'),
+        '/Content': (context) => ViewCourseContents(),
         '/EssayGenerationPage': (context) =>
             EssayGeneration(title: 'Essay Generation'),
         '/QuizGenerationPage': (context) => CreateAssessment('Tester'),
@@ -87,7 +87,7 @@ class _DevLaunch extends State {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => ViewCourseContents("Test Course")),
+                      builder: (context) => ViewCourseContents()),
                 );
               }),
           ElevatedButton(

@@ -16,6 +16,8 @@ class MainController
   MainController._internal();
   static bool isLoggedIn = false;
   final ValueNotifier<bool> isUserLoggedInNotifier = ValueNotifier(false);
+  List<Course> courses = [];
+  Course? selectedCourse;
 
   Future<bool> loginToMoodle(String username, String password) async 
   {
@@ -45,9 +47,12 @@ class MainController
 
   Future<List<Course>> getCourses() async 
   {
+    if (courses != []){
+      return courses;
+    }
     var moodleApi = MoodleApiSingleton();
     try {
-      List<Course> courses = await moodleApi.getCourses();
+      courses = await moodleApi.getCourses();
       if (courses.isNotEmpty) {
         courses.removeAt(
             0); // first course is always "Moodle" - no need to show it
@@ -64,5 +69,15 @@ class MainController
   Future<bool> isUserLoggedIn() async 
   {
     return isLoggedIn;
+  }
+
+  void selectCourse(int index){
+    if (index < courses.length){
+      selectedCourse = courses[index];
+    }
+  }
+
+  Course? getSelectedCourse(){
+    return selectedCourse;
   }
 }
