@@ -56,7 +56,7 @@ class _AssessmentState extends State<CreateAssessment> {
                         SizedBox(height: paddingHeight),
                         TextEntry._('Description', false, descriptionController, isTextArea: true,),
                         SizedBox(height: paddingHeight),
-                        TextEntry._('Question Topic', false, topicController),
+                        TextEntry._('Question Topic', true, topicController),
                         SizedBox(height: paddingHeight),
                         TextEntry._('Question Source', false, sourceController),
                         SizedBox(height: paddingHeight),
@@ -111,14 +111,15 @@ class SubmitButton extends StatelessWidget {
     if(formKey.currentState!.validate()) {
       AssignmentForm af = new AssignmentForm(
       questionType: QuestionType.shortanswer, //Potentially not necessary? Need to see about essay generator
-      subject: 'Algebra', // Get these progromatically?
+      subject: 'Algebra', // Get these programatically?
       topic: fields['topic']!.text, 
-      gradeLevel: 'Sophomore', // Get these progromatically?
+      gradeLevel: 'Sophomore', // Get these programatically?
       title: fields['name']!.text,
       trueFalseCount: int.parse(fields['trueFalse']!.text),
       shortAnswerCount: int.parse(fields['shortAns']!.text),
       multipleChoiceCount: int.parse(fields['multipleChoice']!.text),
       maximumGrade: 100);
+      print(PromptEngine.generatePrompt(af));
     }
   }
 
