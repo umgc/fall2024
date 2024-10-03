@@ -12,6 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
   editable: 2.0.0
+  flutter_dotenv: ^5.1.0
+  xml: ^6.2.2
+  http: ^1.2.1 
   flutter_quill: ^10.8.0
 
   english_words: ^4.0.0
