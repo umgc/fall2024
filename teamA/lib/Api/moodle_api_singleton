@@ -78,4 +78,23 @@ class MoodleApiSingleton
       throw HttpException(response.body);
     }
   }
+
+  // Gets the contents of the specified course.
+  void getCourseContents(int courseID) async {
+    if (_userToken == null) throw StateError('User not logged in to Moodle');
+    // Make the request.
+    final http.Response response = await http.get(Uri.parse('$serverUrl$_userToken$jsonFormat&wsfunction=core_course_get_contents&courseid=$courseID'))
+    if (response.statusCode != 200) {
+      throw HttpException(response.body);
+    }
+    
+    // Decode the JSON to get the wanted information.
+    Map<String, dynamic> temp = jsonDecode(response.body) as Map<String, dynamic>;
+    result = [];
+    temp.forEach((k,v) =>{
+      if (v['modules'] != []){
+        //todo method for converting from json or xml
+      }
+    })
+  }
 }

@@ -32,6 +32,10 @@ class XmlConsts {
   static const html = 'html';
 }
 
+class Assessment {
+  //todo
+}
+
 // A Moodle quiz containing a list of questions.
 class Quiz {
   String? name; // quiz name - optional.
