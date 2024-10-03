@@ -23,6 +23,8 @@ class _AssessmentState extends State<CreateAssessment> {
   TextEditingController multipleChoiceController = TextEditingController();
   TextEditingController trueFalseController = TextEditingController();
   TextEditingController shortAnswerController = TextEditingController();
+  TextEditingController topicController = TextEditingController();
+
   final _formKey = GlobalKey<FormState>();
   _AssessmentState();
 
@@ -54,6 +56,8 @@ class _AssessmentState extends State<CreateAssessment> {
                         SizedBox(height: paddingHeight),
                         TextEntry._('Description', false, descriptionController, isTextArea: true,),
                         SizedBox(height: paddingHeight),
+                        TextEntry._('Question Topic', false, topicController),
+                        SizedBox(height: paddingHeight),
                         TextEntry._('Question Source', false, sourceController),
                         SizedBox(height: paddingHeight),
                         NumberEntry._('Total Multiple Choice Questions', true, multipleChoiceController),
@@ -79,7 +83,12 @@ class _AssessmentState extends State<CreateAssessment> {
                           onChanged: (newValue) {},
                         ),
                         SizedBox(height: paddingHeight),
-                        SubmitButton._('Submit', [nameController, descriptionController, multipleChoiceController, trueFalseController, shortAnswerController], _formKey)
+                        SubmitButton._('Submit', {"name" : nameController, 
+                                                  "description" : descriptionController,
+                                                  "topic" : topicController,
+                                                  "multipleChoice" : multipleChoiceController,
+                                                  "trueFalse" :  trueFalseController,
+                                                  "shortAns" : shortAnswerController,}, _formKey)
                       ],
                     ),
                   )
@@ -93,25 +102,23 @@ class _AssessmentState extends State<CreateAssessment> {
 
 class SubmitButton extends StatelessWidget {
   final String buttonText;
-  final List<TextEditingController> fields;
+  final Map<String, TextEditingController> fields;
   final GlobalKey<FormState> formKey;
 
   SubmitButton._(this.buttonText, this.fields, this.formKey);
 
   void _submitToLLM() {
-    AssignmentForm af = new AssignmentForm(
-      questionType: QuestionType.shortanswer, 
-      subject: 'Algebra',
-      topic: 'Pythagorean Theorem', 
-      gradeLevel: 'Sophomore', 
-      title: 'All about the Pythagorean Theorem',
-      trueFalseCount: 1,
-      shortAnswerCount: 1,
-      multipleChoiceCount: 1,
-      maximumGrade: 100);
-    print(PromptEngine.generatePrompt(af));
     if(formKey.currentState!.validate()) {
-      print(formKey.currentState!.context.widget.toStringDeep());
+      AssignmentForm af = new AssignmentForm(
+      questionType: QuestionType.shortanswer, //Potentially not necessary? Need to see about essay generator
+      subject: 'Algebra', // Get these progromatically?
+      topic: fields['topic']!.text, 
+      gradeLevel: 'Sophomore', // Get these progromatically?
+      title: fields['name']!.text,
+      trueFalseCount: int.parse(fields['trueFalse']!.text),
+      shortAnswerCount: int.parse(fields['shortAns']!.text),
+      multipleChoiceCount: int.parse(fields['multipleChoice']!.text),
+      maximumGrade: 100);
     }
   }
 

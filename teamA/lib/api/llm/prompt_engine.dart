@@ -7,7 +7,7 @@ class PromptEngine {
       'that is compatible with Moodle XML import.  The quiz is to be on the subject of '
       '[subject] and should be related to [topic]. '
       'The quiz should be the same level of difficulty for college [gradelevel] students of the '
-      'English-speaking language. The quiz should have 4 true / false questions, 3 multiple choice questions, and one short answer question. ';
+      'English-speaking language. ';
 
    static const prompt_quizgen_high_school = 
       'Generate a quiz in XML format '
@@ -40,27 +40,39 @@ class PromptEngine {
       // 'Please use this XML sample as a template for your response: <?xml version="1.0" encoding="UTF-8"?><quiz><question type="essay"><name><text><![CDATA[ Name of assignment goes here ]]></text></name><questiontext format="html"><text><![CDATA[ Assignment description goes here ]]></text></questiontext><generalfeedback format="html"><text><![CDATA[ Assignment criteria goes here ]]></text></generalfeedback><defaultgrade>Maximum grade goes here</defaultgrade><penalty>0</penalty><hidden>0</hidden><responseformat>editorfilepicker</responseformat><responserequired>1</responserequired><responsefieldlines>15</responsefieldlines><attachments>0</attachments><attachmentsrequired>1</attachmentsrequired><rubric><rubric_criteria><criterion><description><text><![CDATA[ Criteria description goes here ]]></text></description><levels><level><score>Level 4, the highest criteria score goes here.</score><definition><text><![CDATA[ Level 4 criteria definition goes here ]]></text></definition></level><level><score>Level 3 criteria score goes here</score><definition><text><![CDATA[ Level 3 criteria definition goes here ]]></text></definition></level><level><score>Level 2 criteria score goes here</score><definition><text><![CDATA[ Level 2 criteria definition goes here ]]></text></definition></level><level><score>Level 1, the lowest criteria score goes here</score><definition><text><![CDATA[ Level 1 criteria definition goes here ]]></text></definition></level></levels></criterion></rubric_criteria></rubric></question></quiz><dataset><data><inputs><input>Input goes here</input></inputs><expectedoutput>Expected output goes here</expectedoutput></data></dataset> ';
   // 'Please use this XML sample as a template for your response: <?xml version="1.0" encoding="UTF-8"?><quiz><question type="essay"><name><text>Recursive Functions in Dart</text></name><questiontext format="html"><text>Implement a recursive function in Dart that calculates the nth Fibonacci number. The Fibonacci sequence is defined as follows: the first two numbers are 0 and 1, and each subsequent number is the sum of the two preceding ones. Your function should take an integer n as input and return the nth Fibonacci number. Additionally, explain the time complexity of your recursive solution and suggest how you might optimize it using memoization. Provide your code implementation and explanation below.</text></questiontext><generalfeedback format="html"><text>A well-implemented recursive Fibonacci function should correctly calculate the nth Fibonacci number. The explanation should discuss the exponential time complexity of the naive recursive solution and how memoization can improve it to linear time complexity.</text></generalfeedback><defaultgrade>10</defaultgrade><penalty>0</penalty><hidden>0</hidden><responseformat>editor</responseformat><responserequired>1</responserequired><responsefieldlines>15</responsefieldlines><attachments>0</attachments></question></quiz>';
 
+  static String _FormatQuestionNumbers(AssignmentForm form) {
+    String ret = 'The quiz should have ';
+    List<String> questionsCount = <String>[];
+    int count;
+    if (form.multipleChoiceCount > 0) {
+      count = form.multipleChoiceCount;
+      print(count);
+      if (count == 1) {
+        questionsCount.add("$count multiple choice question");
+      } else {
+        questionsCount.add("$count multiple choice questions");
+      }
+    } if (form.trueFalseCount > 0) {
+      count = form.trueFalseCount;
+      if (count == 1) {
+        questionsCount.add("$count true or false question");
+      } else {
+        questionsCount.add("$count true or false questions");
+      }
+    }
+      if (form.shortAnswerCount > 0) {
+      count = form.shortAnswerCount;
+      if (count == 1) {
+        questionsCount.add("$count short answer question");
+      } else {
+        questionsCount.add("$count short answer questions");
+      }
+    }
+    return "$ret${questionsCount.join(", ")}. "; 
+  }
+
   static String generatePrompt(AssignmentForm form) {
-    String prompt;
-    /*switch (form.questionType) {
-      case QuestionType.multichoice:
-        prompt = prompt_quizgen_choice + prompt_quizgen_choice_example;
-        break;
-      case QuestionType.truefalse:
-        prompt = prompt_quizgen_truefalse + prompt_quizgen_truefalse_example;
-        break;
-      case QuestionType.shortanswer:
-        prompt =
-            prompt_quizgen_shortanswer + prompt_quizgen_shortanswer_example;
-        break;
-      case QuestionType.essay:
-        prompt = prompt_quizgen_essay + prompt_quizgen_essay_example;
-        break;
-      case QuestionType.coding:
-        prompt = prompt_quizgen_code + prompt_quizgen_coding_example;
-        break;
-    }*/
-    prompt = prompt_quizgen_college + prompt_quizgen_choice_example;
+    String prompt = prompt_quizgen_college + _FormatQuestionNumbers(form) + prompt_quizgen_choice_example;
     prompt = prompt
         .replaceAll('[subject]', form.subject)
         .replaceAll('[topic]', form.topic)
