@@ -27,6 +27,9 @@ environment:
 # dependencies can be manually updated by changing the version numbers below to
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
+dependency_overrides:
+  http: ^1.1.0
+
 dependencies:
   flutter:
     sdk: flutter
@@ -61,7 +64,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  dart_openai: ^3.0.0
+  dart_openai: ^5.0.0
   aws_rekognition_api: ^2.0.0
   flutter_dotenv: ^5.1.0
   flutter_speed_dial: ^7.0.0
@@ -82,7 +85,6 @@ dependencies:
   sqflite: ^2.3.0
   video_thumbnail: ^0.5.3
   aws_transcribe_api: ^2.0.0
-  http: ^0.13.6
   aws_client: ^0.4.1
   mockito: ^5.4.2
   plugin_platform_interface: ^2.1.6

@@ -137,22 +137,26 @@ class _AssistantScreenState extends State<AssistantScreen> {
       _isTyping = true;
     });
 
-    var messages = [
-      OpenAIChatCompletionChoiceMessageModel(
-        content: prompt,
-        role: OpenAIChatMessageRole.system,
-      ),
-    ];
+    final systemMessage = OpenAIChatCompletionChoiceMessageModel(
+      content: [
+        OpenAIChatCompletionChoiceMessageContentItemModel.text(
+          prompt,
+        ),
+      ],
+      role: OpenAIChatMessageRole.assistant,
+    );
+
+    var messages = [systemMessage];
     for (ChatMessage chat in _chatMessages) {
       messages.add(
         OpenAIChatCompletionChoiceMessageModel(
-          content: chat.messageText,
+          content: [OpenAIChatCompletionChoiceMessageContentItemModel.text(chat.messageText)],
           role: OpenAIChatMessageRole.user,
         ),
       );
     }
     messages.add(OpenAIChatCompletionChoiceMessageModel(
-      content: userMessage,
+      content: [OpenAIChatCompletionChoiceMessageContentItemModel.text(userMessage)],
       role: OpenAIChatMessageRole.user,
     ));
 
@@ -162,11 +166,11 @@ class _AssistantScreenState extends State<AssistantScreen> {
     try {
       OpenAIChatCompletionModel chatCompletion =
           await OpenAI.instance.chat.create(
-        model: "gpt-3.5-turbo",
+        model: "gpt-4o-mini",
         messages: messages,
       );
 
-      final content = chatCompletion.choices[0].message.content;
+      final content = chatCompletion.choices.first.message.content?.first.text ?? "";
 
       response = 'Cora: $content';
     } on RequestFailedException catch (e) {
