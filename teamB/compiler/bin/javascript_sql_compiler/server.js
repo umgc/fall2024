@@ -4,6 +4,7 @@ const url = require('url');
 const PORT = 3000;
 const processJSRequest = require('./javascriptCompiler');
 const processSQLRequest = require('./sqlCompiler');
+const processPyRequest = require('./pythonCompiler');
 
 const server = http.createServer((req, res) => {
   console.log('Server has been created');
@@ -36,6 +37,14 @@ const server = http.createServer((req, res) => {
         res.end('400 Bad Request\n');
       }
       break;
+    case '/compile/python':
+        if (req.method === 'POST' && req.headers['content-type'].includes('multipart/form-data')) {
+         processPyRequest(req, res);
+       } else {
+         res.statusCode = 400;
+         res.end('400 Bad Request\n');
+       }
+       break;
     default:
       res.statusCode = 404;
       res.end('404 Not Found\n');

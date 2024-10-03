@@ -26,13 +26,11 @@ async function processSQLRequest(req, res) {
       `File [${name}]: Filename: ${filename}, Encoding: ${encoding}, MimeType: ${mimeType}`
     );
 
-    console.log(mimeType);
-
-    // if (mimeType !== "application/javascript") {
-    //   hasInvalidFile = true;
-    //   file.resume(); // Discard this file
-    //   return;
-    // }
+    if (mimeType !== "application/javascript" && mimeType !== "application/x-sql") {
+      hasInvalidFile = true;
+      file.resume(); // Discard this file
+      return;
+    }
 
     const savePath = path.join(uploadDir, filename);
     const writeStream = fs.createWriteStream(savePath);
