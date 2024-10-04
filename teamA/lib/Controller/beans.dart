@@ -1,3 +1,5 @@
+// import 'dart:ffi';
+
 import 'package:xml/xml.dart';
 import 'dart:typed_data';
 
@@ -85,8 +87,7 @@ class Quiz {
 // Abstract class that represents a single question.
 class Question {
   String name; // question name - required.
-  String
-      type; // question type (multichoice, truefalse, shortanswer, essay) - required.
+  String type; // question type (multichoice, truefalse, shortanswer, essay) - required.
   String questionText; // question text - required.
   String? generalFeedback;
   String? defaultGrade;
@@ -95,6 +96,7 @@ class Question {
   String? attachmentsRequired;
   String? responseTemplate;
   String? graderInfo;
+  // Bool? isFavorite;
   // String description;
   List<Answer> answerList =
       <Answer>[]; // list of answers. Not needed for essay.
@@ -111,6 +113,7 @@ class Question {
     this.attachmentsRequired,
     this.responseTemplate,
     this.graderInfo,
+    // this.isFavorite,
     List<Answer>? answerList,
   }) : answerList = answerList ?? [];
 
@@ -146,6 +149,13 @@ class Question {
     }
     return question;
   }
+
+
+// Question copyWith({
+//    String? name
+//   }){
+//      return Question(name: name ?? this.name, type: type, questionText: questionText, isFavorite: isFavorite ?? isFavorite,);
+//  }
 
   @override
   String toString() {

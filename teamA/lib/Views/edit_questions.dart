@@ -19,44 +19,71 @@ class _EditQuestionsState extends State<EditQuestions> {
     myQuiz.description = "This is a quiz about the Pythagorean Theorem.";
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      appBar: AppBar(title: Text('Edit Questions')),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: [],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: [],
-          ),
-          Expanded(
-              flex: 1,
-              child: ListView.builder(
-                  padding: const EdgeInsets.all(8),
-                  itemCount: myQuiz.questionList.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return SizedBox(
-                      height: 150,
-                    //   color: Colors.amber[colorCodes[index]],
-                      child: Text('${myQuiz.questionList[index]}'),
-                    );
-                  })),
-        ],
+      appBar: AppBar(
+        title: Text('Flavors'),
+      ),
+      body: ListView.builder(
+        itemCount: myQuiz.questionList.length,
+        itemBuilder: (context, index) {
+          final question = myQuiz.questionList[index];
+          return Dismissible(
+            key: Key(question.name),
+            background: Container(
+              color: Colors.green,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Icon(Icons.favorite),
+                ),
+              ),
+            ),
+            secondaryBackground: Container(
+              color: Colors.red,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Icon(Icons.delete),
+                ),
+              ),
+            ),
+            confirmDismiss: (direction) async {
+              if (direction == DismissDirection.startToEnd) {
+                setState(() {
+                  // myQuiz.questionList[index] = Question.copyWith(isFavorite: !Question.isFavorite);
+                });
+                return false;
+              } else {
+                bool delete = true;
+                final snackbarController = ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Deleted $Question'),
+                    action: SnackBarAction(label: 'Undo', onPressed: () => delete = false),
+                  ),
+                );
+                await snackbarController.closed;
+                return delete;
+              }
+            },
+            onDismissed: (_) {
+              setState(() {
+                myQuiz.questionList.removeAt(index);
+              });
+            },
+            child: ListTile(
+              title: Text(question.toString()),
+              // trailing: Icon(myQuiz.questionList.Question.isFavorite ? Icons.favorite : Icons.favorite_border),
+            ),
+          );
+        },
       ),
     );
   }
+  
 }
 
 String sampleXML = '''
