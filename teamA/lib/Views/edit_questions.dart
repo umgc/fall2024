@@ -13,6 +13,7 @@ class _EditQuestionsState extends State<EditQuestions> {
   @override
   void initState() {
     super.initState();
+    //temporary code to load the quiz from the sample XML
     myQuiz = Quiz.fromXmlString(sampleXML);
     myQuiz.name = "My Quiz";
     myQuiz.description = "This is a quiz about the Pythagorean Theorem.";
@@ -22,10 +23,10 @@ class _EditQuestionsState extends State<EditQuestions> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      appBar: AppBar(title: Text('Create Assessment')),
+      appBar: AppBar(title: Text('Edit Questions')),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
         children: [
           Row(
@@ -41,15 +42,17 @@ class _EditQuestionsState extends State<EditQuestions> {
             children: [],
           ),
           Expanded(
-            flex: 1,
-            child: ListView(
-              scrollDirection: Axis.vertical,
-              padding: EdgeInsets.zero,
-              shrinkWrap: false,
-              physics: ScrollPhysics(),
-              children: [],
-            ),
-          ),
+              flex: 1,
+              child: ListView.builder(
+                  padding: const EdgeInsets.all(8),
+                  itemCount: myQuiz.questionList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return SizedBox(
+                      height: 150,
+                    //   color: Colors.amber[colorCodes[index]],
+                      child: Text('${myQuiz.questionList[index]}'),
+                    );
+                  })),
         ],
       ),
     );
