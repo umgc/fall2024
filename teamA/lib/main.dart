@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:namer_app/Views/course_list.dart';
 import 'Views/dashboard.dart';
 import 'Views/essay_edit_page.dart';
 import 'Views/course_content.dart';
@@ -43,6 +44,7 @@ class MyApp extends StatelessWidget {
         // '/create': (context) => const CreatePage(),
         '/dashboard': (context) => TeacherDashboard(),
         '/send_essay_to_moodle': (context) => EssayAssignmentSettings(),
+        '/course_list': (context) => CourseList(),
         // '/viewExams': (context) => const ViewExamPage(),
         // '/settings': (context) => Setting(themeModeNotifier: _themeModeNotifier)
       },
@@ -115,7 +117,15 @@ class _DevLaunch extends State {
                   MaterialPageRoute(
                       builder: (context) => CreateAssessment('Tester')));
             },
-          )
+          ),
+          ElevatedButton(
+              child: const Text('Course List'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CourseList()),
+                );
+              }),
         ]));
   }
 }
