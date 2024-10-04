@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:intelligrade/ui/create_page.dart';
+import 'package:intelligrade/assignment_form.dart';
 import 'package:intelligrade/ui/setting_page.dart';
 import 'package:intelligrade/ui/dashboard_page.dart';
 import 'package:intelligrade/ui/grading_page.dart';
@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
           routes: {
             '/login': (context) => const LoginPage(),
             '/grading': (context) => const GradingPage(),
-            '/create': (context) => const CreatePage(),
+            '/create': (context) => const CreateAssignmentScreen(),
             '/dashboard': (context) => const DashBoardPage(),
             '/viewAssignments': (context) => const ViewAssignmentsPage(),
             '/settings': (context) =>
