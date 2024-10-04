@@ -84,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: 80, width: 80),
                       const SizedBox(height: 20),
                       Text(
-                        "CogniOpen",
+                        "ClearAssist",
                         style: TextStyle(
                           color: Colors.blueGrey[900],
                           fontSize: 32.0,

@@ -4,14 +4,13 @@ import 'dart:async';
 
 import 'package:cogniopenapp/src/database/model/audio.dart';
 import 'package:cogniopenapp/src/typingIndicator.dart';
+import 'package:cogniopenapp/ui/reusable/custom_title.dart';
 import 'package:dart_openai/dart_openai.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-
-// This is a AssistantScreen class.
 
 class AssistantScreen extends StatefulWidget {
   const AssistantScreen({super.key, this.conversation});
@@ -51,21 +50,18 @@ class _AssistantScreenState extends State<AssistantScreen> {
 
     tts.setStartHandler(() {
       setState(() {
-        print("Playing");
         isPlaying = true;
       });
     });
 
     tts.setCompletionHandler(() {
       setState(() {
-        print("Complete");
         isPlaying = false;
       });
     });
 
     tts.setCancelHandler(() {
       setState(() {
-        print("Cancel");
         isPlaying = false;
       });
     });
@@ -84,14 +80,12 @@ class _AssistantScreenState extends State<AssistantScreen> {
   // response to chat list
   Future<void> _handleUserMessage(String messageText, bool display) async {
     if (display) {
-      // Create a user message
       ChatMessage userMessage = ChatMessage(
         messageText: messageText,
         isUserMessage: true,
         toggleTTS: (chatText) => toggleTTS(chatText),
       );
 
-      // Add the user message to the chat
       setState(() {
         _chatMessages.add(userMessage);
       });
@@ -99,20 +93,16 @@ class _AssistantScreenState extends State<AssistantScreen> {
 
     _scrollDown();
 
-    // Clear the input field
     _messageController.clear();
 
-    // Send the user message to the AI assistant (ChatGPT) and get a response
     String aiResponse = await getChatGPTResponse(messageText);
 
-    // Create an AI message
     ChatMessage aiMessage = ChatMessage(
       messageText: aiResponse,
       isUserMessage: false,
       toggleTTS: (chatText) => toggleTTS(chatText),
     );
 
-    // Add the AI message to the chat
     setState(() {
       _chatMessages.add(aiMessage);
     });
@@ -120,7 +110,6 @@ class _AssistantScreenState extends State<AssistantScreen> {
     _scrollDown();
   }
 
-// Scroll to the bottom of the chat list with delay to make sure newest message is rendered
   void _scrollDown() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.animateTo(
@@ -131,7 +120,6 @@ class _AssistantScreenState extends State<AssistantScreen> {
     });
   }
 
-  // Send user Message to ChatGPT 3.5 Turbo and return response
   Future<String> getChatGPTResponse(String userMessage) async {
     setState(() {
       _isTyping = true;
@@ -160,12 +148,10 @@ class _AssistantScreenState extends State<AssistantScreen> {
       role: OpenAIChatMessageRole.user,
     ));
 
-    print(messages);
-
     String response;
     try {
       OpenAIChatCompletionModel chatCompletion =
-          await OpenAI.instance.chat.create(
+      await OpenAI.instance.chat.create(
         model: "gpt-4o-mini",
         messages: messages,
       );
@@ -191,113 +177,73 @@ class _AssistantScreenState extends State<AssistantScreen> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: goodAPIKey, //Lock text input if API key is not found
-        initialData: false,
-        builder: (BuildContext context, AsyncSnapshot<bool> isLoad) {
-          return Scaffold(
-            extendBodyBehindAppBar: true,
-            appBar: AppBar(
-              backgroundColor:
-                  const Color(0x00440000), // Set appbar background color
-              centerTitle: true,
-              title: const Text('Virtual Assistant',
-                  style: TextStyle(color: Colors.black54)),
-              elevation: 0,
-              leading: const BackButton(color: Colors.black54),
-            ),
-            body: Container(
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage("assets/images/background.jpg"),
-                  fit: BoxFit.cover,
-                ),
+      future: goodAPIKey, //Lock text input if API key is not found
+      initialData: false,
+      builder: (BuildContext context, AsyncSnapshot<bool> isLoad) {
+        return Column(
+          children: <Widget>[
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.fromLTRB(20, 115, 20, 0),
+                controller: _scrollController,
+                itemCount: _chatMessages.length,
+                itemBuilder: (context, index) {
+                  return _chatMessages[index];
+                },
               ),
-              child: Column(
+            ),
+            if (_isTyping) TypingIndicator(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(25.0, 20, 0, 30),
+              child: Row(
                 children: <Widget>[
                   Expanded(
-                    child: ListView.builder(
-                      padding: EdgeInsets.fromLTRB(20, 115, 20, 0),
-                      controller: _scrollController,
-                      itemCount: _chatMessages.length,
-                      itemBuilder: (context, index) {
-                        return _chatMessages[index];
-                      },
+                    child: TextField(
+                      enabled: isLoad.data, //Disable input without API key
+                      controller: _messageController,
+                      decoration: const InputDecoration(
+                        hintText: 'Type your message...',
+                      ),
+                      maxLines: null,
+                      style: const TextStyle(color: Colors.white),
+                      cursorColor: Colors.white,
                     ),
                   ),
-                  if (_isTyping) TypingIndicator(),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(25.0, 20, 0, 30),
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: TextField(
-                            enabled:
-                                isLoad.data, //Disable input without API key
-                            controller: _messageController,
-                            decoration: const InputDecoration(
-                              hintText: 'Type your message...',
-                            ),
-                            maxLines: null,
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.send),
-                          onPressed: () {
-                            String messageText = _messageController.text.trim();
-                            if (messageText.isNotEmpty) {
-                              _handleUserMessage(messageText, true);
-                            }
-                          },
-                        ),
-                      ],
-                    ),
+                  IconButton(
+                    icon: const Icon(Icons.send, color: Colors.white),
+                    onPressed: () {
+                      String messageText = _messageController.text.trim();
+                      if (messageText.isNotEmpty) {
+                        _handleUserMessage(messageText, true);
+                      }
+                    },
                   ),
                 ],
               ),
             ),
-          );
-        });
+          ],
+        );
+      },
+    );
   }
 
   Future<bool> loadAPIKey() async {
-    print("Load");
-    // Load function will throw an error if cogniopenapp/.env is missing or empty
-    // make sure this file holds your api key in the format "OPEN_AI_API_KEY=<key>"
-    // Also, make sure not to share your API key or push it to Git
     await dotenv.load(fileName: ".env");
     String apiKeyEnv = dotenv.get('OPEN_AI_API_KEY', fallback: "");
 
-    // If there's no API key, throw internal error
     if (apiKeyEnv.isEmpty) {
       _showAlert("API Key Error",
           "OpenAI API Key must be set to use the Virtual Assistant.");
       return false;
     } else {
-      // Find the user's name to welcome them personally
-      String userName;
-      try {
-        final directory = await getApplicationDocumentsDirectory();
-        String path = directory.path;
-        final file = File('$path/user_data.txt');
-        String contents = await file.readAsString();
-        List<String> details = contents.split(', ');
-        userName = details[0];
-      } on Exception catch (e) {
-        // default if user file is not found (should not be possible outside of testing)
-        userName = "Unidentified User";
-
-        print(e.toString());
-      }
-
       OpenAI.apiKey = apiKeyEnv;
-      String prompt =
-          "You are an assistant for $userName, who has memory loss.";
+      String userName = "User"; // Default user name
+      String prompt = "You are an assistant for $userName, who has memory loss.";
       if (widget.conversation != null) {
-        print("path");
         String transcript = await getTranscript();
         if (transcript.isNotEmpty) {
           prompt +=
-              "\n$userName wants to talk about the following conversation: \n{$transcript}";
+          "\n$userName wants to talk about the following conversation: \n$transcript";
         }
       }
       setState(() {
@@ -308,33 +254,30 @@ class _AssistantScreenState extends State<AssistantScreen> {
     }
   }
 
-  // Display alert when API key is empty
   FutureOr _showAlert(String title, String message) {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              title: Text(title),
-              content: Text(message),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ));
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ));
   }
 
   Future<String> getTranscript() async {
     File? file = await widget.conversation!.loadTranscriptFile();
     if (file != null) {
-      print(file.path);
       try {
         return await file.readAsString();
       } on Exception catch (e) {
         _showAlert("Missing Transcript", "Transcript file could not be read.");
-        print(e.toString());
         return "";
       }
     }
@@ -349,7 +292,8 @@ class ChatMessage extends StatelessWidget {
   final String messageText;
   final bool isUserMessage;
 
-  const ChatMessage({super.key, 
+  const ChatMessage({
+    super.key,
     required this.messageText,
     required this.isUserMessage,
     required this.toggleTTS,
@@ -359,8 +303,8 @@ class ChatMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     var virtualAssistantIcon = Image.asset(
       'assets/icons/virtual_assistant.png',
-      width: 25.0, // You can adjust the width and height
-      height: 25.0, // as per your requirement
+      width: 25.0,
+      height: 25.0,
     );
     IconButton speakerButton = IconButton(
       icon: const Icon(IconData(0xe6c5, fontFamily: 'MaterialIcons')),
@@ -389,9 +333,10 @@ class ChatMessage extends StatelessWidget {
           borderRadius: BorderRadius.circular(10.0),
           boxShadow: const [
             BoxShadow(
-                color: Colors.grey, //New
-                blurRadius: 15,
-                offset: Offset(0, 12))
+              color: Colors.grey,
+              blurRadius: 15,
+              offset: Offset(0, 12),
+            )
           ],
         ),
         child: FractionallySizedBox(

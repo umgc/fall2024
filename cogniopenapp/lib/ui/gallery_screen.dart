@@ -39,7 +39,7 @@ class GalleryScreen extends StatefulWidget {
     // Scaffold widget for the Gallery screen
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gallery', style: TextStyle(color: Colors.black54)),
+        title: const Text('Gallery', style: TextStyle(color: Colors.white)),
       ),
       // Implement the Gallery screen UI here
     );
@@ -250,105 +250,108 @@ class _GalleryScreenState extends State<GalleryScreen> {
     _updateLayoutValues();
     refresh();
 
-    return Scaffold(
-        backgroundColor: Color(int.parse("0xFFC1DFDD")),
-        extendBodyBehindAppBar: false,
-        extendBody: true,
-        appBar: _buildAppBar(),
-        body: Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/images/background.jpg"),
-              fit: BoxFit.cover,
-            ),
-          ),
-          child: Column(
+    return Container(
+      color: Colors.transparent, // Transparent background for the container
+      child: Stack(
+        children: [
+          // Main content with the grid view
+          Column(
             children: [
+              // Sticky custom app bar at the top
+              _buildCustomAppBar(),
               if (_searchBarVisible) _buildSearchBar(),
               Expanded(
                 child: _buildGridView(),
               ),
-              _buildSliderBar(),
             ],
           ),
-        ));
-  }
-
-  AppBar _buildAppBar() {
-    return AppBar(
-      backgroundColor: const Color(0x00440000),
-      elevation: 0.0,
-      iconTheme: const IconThemeData(
-        color: Colors.black54, //change your color here
-      ),
-      title: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 4),
+          // Sticky slider bar at the bottom
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: _buildSliderBar(),
+          ),
         ],
       ),
-      actions: [
-        Row(
-          children: [
-            // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| SEARCH BAR |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-            IconButton(
-              key: const Key('searchIcon'),
-              icon: const Icon(Icons.search),
-              color: Colors.black54,
-              onPressed: _toggleSearchBarVisibility,
-            ),
-            IconButton(
-              key: const Key('cameraIcon'),
-              color: Colors.grey,
-              icon: const Icon(Icons.camera_alt),
-              onPressed: takePicture,
-            ),
-            // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| FAVORITE/TYPE ICONS FOR GRID VIEW |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-            IconButton(
-              key: const Key('favoriteIcon'),
-              color: _showFavoritedOnly ? Colors.yellow : Colors.grey,
-              icon: _showFavoritedOnly
-                  ? const Icon(Icons.star)
-                  : const Icon(Icons.star_border),
-              onPressed: _toggleShowFavorited,
-            ),
-            IconButton(
-              key: const Key('filterPhotoIcon'),
-              icon: _showPhotos
-                  ? const Icon(Icons.photo)
-                  : const Icon(Icons.photo_outlined),
-              color: _showPhotos ? Colors.blueAccent : Colors.grey,
-              onPressed: _toggleShowPhotos,
-            ),
-            IconButton(
-              key: const Key('filterVideoIcon'),
-              color: _showVideos ? Colors.blueAccent : Colors.grey,
-              icon: _showVideos
-                  ? const Icon(Icons.videocam)
-                  : const Icon(Icons.videocam_outlined),
-              onPressed: _toggleShowVideos,
-            ),
-            IconButton(
-              key: const Key('filterConversationIcon'),
-              color: _showConversations ? Colors.blueAccent : Colors.grey,
-              icon: _showConversations
-                  ? const Icon(Icons.chat)
-                  : const Icon(Icons.chat_outlined),
-              onPressed: _toggleShowConversations,
-            ),
-          ],
-        ),
-        // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| POP UP MENU BAR |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-        PopupMenuButton<SortingCriteria>(
-          key: const Key('sortGalleryButton'),
-          itemBuilder: (BuildContext context) {
-            return _buildSortingCriteriaMenuItems();
-          },
-          onSelected: _onSortingCriteriaSelected,
-        ),
-      ],
     );
   }
+
+  Widget _buildCustomAppBar() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+      color: const Color(0x00440000), // Set background color if necessary
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Left Side (Empty, no leading icons as in your AppBar)
+          const SizedBox(width: 48), // To align with the actions row space
+
+          // Center Icons Row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                key: const Key('searchIcon'),
+                icon: const Icon(Icons.search),
+                color: Colors.white,
+                onPressed: _toggleSearchBarVisibility,
+              ),
+              IconButton(
+                key: const Key('cameraIcon'),
+                color: Colors.white,
+                icon: const Icon(Icons.camera_alt),
+                onPressed: takePicture,
+              ),
+              IconButton(
+                key: const Key('favoriteIcon'),
+                color: _showFavoritedOnly ? Colors.yellow : Colors.white,
+                icon: _showFavoritedOnly
+                    ? const Icon(Icons.star)
+                    : const Icon(Icons.star_border),
+                onPressed: _toggleShowFavorited,
+              ),
+              IconButton(
+                key: const Key('filterPhotoIcon'),
+                icon: _showPhotos
+                    ? const Icon(Icons.photo)
+                    : const Icon(Icons.photo_outlined),
+                color: _showPhotos ? Colors.deepPurple : Colors.white,
+                onPressed: _toggleShowPhotos,
+              ),
+              IconButton(
+                key: const Key('filterVideoIcon'),
+                color: _showVideos ? Colors.deepPurple : Colors.white,
+                icon: _showVideos
+                    ? const Icon(Icons.videocam)
+                    : const Icon(Icons.videocam_outlined),
+                onPressed: _toggleShowVideos,
+              ),
+              IconButton(
+                key: const Key('filterConversationIcon'),
+                color: _showConversations ? Colors.deepPurple : Colors.white,
+                icon: _showConversations
+                    ? const Icon(Icons.chat)
+                    : const Icon(Icons.chat_outlined),
+                onPressed: _toggleShowConversations,
+              ),
+            ],
+          ),
+
+          // Right Side Popup Menu
+          PopupMenuButton<SortingCriteria>(
+            key: const Key('sortGalleryButton'),
+            iconColor: Colors.white,
+            itemBuilder: (BuildContext context) {
+              return _buildSortingCriteriaMenuItems();
+            },
+            onSelected: _onSortingCriteriaSelected,
+          ),
+        ],
+      ),
+    );
+  }
+
 
   // Don't ask me how or why this works
   void refresh() {
@@ -405,7 +408,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(
-            color: Colors.black,
+            color: Colors.deepPurple,
             width: 2.0,
           ),
         ),
@@ -524,7 +527,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
           children: [
             Icon(
               media.isFavorited ? Icons.star : Icons.star_border,
-              color: media.isFavorited ? Colors.yellow : Colors.grey,
+              color: media.isFavorited ? Colors.yellow : Colors.white,
               size: _iconSize,
             ),
           ],
@@ -611,135 +614,108 @@ class _FullObjectViewState extends State<FullObjectView> {
     // Get the screen height
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      backgroundColor:
-          Colors.transparent, // Make the Scaffold's background transparent
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor:
-            Colors.transparent, // Make the AppBar's background transparent
-        elevation: 0.0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          color: Colors.black54,
-          onPressed: () async {
-            Navigator.of(context).pop();
-            Navigator.of(context).pop();
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const GalleryScreen()),
-            );
-          },
-        ), // Remove the BackButton
-        title: const Text('Gallery Details',
-            style: TextStyle(color: Colors.black54)),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () async {
-              await displayEditPopup(context, widget.activeMedia);
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () async {
-              // Call the delete method when the delete button is pressed
-              await deleteMedia(widget.activeMedia);
-              // Navigate back to the ResponseScreen
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const GalleryScreen()),
-              );
-            },
-          ),
-        ],
-      ),
-      body: Container(
-        height:
-            screenHeight, // Set the height of the Container to the screen height
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/images/background.jpg"),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: SingleChildScrollView(
-          child: Center(
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
-              child: Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage("assets/images/background.jpg"),
-                    fit: BoxFit.cover,
-                  ),
+    return Container(
+      color: Colors.transparent, // Transparent background
+      child: Column(
+        children: [
+          // Row of icons at the top (acts like the AppBar)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.white),
+                  onPressed: () async {
+                    await displayEditPopup(context, widget.activeMedia);
+                  },
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(
-                        height:
-                            80), // Used to provide an invisible barrier for the objects
-                    addSpacingSizedBox(),
-                    if (widget.activeMedia.title.isNotEmpty)
-                      returnTextBox("Title", widget.activeMedia.title),
-                    addSpacingSizedBox(),
-                    returnTextBox("Timestamp",
-                        FormatUtils.getDateString(widget.activeMedia.timestamp)),
-                    addSpacingSizedBox(),
-                    if (widget.activeMedia is Audio)
-                      createAudioControlButtons(),
-                    addSpacingSizedBox(),
-                    if (widget.activeMedia is Photo &&
-                        (widget.activeMedia as Photo).photo != null)
-                      Image(
-                        image: (widget.activeMedia as Photo).photo!.image,
-                      ),
-                    if (widget.activeMedia is Video &&
-                        (widget.activeMedia as Video).thumbnail != null)
-                      videoDisplay(widget.activeMedia as Video),
-                    addSpacingSizedBox(),
-                    if (widget.activeMedia.description != null &&
-                        widget.activeMedia.description != "")
-                      returnTextBox(
-                          "Description", '${widget.activeMedia.description}'),
-                    addSpacingSizedBox(),
-                    if (widget.activeMedia is Audio)
-                      returnTextBox("Summary",
-                          '${(widget.activeMedia as Audio).summary}'),
-                    addSpacingSizedBox(),
-                    if (widget.activeMedia is Audio)
-                      FutureBuilder<String>(
-                        future: readFileAsString(widget.activeMedia as Audio),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const CircularProgressIndicator();
-                          } else if (snapshot.hasError) {
-                            return Text('Error: ${snapshot.error}');
-                          } else {
-                            return returnTextBox(
-                                "Transcription", '${snapshot.data}');
-                          }
-                        },
-                      ),
-                    if (widget.activeMedia.physicalAddress!.isNotEmpty)
-                      returnTextBox(
-                          "Address", '${widget.activeMedia.physicalAddress}'),
-                  ],
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.white),
+                  onPressed: () async {
+                    // Call the delete method when the delete button is pressed
+                    await deleteMedia(widget.activeMedia);
+                    // Navigate back to the ResponseScreen
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const GalleryScreen()),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+
+          // Body content
+          Expanded(
+            child: SingleChildScrollView(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 80), // Invisible barrier for spacing
+                      addSpacingSizedBox(),
+                      if (widget.activeMedia.title.isNotEmpty)
+                        returnTextBox("Title", widget.activeMedia.title),
+                      addSpacingSizedBox(),
+                      returnTextBox("Timestamp",
+                          FormatUtils.getDateString(widget.activeMedia.timestamp)),
+                      addSpacingSizedBox(),
+                      if (widget.activeMedia is Audio)
+                        createAudioControlButtons(),
+                      addSpacingSizedBox(),
+                      if (widget.activeMedia is Photo &&
+                          (widget.activeMedia as Photo).photo != null)
+                        Image(
+                          image: (widget.activeMedia as Photo).photo!.image,
+                        ),
+                      if (widget.activeMedia is Video &&
+                          (widget.activeMedia as Video).thumbnail != null)
+                        videoDisplay(widget.activeMedia as Video),
+                      addSpacingSizedBox(),
+                      if (widget.activeMedia.description != null &&
+                          widget.activeMedia.description != "")
+                        returnTextBox(
+                            "Description", '${widget.activeMedia.description}'),
+                      addSpacingSizedBox(),
+                      if (widget.activeMedia is Audio)
+                        returnTextBox("Summary",
+                            '${(widget.activeMedia as Audio).summary}'),
+                      addSpacingSizedBox(),
+                      if (widget.activeMedia is Audio)
+                        FutureBuilder<String>(
+                          future: readFileAsString(widget.activeMedia as Audio),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              return returnTextBox(
+                                  "Transcription", '${snapshot.data}');
+                            }
+                          },
+                        ),
+                      if (widget.activeMedia.physicalAddress!.isNotEmpty)
+                        returnTextBox(
+                            "Address", '${widget.activeMedia.physicalAddress}'),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
+
 
   Future<void> deleteMedia(Media media) async {
     if (media is Audio) {

@@ -3,6 +3,7 @@
 /*
 Author: Eyerusalme (Jerry)
 */
+import 'package:cogniopenapp/ui/reusable/custom_title.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
@@ -87,8 +88,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: const Color(0x00440000), // Set appbar background color
         elevation: 0.0,
         centerTitle: true,
-        leading: const BackButton(color: Colors.black54),
-        title: const Text('Profile', style: TextStyle(color: Colors.black54)),
+        leading: const BackButton(color: Colors.white),
+        title: CustomTitle(titleText: 'Profile'),
       ),
       body: Container(
         decoration: const BoxDecoration(

@@ -8,6 +8,7 @@
 import 'dart:async';
 
 import 'package:camera/camera.dart';
+import 'package:cogniopenapp/ui/reusable/custom_title.dart';
 import 'package:flutter/material.dart';
 import 'package:cogniopenapp/src/camera_manager.dart';
 
@@ -72,14 +73,15 @@ class _CameraHomeState extends State<VideoScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        foregroundColor: Colors.white,
         flexibleSpace: const Image(
           image: AssetImage('assets/images/background.jpg'),
           fit: BoxFit.cover,
         ),
         elevation: 0,
         centerTitle: true,
-        leading: const BackButton(color: Colors.black54),
-        title: const Text('Camera', style: TextStyle(color: Colors.black54)),
+        leading: const BackButton(color: Colors.white),
+        title: CustomTitle(titleText: 'Video'),
       ),
       body: Column(
         children: <Widget>[
@@ -161,7 +163,7 @@ class _CameraHomeState extends State<VideoScreen>
                 image: AssetImage("assets/images/background.jpg"),
                 fit: BoxFit.cover,
               ),
-              color: Colors.black,
+              color: Colors.white,
             ),
             child: IconButton(
               icon: isRecording

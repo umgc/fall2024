@@ -4,6 +4,7 @@
 // Edited by: Ben Sutter
 // Refactored for Settings Screen with matching app style
 
+import 'package:cogniopenapp/ui/reusable/custom_title.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -28,125 +29,96 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      extendBody: true,
-      appBar: AppBar(
-        backgroundColor: const Color(0x00440000),
-        elevation: 0.0,
-        centerTitle: true,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
+    return Container(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView(
           children: [
-            Image.asset(
-              'assets/icons/app_icon.png', // Replace with your app icon
-              fit: BoxFit.contain,
-              height: 32,
+            const SizedBox(height: 20),
+            _buildSettingsCard(
+              icon: Icons.notifications,
+              title: 'Enable Notifications',
+              trailing: Switch(
+                value: _notificationsEnabled,
+                onChanged: (value) {
+                  setState(() {
+                    _notificationsEnabled = value;
+                  });
+                },
+              ),
             ),
-            const SizedBox(width: 10),
-            const Text('Settings',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black54)),
+            const Divider(color: Colors.black54, height: 25, thickness: 2),
+            _buildSettingsCard(
+              icon: Icons.dark_mode,
+              title: 'Dark Mode',
+              trailing: Switch(
+                value: _darkModeEnabled,
+                onChanged: (value) {
+                  setState(() {
+                    _darkModeEnabled = value;
+                  });
+                },
+              ),
+            ),
+            const Divider(color: Colors.black54, height: 25, thickness: 2),
+            _buildSettingsCard(
+              icon: Icons.language,
+              title: 'Language',
+              trailing: DropdownButton<String>(
+                value: _selectedLanguage,
+                dropdownColor: Colors.deepPurple,
+                style: Theme.of(context).textTheme.bodyMedium,
+                items: ['English', 'Spanish', 'French']
+                    .map<DropdownMenuItem<String>>(
+                        (String value) => DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    ))
+                    .toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedLanguage = newValue!;
+                  });
+                },
+              ),
+            ),
+            const Divider(color: Colors.black54, height: 25, thickness: 2),
+            _buildSettingsCard(
+              icon: Icons.location_on,
+              title: 'Location Access',
+              trailing: Switch(
+                value: _locationAccess,
+                onChanged: (value) {
+                  setState(() {
+                    _locationAccess = value;
+                  });
+                  _requestLocationPermission();
+                },
+              ),
+            ),
+            const Divider(color: Colors.black54, height: 25, thickness: 2),
+            Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: ElevatedButton(
+                onPressed: _showAboutDialog,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.deepPurple,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.info, size: 24, color: Colors.white),
+                    SizedBox(width: 10),
+                    Text('About'),
+                  ],
+                ),
+              ),
+            ),
           ],
-        ),
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/images/background.jpg"), // Background image
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: ListView(
-            children: [
-              const SizedBox(height: 20),
-              _buildSettingsCard(
-                icon: Icons.notifications,
-                title: 'Enable Notifications',
-                trailing: Switch(
-                  value: _notificationsEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      _notificationsEnabled = value;
-                    });
-                  },
-                ),
-              ),
-              const Divider(color: Colors.black54, height: 25, thickness: 2),
-              _buildSettingsCard(
-                icon: Icons.dark_mode,
-                title: 'Dark Mode',
-                trailing: Switch(
-                  value: _darkModeEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      _darkModeEnabled = value;
-                    });
-                  },
-                ),
-              ),
-              const Divider(color: Colors.black54, height: 25, thickness: 2),
-              _buildSettingsCard(
-                icon: Icons.language,
-                title: 'Language',
-                trailing: DropdownButton<String>(
-                  value: _selectedLanguage,
-                  dropdownColor: const Color(0XFFCCFFFF),
-                  style: TextStyle(color: Colors.black87),
-                  items: ['English', 'Spanish', 'French']
-                      .map<DropdownMenuItem<String>>(
-                          (String value) => DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      ))
-                      .toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selectedLanguage = newValue!;
-                    });
-                  },
-                ),
-              ),
-              const Divider(color: Colors.black54, height: 25, thickness: 2),
-              _buildSettingsCard(
-                icon: Icons.location_on,
-                title: 'Location Access',
-                trailing: Switch(
-                  value: _locationAccess,
-                  onChanged: (value) {
-                    setState(() {
-                      _locationAccess = value;
-                    });
-                    _requestLocationPermission();
-                  },
-                ),
-              ),
-              const Divider(color: Colors.black54, height: 25, thickness: 2),
-              Padding(
-                padding: const EdgeInsets.only(top: 20.0),
-                child: ElevatedButton(
-                  onPressed: _showAboutDialog,
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black,
-                    backgroundColor: const Color(0XFFCCFFFF),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.info, size: 24, color: Colors.black54),
-                      SizedBox(width: 10),
-                      Text('About'),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -154,13 +126,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildSettingsCard({required IconData icon, required String title, required Widget trailing}) {
     return ListTile(
-      leading: Icon(icon, color: Colors.black54),
+      leading: Icon(icon, color: Colors.white),
       title: Text(
         title,
-        style: TextStyle(
-          fontSize: 18.0,
-          color: Colors.black87,
-        ),
+        style: Theme.of(context).textTheme.bodyLarge,
       ),
       trailing: trailing,
     );
