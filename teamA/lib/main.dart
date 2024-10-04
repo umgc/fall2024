@@ -7,6 +7,7 @@ import 'Views/course_content.dart';
 import 'Views/send_essay_to_moodle.dart';
 import 'Views/essay_generation.dart';
 import 'Views/quiz_generator.dart';
+import 'Views/edit_questions.dart';
 
 void main() {
   runApp(MyApp());
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
         '/EssayGenerationPage': (context) =>
             EssayGeneration(title: 'Essay Generation'),
         '/QuizGenerationPage': (context) => CreateAssessment('Tester'),
-        // '/create': (context) => const CreatePage(),
+        '/EditQuestions': (context) => EditQuestions(),
         '/dashboard': (context) => TeacherDashboard(),
         '/send_essay_to_moodle': (context) => EssayAssignmentSettings(),
         // '/viewExams': (context) => const ViewExamPage(),
@@ -124,6 +125,13 @@ class _DevLaunch extends State {
                   context,
                   MaterialPageRoute(
                       builder: (context) => CreateAssessment('Tester')));
+            },
+          ),
+          ElevatedButton(
+            child: const Text('Edit Questions'),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => EditQuestions()));
             },
           )
         ]));
