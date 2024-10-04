@@ -18,6 +18,8 @@ class MainController
   final ValueNotifier<bool> isUserLoggedInNotifier = ValueNotifier(false);
   List<Course> courses = [];
   Course? selectedCourse;
+  List<Quiz>? quizzes;
+  List<Essay>? essays;
 
   Future<bool> loginToMoodle(String username, String password) async 
   {
@@ -79,5 +81,13 @@ class MainController
 
   Course? getSelectedCourse(){
     return selectedCourse;
+  }
+
+  List<Quiz>? getQuizzes(){
+    return quizzes;
+  }
+
+  List<Essay>? getEssays(){
+    return essays;
   }
 }

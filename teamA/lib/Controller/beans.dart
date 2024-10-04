@@ -32,7 +32,7 @@ class XmlConsts {
   static const html = 'html';
 }
 
-class Assessment {
+class Essay {
   //todo
 }
 

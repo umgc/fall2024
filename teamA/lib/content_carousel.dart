@@ -68,6 +68,32 @@ class CarouselCard extends StatelessWidget{
 
   CarouselCard(this.title, this.information, this.type);
 
+  CarouselCard fromQuiz(Quiz input){
+    //todo
+    return CarouselCard('test', 'test', 'assessment');
+  }
+
+  List<CarouselCard> fromQuizzes(List<Quiz> input){
+    List<CarouselCard> output = [];
+    for (Quiz quiz in input){
+      output.insert(output.length, fromQuiz(quiz));
+    }
+    return output;
+  }
+
+  CarouselCard fromEssay(Essay input){
+    //todo
+    return CarouselCard('test', 'test', 'essay');
+  }
+
+  List<CarouselCard> fromEssays(List<Essay> input){
+    List<CarouselCard> output = [];
+    for (Essay essay in input){
+      output.insert(output.length, fromEssay(essay));
+    }
+    return output;
+  }
+
   @override
   StatelessWidget build(BuildContext context){
     return Card.filled(
