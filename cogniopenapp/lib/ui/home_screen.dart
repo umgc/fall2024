@@ -15,6 +15,8 @@ import 'package:flutter/material.dart';
 
 // Main HomeScreen widget which is a stateless widget.
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -82,7 +84,8 @@ class _HomeScreenState extends State<HomeScreen> {
         extendBody: true,
         // Setting up the app bar at the top of the screen
         appBar: AppBar(
-          backgroundColor: const Color(0x440000), // Set appbar background color
+          backgroundColor:
+              const Color(0x00440000), // Set appbar background color
           elevation: 0.0,
           centerTitle: true, // This centers the title
           automaticallyImplyLeading: false,
@@ -97,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 32, // Adjust the size as needed
               ),
               const SizedBox(width: 10), // Spacing between the icon and title
-              const Text('CogniOpen',
+              const Text('ClearMind',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.black54)),
             ],
@@ -173,27 +176,35 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     _buildElevatedButton(
                       context: context,
-                      icon: Icon(Icons.photo,
-                          size: iconSize, color: Colors.black54),
-                      text: 'Gallery',
+                      icon: Icon(
+                        Icons.sos_rounded,
+                        size: iconSize,
+                        color: Colors.black54,
+                        semanticLabel: "Emergency Help Icon",
+                      ),
+                      text: 'Emergency Help',
                       screen: GalleryScreen(),
-                      keyName: "GalleryButtonKey",
+                      keyName: "EmergencyHelpButtonKey",
                     ),
                     _buildElevatedButton(
                       context: context,
-                      icon: Icon(Icons.search,
-                          size: iconSize, color: Colors.black54),
-                      text: 'Object Search',
+                      icon: Icon(
+                        Icons.manage_history,
+                        size: iconSize,
+                        color: Colors.black54,
+                        semanticLabel: "Emergency Help Icon",
+                      ),
+                      text: 'Task Management',
                       screen: ResponseScreen(),
-                      keyName: "VideoRecordingButtonKey",
+                      keyName: "TaskManagementButtonKey",
                     ),
                     _buildElevatedButton(
                       context: context,
                       icon: Icon(Icons.mic_rounded,
                           size: iconSize, color: Colors.black54),
-                      text: 'Record Audio',
+                      text: 'Transcript',
                       screen: AudioScreen(),
-                      keyName: "AudioRecordingButtonKey",
+                      keyName: "TranscriptButtonKey",
                     ),
                     _buildElevatedButton(
                       context: context,
@@ -203,13 +214,21 @@ class _HomeScreenState extends State<HomeScreen> {
                       screen: LocationHistoryScreen(),
                       keyName: "LocationObjectButtonKey",
                     ),
+                    // _buildElevatedButton(
+                    //   context: context,
+                    //   icon: Icon(Icons.flag,
+                    //       size: iconSize, color: Colors.black54),
+                    //   text: 'Tour Guide',
+                    //   screen: TourScreen(),
+                    //   keyName: "TourGuideButtonKey",
+                    // ),
                     _buildElevatedButton(
                       context: context,
-                      icon: Icon(Icons.flag,
+                      icon: Icon(Icons.calendar_today,
                           size: iconSize, color: Colors.black54),
-                      text: 'Tour Guide',
+                      text: 'Calendar',
                       screen: TourScreen(),
-                      keyName: "TourGuideButtonKey",
+                      keyName: "CalendarButtonKey",
                     ),
                   ],
                 ),
@@ -243,10 +262,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => screen),
-        );
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => CalendarPage()),
+        // );
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,

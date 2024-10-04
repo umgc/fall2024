@@ -23,7 +23,7 @@ void main() {
         s3Bucket.addAudioToS3('testAudio', '/assets/test_images/Sea waves.mp4'),
         result);
 
-    verifyNever(s3Bucket.addAudioToS3('testAudio', '\some\localPath'));
+    verifyNever(s3Bucket.addAudioToS3('testAudio', 'somelocalPath'));
   });
 
   test('U-6-2: add video to S3', () async {
@@ -42,6 +42,6 @@ void main() {
             'testVideo', '/assets/test_images/1MinuteSampleVideo.mp4'),
         result);
 
-    verifyNever(s3Bucket.addVideoToS3('testVideo2', '\some\localPath'));
+    verifyNever(s3Bucket.addVideoToS3('testVideo2', 'somelocalPath'));
   });
 }

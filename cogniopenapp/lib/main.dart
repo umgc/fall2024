@@ -24,14 +24,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'CogniOpen',
+      title: 'ClearAssist',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       initialRoute: '/loginScreen', // the initial screen when the app starts
       routes: {
-        '/loginScreen': (context) => LoginScreen(),
-        '/homeScreen': (context) => HomeScreen(),
+        '/loginScreen': (context) => const LoginScreen(),
+        '/homeScreen': (context) => const HomeScreen(),
         // You can add other routes as needed
       },
     );

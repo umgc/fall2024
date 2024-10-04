@@ -10,36 +10,14 @@ import 'registration_screen.dart';
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final LocalAuthentication _localAuth = LocalAuthentication();
-
-  Future<void> _authenticateWithAllMethods() async {
-    try {
-      final didAuthenticate = await _localAuth.authenticate(
-        localizedReason: 'Please authenticate to access your account',
-      );
-
-      if (didAuthenticate) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Authentication failed!')),
-        );
-      }
-    } catch (e) {
-      print(e);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
-    }
-  }
+  // Authentication instance removed
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: 80, width: 80),
                       const SizedBox(height: 20),
                       Text(
-                        "CogniOpen",
+                        "ClearMind",
                         style: TextStyle(
                           color: Colors.blueGrey[900],
                           fontSize: 32.0,
@@ -93,7 +71,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(height: 20),
                   GestureDetector(
-                    onTap: _authenticateWithAllMethods,
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()),
+                      );
+                    },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -113,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(height: 35),
                   Text(
-                    "First time Here? Welcome! \n \n Join us as we focus on nurturing memory wellness for cognitive impairment.",
+                    "New here? We're glad to have you! \n \n Come along with us as we prioritize memory care and cognitive health.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.blueGrey[600],
@@ -129,9 +112,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             builder: (context) => RegistrationScreen()),
                       );
                     },
-                    child: Text('Create Account'),
-                    style:
-                        ElevatedButton.styleFrom(primary: Colors.blueGrey[600]),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            const Color.fromARGB(255, 40, 121, 158)),
+                    child: Text(
+                      'Create Account',
+                      selectionColor: Colors.black38,
+                    ),
                   ),
                   SizedBox(height: 30),
                   ElevatedButton(
@@ -141,9 +128,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         MaterialPageRoute(builder: (context) => HomeScreen()),
                       );
                     },
-                    child: Text('HomeScreen(Test)'),
-                    style: ElevatedButton.styleFrom(
-                        primary: Colors.red), // This is for testing purpose
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    child: Text(
+                      'HomeScreen(Test)',
+                      selectionColor: Colors.black87,
+                    ), // This is for testing purpose
                   ),
                 ],
               ),

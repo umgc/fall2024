@@ -33,6 +33,8 @@ final API_KEY = dotenv.env['OPEN_AI_API_KEY']; // Replace with your API key
 
 /// AudioScreen widget provides the main interface for audio recording.
 class AudioScreen extends StatefulWidget {
+  const AudioScreen({super.key});
+
   @override
   _AudioScreenState createState() => _AudioScreenState();
 }
@@ -292,9 +294,8 @@ class _AudioScreenState extends State<AudioScreen> {
                   }
                   fullTranscription += item['alternatives'][0]['content'] + ' ';
                 } else if (item['type'] == 'punctuation') {
-                  fullTranscription = fullTranscription.trim() +
-                      item['alternatives'][0]['content'] +
-                      ' ';
+                  fullTranscription =
+                      '${fullTranscription.trim() + item['alternatives'][0]['content']} ';
                 }
               }
               setState(() {
@@ -446,7 +447,7 @@ class _AudioScreenState extends State<AudioScreen> {
         extendBodyBehindAppBar: true,
         extendBody: true,
         appBar: AppBar(
-          backgroundColor: const Color(0x440000),
+          backgroundColor: const Color(0x00440000),
           elevation: 0,
           centerTitle: true,
           leading: const BackButton(color: Colors.black54),
@@ -492,7 +493,7 @@ class _AudioScreenState extends State<AudioScreen> {
                                     children: [
                                       TextButton(
                                         style: ButtonStyle(
-                                            shape: MaterialStateProperty.all<
+                                            shape: WidgetStateProperty.all<
                                                     RoundedRectangleBorder>(
                                                 RoundedRectangleBorder(
                                           borderRadius:
@@ -599,10 +600,9 @@ class _AudioScreenState extends State<AudioScreen> {
                                           );
                                         },
                                         style: ElevatedButton.styleFrom(
-                                          primary: Colors
-                                              .red, // background (button) color - adjust as needed
-                                          onPrimary: Colors
-                                              .white, // foreground (text/icon) color - adjust as needed
+                                          foregroundColor: Colors.white,
+                                          backgroundColor: Colors
+                                              .red, // foreground (text/icon) color - adjust as needed
                                         ),
                                         child: Icon(Icons
                                             .delete), // Use the `delete` icon
@@ -640,7 +640,7 @@ class _AudioScreenState extends State<AudioScreen> {
                               child: TextButton(
                                 onPressed: _startRecording,
                                 style: ButtonStyle(
-                                    shape: MaterialStateProperty.all<
+                                    shape: WidgetStateProperty.all<
                                             RoundedRectangleBorder>(
                                         RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(75.0),

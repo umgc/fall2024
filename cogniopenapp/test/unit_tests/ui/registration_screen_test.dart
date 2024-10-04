@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   testWidgets('Tests that the application registration page loads correctly.', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(MaterialApp(home: RegistrationScreen()));
+    await tester.pumpWidget(const MaterialApp(home: RegistrationScreen()));
     await tester.pumpAndSettle();
     await tester.pump();
 

@@ -15,7 +15,7 @@ final mockPosition = Position(
     speed: 0.0,
     speedAccuracy: 0.0);
 
-final mockPlacemark = Placemark(
+const mockPlacemark = Placemark(
     administrativeArea: 'Maryland',
     country: 'United States',
     isoCountryCode: 'US',
@@ -28,9 +28,12 @@ final mockPlacemark = Placemark(
     subThoroughfare: '501',
     thoroughfare: 'Hungerford Drive');
 
-class MockGeolocatorPlatform extends Mock with MockPlatformInterfaceMixin implements GeolocatorPlatform {
+class MockGeolocatorPlatform extends Mock
+    with MockPlatformInterfaceMixin
+    implements GeolocatorPlatform {
   @override
-  Future<LocationPermission> requestPermission() => Future.value(LocationPermission.whileInUse);
+  Future<LocationPermission> requestPermission() =>
+      Future.value(LocationPermission.whileInUse);
 
   @override
   Future<Position> getCurrentPosition({
@@ -39,7 +42,9 @@ class MockGeolocatorPlatform extends Mock with MockPlatformInterfaceMixin implem
       Future.value(mockPosition);
 }
 
-class MockGeocodingPlatform extends Mock with MockPlatformInterfaceMixin implements GeocodingPlatform {
+class MockGeocodingPlatform extends Mock
+    with MockPlatformInterfaceMixin
+    implements GeocodingPlatform {
   @override
   Future<List<Placemark>> placemarkFromCoordinates(
     double latitude,
