@@ -12,16 +12,6 @@ $functions = [
             MOODLE_OFFICIAL_MOBILE_SERVICE,
         ]
     ],
-    'local_learninglens_add_question_to_quiz' => [
-        'classname'   => 'local_learninglens\external\add_question_to_quiz',
-        'description' => 'Add a question to a quiz',
-        'type'        => 'write',
-        'ajax'        => true,
-        'capabilities'=> 'mod/quiz:manage',
-        'services'     => [
-            MOODLE_OFFICIAL_MOBILE_SERVICE,
-            ]
-        ],
      'local_learninglens_import_questions' => [
         'classname'   => 'local_learninglens\external\import_questions',
         'description' => 'Import XML questions to a course question bank',

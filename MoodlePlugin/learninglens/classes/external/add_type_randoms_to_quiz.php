@@ -18,20 +18,6 @@ use qformat_xml;
 
 class add_type_randoms_to_quiz extends external_api {
 
-    /**
-     * Adds a specified number of qtype_random questions to a quiz.
-     *
-     * @param int $quizid The ID of the quiz to which questions will be added.
-     * @param int $categoryid The category ID from which random questions are drawn.
-     * @param int $numquestions The number of random questions to add.
-     * @throws moodle_exception If unable to add questions.
-     */
-
-    /**
-     * Defines function parameters
-     * @return external_function_parameters
-     */
-
     public static function execute_parameters() {
         return new external_function_parameters([
             'quizid' => new external_value(PARAM_INT, 'The quiz ID'),
@@ -40,10 +26,6 @@ class add_type_randoms_to_quiz extends external_api {
         ]);
     }
 
-    /**
-     * Defines function return values
-     * @return external_multiple_structure
-     */
     public static function execute_returns() {
         return new external_value(PARAM_BOOL, 'Returns TRUE if succesful');
 
@@ -76,43 +58,4 @@ class add_type_randoms_to_quiz extends external_api {
             return false; // Return false if an error occurs.
         }
     }
-
-    /**
-     * Creates a qtype_random question.
-     *
-     * @param int $categoryid The category ID for the random question.
-     * @return stdClass|false The created question object or false if failed.
-     * @throws moodle_exception If the question cannot be created.
-     */
-    // private static function create_random_question(int $categoryid) {
-    //     global $DB;
-
-    //     try {
-    //         // Create a question object with the necessary properties.
-    //         $question = new \stdClass();
-    //         $question->category = $categoryid;
-    //         $question->name = get_string('random', 'question');
-    //         $question->questiontext = '';
-    //         $question->questiontextformat = FORMAT_HTML;
-    //         $question->generalfeedback = ''; // Add this line to prevent the error.
-    //         $question->generalfeedbackformat = FORMAT_HTML; // Add format for feedback.
-    //         $question->qtype = 'random';
-    //         $question->stamp = make_unique_id_code();
-    //         $question->version = make_unique_id_code();
-    //         $question->hidden = 0;
-    //         $question->createdby = 2; // Default admin user (change as needed).
-    //         $question->modifiedby = 2; // Default admin user (change as needed).
-    //         $question->timecreated = time();
-    //         $question->timemodified = time();
-
-    //         // Insert the question into the database.
-    //         $question->id = $DB->insert_record('question', $question);
-
-    //         return $question;
-    //     } catch (Exception $e) {
-    //         // Log the error message or handle the error as needed.
-    //         debugging('Error creating random question: ' . $e->getMessage());
-    //         return false;
-    //     }
-    // }
 }

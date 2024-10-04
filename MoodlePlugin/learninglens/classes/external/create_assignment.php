@@ -6,164 +6,238 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/externallib.php');
 require_once($CFG->dirroot . '/course/modlib.php');
 require_once($CFG->dirroot . '/mod/assign/lib.php');
+require_once($CFG->dirroot.'/grade/grading/lib.php');
+require_once($CFG->dirroot.'/grade/grading/form/rubric/lib.php');
+require_once($CFG->dirroot.'/course/lib.php'); // For course functions
+
 
 use external_function_parameters;
 use external_single_structure;
-use external_multiple_structure;
 use external_value;
-use context_system;
 use context_course;
 use context_module;
-use moodle_exception;
 use coding_exception;
-use required_capability_exception;
-use access_manager;
 use external_api;
-use qformat_xml;
-use question_bank;
-use question_edit_contexts;
 
-class create_assignment extends \external_api {
+class create_assignment extends external_api {
 
+    // Define the input parameters for the web service
     public static function execute_parameters() {
         return new external_function_parameters(
             array(
-                'courseid'    => new external_value(PARAM_INT, 'Course ID'),
-                'sectionid'   => new external_value(PARAM_INT, 'Section ID'),
-                'name'        => new external_value(PARAM_TEXT, 'Assignment name'),
-                'description' => new external_value(PARAM_RAW, 'Assignment description', VALUE_OPTIONAL),
-                'duedate'     => new external_value(PARAM_INT, 'Due date timestamp', VALUE_OPTIONAL),
-                'startdate'     => new external_value(PARAM_INT, 'Start date timestamp', VALUE_OPTIONAL),
-                'rubricdefinitionid'    => new external_value(PARAM_INT, 'Rubric Definition ID', VALUE_OPTIONAL),
-                // Add more parameters as needed.
+                'courseid'        => new external_value(PARAM_INT, 'Course ID'),
+                'sectionid'       => new external_value(PARAM_INT, 'Section ID'),
+                'assignmentName'  => new external_value(PARAM_TEXT, 'Assignment name'),
+                'startdate'       => new external_value(PARAM_TEXT, 'Start date (timestamp)'),
+                'enddate'         => new external_value(PARAM_TEXT, 'End date (timestamp)'),
+                'rubricJson'      => new external_value(PARAM_RAW, 'Rubric JSON', VALUE_DEFAULT, ''),
+                'description'     => new external_value(PARAM_RAW, 'Assignment description', VALUE_DEFAULT, '')
             )
         );
     }
 
-    public static function execute($courseid, $sectionid, $name, $description = '', $startdate = 0, $duedate = 0, $rubricdefinitionid = 0) {
-        global $DB, $CFG, $USER;
+    // The actual function that performs the task
+    public static function execute($courseid, $sectionid, $assignmentName, $startdate, $enddate, $rubricJson = '', $description = '') {
+        global $USER, $DB;
 
-        // Validate parameters.
-        $params = self::validate_parameters(self::execute_parameters(), array(
-            'courseid'    => $courseid,
-            'sectionid'   => $sectionid,
-            'name'        => $name,
-            'description' => $description,
-            'startdate'   => $startdate,
-            'duedate'     => $duedate,
-            'rubricdefinitionid'    => $rubricdefinitionid,
-        ));
+        // Validate the parameters
+        $params = self::validate_parameters(
+            self::execute_parameters(),
+            array(
+                'courseid'        => $courseid,
+                'sectionid'       => $sectionid,
+                'assignmentName'  => $assignmentName,
+                'startdate'       => $startdate,
+                'enddate'         => $enddate,
+                'rubricJson'      => $rubricJson,
+                'description'     => $description
+            )
+        );
 
-        // Debugging: Log parameter values
-        error_log('Debug: courseid = ' . $params['courseid']);
-        error_log('Debug: sectionid = ' . $params['sectionid']);
+    // Convert date strings to timestamps
+    $startdate_timestamp = strtotime($startdate);
+    $enddate_timestamp = strtotime($enddate);
 
-        // Context validation.
-        $context = context_course::instance($params['courseid']);
-        self::validate_context($context);
+    // Validate the conversion
+    if ($startdate_timestamp === false) {
+        throw new invalid_parameter_exception('Invalid start date format.');
+    }
+    if ($enddate_timestamp === false) {
+        throw new invalid_parameter_exception('Invalid end date format.');
+    }
 
-        // Capability check.
-        require_capability('moodle/course:manageactivities', $context);
+        // Capability check
+        $context = context_course::instance($courseid);
+        require_capability('mod/assign:addinstance', $context);
 
-        // Retrieve the course record.
-        try {
-            $course = $DB->get_record('course', array('id' => $params['courseid']), '*', MUST_EXIST);
-        } catch (dml_missing_record_exception $e) {
-            throw new invalid_parameter_exception('Invalid course ID: ' . $params['courseid']);
-        }
+        // Prepare the course module data
+        $moduleid = $DB->get_field('modules', 'id', ['name' => 'assign']);
+        $cm = new \stdClass();
+        $cm->course = $courseid;
+        $cm->module = $moduleid;
+        $cm->section = $sectionid;
+        $cm->visible = 1;
 
-        // Check if the section exists in the course.
-        try {
-            $section = $DB->get_record('course_sections', array('section' => $params['sectionid'], 'course' => $params['courseid']), '*', MUST_EXIST);
-        } catch (dml_missing_record_exception $e) {
-            throw new invalid_parameter_exception('Invalid section ID: ' . $params['sectionid'] . ' for course ID: ' . $params['courseid']);
-        }
+        // Add the course module entry
+        $cmid = add_course_module($cm);
 
-        // Prepare assignment data.
-        $assignment = new \stdClass();
-        $assignment->course       = $params['courseid'];
-        $assignment->name         = $params['name'];
-        $assignment->intro        = $params['description'];
-        $assignment->introformat  = FORMAT_HTML;
-        $assignment->duedate      = $params['duedate'];
-        $assignment->timemodified = time();
-        $assignment->submissiondrafts = 1;
-        $assignment->requiresubmissionstatement = 0;
-        $assignment->assignmenttype = 'onlinetext';
-        $assignment->allowsubmissions = 1;
-        $assignment->sendnotifications = 0;
-        $assignment->sendlatenotifications = 0;
-        $assignment->cutoffdate = $params['duedate'] + 86400;
-        $assignment->gradingduedate = $params['duedate'] + 86400;
-        $assignment->allowsubmissionsfromdate = $params['startdate'];
-        $assignment->grade = 0;
-        $assignment->teamsubmission = 0;
-        $assignment->requireallteammemberssubmit = 0;
-        $assignment->blindmarking = 0;
-        $assignment->markingworkflow = 0;
+        // Prepare the assignment data
+        $assignment_data = new \stdClass();
+        $assignment_data->course = $courseid;
+        $assignment_data->name = $assignmentName;
+        $assignment_data->intro = $description;
+        $assignment_data->introformat = FORMAT_HTML;
+        $assignment_data->duedate = $enddate_timestamp;
+        $assignment_data->allowsubmissionsfromdate = $startdate_timestamp;
+        $assignment_data->grade = 100;
+        $assignment_data->coursemodule = $cmid;
 
-        // Module info.
-        $moduleinfo = new \stdClass();
-        $moduleinfo->modulename = 'assign'; // Correct module name
-        $moduleinfo->section    = $section->section; // Use section number, not section ID
-        $moduleinfo->visible    = 1;
-        $moduleinfo->module     = $DB->get_field('modules', 'id', array('name' => 'assign'), MUST_EXIST);
+        // Required fields that must be set
+        $assignment_data->submissiondrafts = 0; // Allow submission drafts: 0 = No, 1 = Yes
+        $assignment_data->requiresubmissionstatement = 0; // Require submission statement
+        $assignment_data->sendnotifications = 1; // Send notifications to graders
+        $assignment_data->sendlatenotifications = 1; // Send notifications about late submissions
+        $assignment_data->sendstudentnotifications = 1; // Notify students
+        $assignment_data->teamsubmission = 0; // Team submissions
+        $assignment_data->requireallteammemberssubmit = 0; // Require all team members to submit
+        $assignment_data->blindmarking = 0; // Blind marking
+        $assignment_data->attemptreopenmethod = 'none'; // Attempt reopen method: 'none', 'manual', 'untilpass'
+        $assignment_data->maxattempts = -1; // Max attempts (-1 for unlimited)
+        $assignment_data->markingworkflow = 0; // Marking workflow
+        $assignment_data->markingallocation = 0; // Marking allocation
+        $assignment_data->cutoffdate = $enddate_timestamp; // Cut-off date
+        $assignment_data->gradingduedate = 0; // Grading due date
+        $assignment_data->grade = 100; // Maximum grade
+        $assignment_data->completionsubmit = 0; // Completion tracking
+        $assignment_data->alwaysshowdescription = 1; // Always show description
 
-        // Merge assignment data into module info.
-        foreach ($assignment as $key => $value) {
-            $moduleinfo->{$key} = $value;
-        }
+        // Initialize submission plugin settings
+        $assignment_data->assignsubmission_onlinetext_enabled = 1; // Enable online text submissions
+        $assignment_data->assignsubmission_file_enabled = 0;       // Disable file submissions
 
-        // Add the assignment module.
-        try {
-            $moduleinfo = add_moduleinfo($moduleinfo, $course); // Pass the course object   
-            $cmid = $moduleinfo->coursemodule; // Capture the course module ID (cmid) of the new assignment.
-        } catch (moodle_exception $e) {
-            throw new moodle_exception('moduledberror', 'error', '', $e->getMessage());
-        }
+        // Create the assignment instance
+        $assignment_instance = assign_add_instance($assignment_data);
 
-        if ($rubricdefinitionid !== 0) {
-            // Get the context of the assignment
-            $context = context_module::instance($cmid);
-        
+        // Update the course module with the correct instance ID
+        $DB->set_field('course_modules', 'instance', $assignment_instance, ['id' => $cmid]);
+
+        // Add the course module to the section
+        course_add_cm_to_section($courseid, $cmid, $sectionid);
+
+        // Set the assignment to use advanced grading (rubric) if rubricJson is provided
+        if (!empty($rubricJson)) {
+            // Create the context_module object
+            $module_context = context_module::instance($cmid);
+
+            require_capability('moodle/grade:managegradingforms', $module_context);
+
             // Initialize the grading manager
-            $grading_manager = get_grading_manager($context);
-            $grading_manager->set_component('mod_assign');
+            $grading_manager = get_grading_manager($module_context);
             $grading_manager->set_area('submissions');
-        
-            // Set the grading method to 'rubric'
+            $grading_manager->set_component('mod_assign');
             $grading_manager->set_active_method('rubric');
-        
-            // Get the controller for the rubric grading method
-            $controller = $grading_manager->get_controller('rubric');
-        
-            if ($controller instanceof \gradingform_rubric_controller) {
-                try {
-                    // Retrieve the rubric definition (template) by its ID from the `grading_definitions` table.
-                    $rubric_definition = $DB->get_record('grading_definitions', array('id' => $rubricdefinitionid), '*', MUST_EXIST);
-        
-                    // Create a new grading instance for the assignment using the template rubric definition.
-                    $grading_instance = $controller->get_or_create_instance(null, $USER->id, $cmid);
-        
-                    // Attach the template rubric to the grading instance
-                    $controller->update_instance($grading_instance->get_id(), $rubric_definition);
-        
-                    // Log success
-                    error_log("Successfully attached rubric definition ID $rubricdefinitionid to assignment with cmid $cmid");
-                } catch (dml_exception $e) {
-                    error_log("Error attaching rubric definition: " . $e->getMessage());
-                    throw new moodle_exception('failedtorubric', 'gradingform_rubric', '', 'Failed to attach the rubric template.');
-                }
-            } else {
-                throw new moodle_exception('invalidcontroller', 'gradingform_rubric', '', 'Failed to retrieve the rubric controller.');
-            }
-        
 
+            // Get the controller for the 'rubric' grading method
+            $rubric_controller = $grading_manager->get_controller('rubric');
+
+            // Create the rubric definition using the custom function
+            $rubric_definition = self::create_rubric_definition_from_json($rubricJson);
+
+            $rubric_controller->update_definition($rubric_definition);
         }
-        return $cmid; // Return the course module ID of the new assignment
+
+        return array('id' => $cmid, 'name' => $assignmentName);
     }
 
     public static function execute_returns() {
-        return new external_value(PARAM_INT, 'Course module ID of the new assignment');
+        return new external_single_structure(
+            array(
+                'id'   => new external_value(PARAM_INT, 'Course module ID (CMID)'),
+                'name' => new external_value(PARAM_TEXT, 'Assignment name')
+            )
+        );
+    }
+
+    public static function create_rubric_definition_from_json($rubricJson) {
+        // Decode the JSON input into an associative array
+        $rubric_data = json_decode($rubricJson, true);
+
+        // Check if the JSON is valid
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new coding_exception('Invalid JSON format.');
+        }
+
+        // Validate that the required fields (criteria and levels) exist in the JSON
+        if (!isset($rubric_data['criteria']) || !is_array($rubric_data['criteria'])) {
+            throw new coding_exception('Invalid rubric format: missing criteria.');
+        }
+
+        // Initialize the rubric definition object (stdClass)
+        $rubric_definition = new \stdClass();
+        $rubric_definition->status = 20; // 20 represents 'active'
+        $rubric_definition->description = ''; // Optional: Add rubric description if needed
+        $rubric_definition->name = 'Rubric Name'; // Optional: Set the rubric name
+
+        // Initialize the 'rubric' property with 'criteria' and 'options'
+        $rubric_definition->rubric = array(
+            'criteria' => array(),
+            'options' => array(
+                'sortlevelsasc' => 1,
+                'allowscoreoverrides' => 0,
+                'showdescriptionteacher' => 1,
+                'showdescriptionstudent' => 0,
+                // Add other options as required
+            ),
+        );
+
+        // Variables to keep track of criterion and level IDs
+        $criterion_id = 0;
+        $level_id = 0;
+
+        // Loop through each criterion in the JSON data
+        foreach ($rubric_data['criteria'] as $criterion_data) {
+            // Each criterion will be an associative array with 'levels' as an array
+            $criterion_array = array();
+            $criterion_array['id'] = $criterion_id;
+            $criterion_array['description'] = $criterion_data['description'];
+            $criterion_array['sortorder'] = $criterion_id; // Sort order starts at 0
+            $criterion_array['levels'] = array();
+
+            // Validate that the levels field exists
+            if (!isset($criterion_data['levels']) || !is_array($criterion_data['levels'])) {
+                throw new coding_exception('Invalid rubric format: missing levels for criterion.');
+            }
+
+            // Level counter for keys
+            $level_key = 0;
+
+            // Loop through each level in the criterion
+            foreach ($criterion_data['levels'] as $level_data) {
+                // Each level is an associative array with a definition (name) and score (points)
+                $level_array = array();
+                $level_array['id'] = $level_id; // ID is integer
+                $level_array['definition'] = $level_data['definition'];
+                $level_array['score'] = $level_data['score'];
+
+                // Assign the level array to the criterion's levels array with 'NEWID' keys
+                // This is required for the update_definition method to see them as new levels
+                $criterion_array['levels']['NEWID' . $level_key] = $level_array;
+
+                $level_id++;
+                $level_key++;
+            }
+
+            // Assign the criterion array to the rubric_definition's rubric['criteria'] array with 'NEWID' keys
+            $rubric_definition->rubric['criteria']['NEWID' . $criterion_id] = $criterion_array;
+            $criterion_id++;
+        }
+
+        // Add the description_editor property
+        $rubric_definition->description_editor = array(
+            'text' => $rubric_definition->description,
+            'format' => FORMAT_HTML,
+        );
+
+        return $rubric_definition;
     }
 }
