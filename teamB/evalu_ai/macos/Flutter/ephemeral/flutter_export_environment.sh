@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=C:\flutter"
-export "FLUTTER_APPLICATION_PATH=C:\Users\dmh10\OneDrive\Documents\Software Development\fall2024\evalu_ai"
+export "FLUTTER_ROOT=C:\tools\flutter"
+export "FLUTTER_APPLICATION_PATH=C:\Users\Camille\Documents\Repo\EvaluAI-Fall2024\teamB\evalu_ai"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.0.0"

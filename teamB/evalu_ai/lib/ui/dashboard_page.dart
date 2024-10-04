@@ -387,14 +387,12 @@ class _DashBoardPageState extends State<DashBoardPage> {
         },
       );
 
-      if (selectedCourseId != null) {
-        await DashBoardPage.controller
-            .postAssessmentToMoodle(quiz, selectedCourseId);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Quiz posted to Moodle successfully')),
-        );
-      }
-    } catch (e) {
+      await DashBoardPage.controller
+          .postAssessmentToMoodle(quiz, selectedCourseId);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Quiz posted to Moodle successfully')),
+      );
+        } catch (e) {
       if (kDebugMode) {
         print('Error posting quiz to Moodle: $e');
       }

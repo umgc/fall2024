@@ -1,6 +1,6 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=C:\flutter
-FLUTTER_APPLICATION_PATH=C:\Users\dmh10\OneDrive\Documents\Software Development\fall2024\evalu_ai
+FLUTTER_ROOT=C:\tools\flutter
+FLUTTER_APPLICATION_PATH=C:\Users\Camille\Documents\Repo\EvaluAI-Fall2024\teamB\evalu_ai
 COCOAPODS_PARALLEL_CODE_SIGN=true
 FLUTTER_BUILD_DIR=build
 FLUTTER_BUILD_NAME=1.0.0

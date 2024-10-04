@@ -391,14 +391,12 @@ class _ViewAssignmentsPage extends State<ViewAssignmentsPage> {
         },
       );
 
-      if (selectedCourseId != null) {
-        await ViewAssignmentsPage.controller
-            .postAssessmentToMoodle(quiz, selectedCourseId);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Quiz posted to Moodle successfully')),
-        );
-      }
-    } catch (e) {
+      await ViewAssignmentsPage.controller
+          .postAssessmentToMoodle(quiz, selectedCourseId);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Quiz posted to Moodle successfully')),
+      );
+        } catch (e) {
       if (kDebugMode) {
         print('Error posting quiz to Moodle: $e');
       }
