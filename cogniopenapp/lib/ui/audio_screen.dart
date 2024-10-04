@@ -3,6 +3,8 @@
 import 'package:cogniopenapp/src/data_service.dart';
 import 'package:cogniopenapp/src/database/model/audio.dart';
 import 'package:cogniopenapp/src/s3_connection.dart';
+import 'package:cogniopenapp/ui/home_screen.dart';
+import 'package:cogniopenapp/ui/reusable/custom_title.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:cogniopenapp/src/typingIndicator.dart';
@@ -27,6 +29,8 @@ import 'package:http/http.dart' as http;
 
 // Record button glow effect
 import 'package:avatar_glow/avatar_glow.dart';
+
+import 'home_screen_content.dart';
 
 const API_URL = 'https://api.openai.com/v1/completions';
 final API_KEY = dotenv.env['OPEN_AI_API_KEY']; // Replace with your API key
@@ -443,225 +447,198 @@ class _AudioScreenState extends State<AudioScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        extendBodyBehindAppBar: true,
-        extendBody: true,
-        appBar: AppBar(
-          backgroundColor: const Color(0x00440000),
-          elevation: 0,
-          centerTitle: true,
-          leading: const BackButton(color: Colors.black54),
-          title: const Text('Audio Recording',
-              style: TextStyle(color: Colors.black54)),
-        ),
-        body: Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/images/background.jpg"),
-              fit: BoxFit.cover,
+    return Container(
+      color: Colors.transparent, // Transparent background
+      child: Column(
+        children: [
+          // App bar replacement with back button and title
+          Padding(
+            padding: const EdgeInsets.only(top: 0.0), // Add padding for the status bar
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
             ),
           ),
-          child: Column(
-            children: [
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 20),
-                      if (_isRecording)
-                        Column(
-                          children: [
-                            AvatarGlow(
-                              glowColor: Colors.red,
-                              duration: Duration(milliseconds: 2000),
-                              repeat: true,
-                              child: Material(
-                                // Replace this child with your own
-                                elevation: 8.0,
-                                shape: CircleBorder(),
-                                child: CircleAvatar(
-                                  backgroundColor: Colors.grey[100],
-                                  radius: 70.0,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      TextButton(
-                                        style: ButtonStyle(
-                                            shape: WidgetStateProperty.all<
-                                                    RoundedRectangleBorder>(
-                                                RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(75.0),
-                                        ))),
-                                        onPressed: () async {
-                                          await _stopRecording();
-                                        },
-                                        child: const Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Icon(Icons.stop,
-                                                size: 65, color: Colors.red),
-                                            Text(
-                                              "Stop Audio Recording",
-                                              textAlign: TextAlign.center,
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Text(
-                              _duration
-                                  .toString()
-                                  .split('.')
-                                  .first
-                                  .padLeft(8, "0"),
-                              style: const TextStyle(
-                                  fontSize: 24, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        )
-                      else if (_pathToSaveRecording != null)
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.topCenter,
-                            child: Padding(
-                              padding: EdgeInsets.only(top: 200.0),
+
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 20),
+                  if (_isRecording)
+                    Column(
+                      children: [
+                        AvatarGlow(
+                          glowColor: Colors.red,
+                          duration: const Duration(milliseconds: 2000),
+                          repeat: true,
+                          child: Material(
+                            elevation: 8.0,
+                            shape: const CircleBorder(),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.grey[100],
+                              radius: 70.0,
                               child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      IconButton(
-                                        icon: _isPlaying
-                                            ? Icon(Icons.pause,
-                                                size: 40, color: Colors.blue)
-                                            : Icon(Icons.play_arrow,
-                                                size: 40, color: Colors.blue),
-                                        onPressed: _isPlaying
-                                            ? _startPlayback
-                                            : _startPlayback,
-                                      ),
-                                      IconButton(
-                                        icon: Icon(Icons.stop,
-                                            size: 40, color: Colors.blue),
-                                        onPressed: _isPlaying || _isPaused
-                                            ? _stopPlayback
-                                            : null,
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _pathToSaveRecording = null;
-                                            _duration =
-                                                const Duration(seconds: 0);
-                                            transcription = '';
-                                          });
-                                        },
-                                        child: const Text('New Recording'),
-                                      ),
-                                      SizedBox(width: 32),
-                                      ElevatedButton(
-                                        onPressed: () async {
-                                          // Your logic to remove audio
-                                          if (audioId != null) {
-                                            await DataService.instance
-                                                .removeAudio(audioId!);
-                                          }
-                                          setState(() {
-                                            _pathToSaveRecording = null;
-                                            _duration =
-                                                const Duration(seconds: 0);
-                                            transcription = '';
-                                          });
-                                          // Notify user that the recording has been deleted
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                                content:
-                                                    Text('Recording Deleted!')),
-                                          );
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          foregroundColor: Colors
-                                              .white, backgroundColor: Colors
-                                              .red, // foreground (text/icon) color - adjust as needed
+                                  TextButton(
+                                    style: ButtonStyle(
+                                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(75.0),
                                         ),
-                                        child: Icon(Icons
-                                            .delete), // Use the `delete` icon
-                                      )
-                                    ],
-                                  ),
-                                  if (_isTranscribing) TypingIndicator(),
-                                  Padding(
-                                    padding: const EdgeInsets.all(15.0),
-                                    child: Text(
-                                      transcription,
-                                      style: const TextStyle(fontSize: 16),
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      await _stopRecording();
+                                    },
+                                    child: const Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.stop, size: 65, color: Colors.red),
+                                        Text(
+                                          "Stop Audio Recording",
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
                             ),
                           ),
-                        )
-                      else
-                        AvatarGlow(
-                          glowColor: Colors.blue,
-                          duration: Duration(milliseconds: 2000),
-                          repeat: true,
-                          child: Material(
-                            // Replace this child with your own
-                            elevation: 8.0,
-                            shape: CircleBorder(),
-                            child: CircleAvatar(
-                              backgroundColor: const Color(0xFFFFFFFF),
-                              radius: 70.0,
-                              child: TextButton(
-                                onPressed: _startRecording,
-                                style: ButtonStyle(
-                                    shape: WidgetStateProperty.all<
-                                            RoundedRectangleBorder>(
-                                        RoundedRectangleBorder(
+                        ),
+                        Text(
+                          _duration.toString().split('.').first.padLeft(8, "0"),
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    )
+                  else if (_pathToSaveRecording != null)
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 200.0),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    icon: _isPlaying
+                                        ? const Icon(Icons.pause, size: 40, color: Colors.blue)
+                                        : const Icon(Icons.play_arrow, size: 40, color: Colors.blue),
+                                    onPressed: _isPlaying ? _startPlayback : _startPlayback,
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.stop, size: 40, color: Colors.blue),
+                                    onPressed: _isPlaying || _isPaused ? _stopPlayback : null,
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _pathToSaveRecording = null;
+                                        _duration = const Duration(seconds: 0);
+                                        transcription = '';
+                                      });
+                                    },
+                                    child: const Text('New Recording'),
+                                  ),
+                                  const SizedBox(width: 32),
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      if (audioId != null) {
+                                        await DataService.instance.removeAudio(audioId!);
+                                      }
+                                      setState(() {
+                                        _pathToSaveRecording = null;
+                                        _duration = const Duration(seconds: 0);
+                                        transcription = '';
+                                      });
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Recording Deleted!')),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      foregroundColor: Colors.white,
+                                      backgroundColor: Colors.red, // Adjust color as needed
+                                    ),
+                                    child: const Icon(Icons.delete), // Delete icon
+                                  ),
+                                ],
+                              ),
+                              if (_isTranscribing) TypingIndicator(),
+                              Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Text(
+                                  transcription,
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    AvatarGlow(
+                      glowColor: Colors.blue,
+                      duration: const Duration(milliseconds: 2000),
+                      repeat: true,
+                      child: Material(
+                        elevation: 8.0,
+                        shape: const CircleBorder(),
+                        child: CircleAvatar(
+                          backgroundColor: const Color(0xFFFFFFFF),
+                          radius: 70.0,
+                          child: TextButton(
+                            onPressed: _startRecording,
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(75.0),
-                                ))),
-                                child: const Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.mic,
-                                        size: 60, color: Colors.green),
-                                    Text(
-                                      "Start Audio Recording",
-                                      textAlign: TextAlign.center,
-                                    )
-                                  ],
                                 ),
                               ),
                             ),
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(Icons.mic, size: 60, color: Colors.green),
+                                Text(
+                                  "Start Audio Recording",
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                    ],
-                  ),
-                ),
+                      ),
+                    ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-        bottomNavigationBar: UiUtils.createBottomNavigationBar(context));
+        ],
+      ),
+    );
   }
+
 }

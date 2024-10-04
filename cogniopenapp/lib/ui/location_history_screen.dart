@@ -142,57 +142,75 @@ class _LocationHistoryScreenState extends State<LocationHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          backgroundColor:
-              const Color(0x00440000), // Set appbar background color
-          centerTitle: true,
-          title: const Text('Location History',
-              style: TextStyle(color: Colors.black54)),
-          elevation: 0,
-          leading: const BackButton(color: Colors.black54),
-        ),
-        body: Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/images/background.jpg"),
-              fit: BoxFit.cover,
-            ),
-          ),
-          child: RefreshIndicator(
-            onRefresh: _loadLocations,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: locations.isEmpty
-                  ? const Center(child: Text("No locations found"))
-                  : ListView.builder(
-                      itemCount: locations.length,
-                      itemBuilder: (context, index) {
-                        if (index > 0 && locations[index].endTime == null) {
-                          return Container(); // Return an empty container for these items.
-                        } else {
-                          return Card(
-                            color: const Color.fromRGBO(255, 255, 255, 0.75),
-                            child: ListTile(
-                              leading: const SizedBox(
-                                height: double.infinity,
-                                child: Icon(Icons.location_on),
-                              ),
-                              title: Text(
-                                  sanitizeAddress(locations[index].address)),
-                              subtitle: Text(getTimeStampString(
-                                  locations[index].startTime,
-                                  locations[index].endTime,
-                                  index)),
-                            ),
-                          );
-                        }
-                      },
+    return Container(
+      color: Colors.transparent, // Set the background to transparent
+      child: Column(
+        children: [
+          // Custom AppBar with a white back button
+          Padding(
+            padding: const EdgeInsets.only(top: 0.0), // Adjust for status bar padding
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () {
+                    Navigator.pop(context); // Pop the current screen from the stack
+                  },
+                ),
+                Expanded(
+                  child: const Center(
+                    child: Text(
+                      'Location History',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ));
+
+          // Main content (list of locations or "No locations found" message)
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: _loadLocations,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: locations.isEmpty
+                    ? const Center(child: Text("No locations found", style: TextStyle(color: Colors.white)))
+                    : ListView.builder(
+                  itemCount: locations.length,
+                  itemBuilder: (context, index) {
+                    if (index > 0 && locations[index].endTime == null) {
+                      return Container(); // Return an empty container for these items.
+                    } else {
+                      return Card(
+                        color: const Color.fromRGBO(255, 255, 255, 0.75),
+                        child: ListTile(
+                          leading: const SizedBox(
+                            height: double.infinity,
+                            child: Icon(Icons.location_on),
+                          ),
+                          title: Text(sanitizeAddress(locations[index].address)),
+                          subtitle: Text(getTimeStampString(
+                              locations[index].startTime,
+                              locations[index].endTime,
+                              index)),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   String getTimeStampString(DateTime? start, DateTime? end, int index) {
@@ -201,7 +219,7 @@ class _LocationHistoryScreenState extends State<LocationHistoryScreen> {
     }
 
     String formattedDate =
-        Moment(start!).format('MMMM Do, YYYY'); // Format the date
+    Moment(start!).format('MMMM Do, YYYY'); // Format the date
     String formattedTime =
         '${this.formattedTime(start)} - ${end != null ? this.formattedTime(end) : 'Now'}';
 

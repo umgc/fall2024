@@ -6,13 +6,43 @@ import 'audio_screen.dart';
 import 'location_history_screen.dart';
 import 'tour_screen.dart';
 
-class HomeScreenContent extends StatelessWidget {
+class HomeScreenContent extends StatefulWidget {
   const HomeScreenContent({Key? key}) : super(key: key);
+
+  @override
+  _HomeScreenContentState createState() => _HomeScreenContentState();
+}
+
+class _HomeScreenContentState extends State<HomeScreenContent> {
+  Widget _currentScreen = const HomeScreenContentBody(); // Start with the home content
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent, // Set scaffold background to transparent
+      body: _currentScreen,
+    );
+  }
+
+  // Function to change the current screen
+  void _setCurrentScreen(Widget screen) {
+    setState(() {
+      _currentScreen = screen;
+    });
+  }
+}
+
+class HomeScreenContentBody extends StatelessWidget {
+  const HomeScreenContentBody({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     double iconSize = 65;
+    _HomeScreenContentState homeScreenState =
+    context.findAncestorStateOfType<_HomeScreenContentState>()!;
+
     return Container(
+      color: Colors.transparent, // Set container background to transparent
       child: Column(
         children: [
           const Padding(
@@ -35,25 +65,25 @@ class HomeScreenContent extends StatelessWidget {
               padding: const EdgeInsets.all(26.0),
               children: [
                 _buildElevatedButton(
-                  context: context,
+                  homeScreenState: homeScreenState,
                   icon: Icon(Icons.search, size: iconSize, color: Colors.white),
                   text: 'Object Search',
                   screen: ResponseScreen(),
                 ),
                 _buildElevatedButton(
-                  context: context,
+                  homeScreenState: homeScreenState,
                   icon: Icon(Icons.mic_rounded, size: iconSize, color: Colors.white),
                   text: 'Record Audio',
                   screen: AudioScreen(),
                 ),
                 _buildElevatedButton(
-                  context: context,
+                  homeScreenState: homeScreenState,
                   icon: Icon(Icons.location_history, size: iconSize, color: Colors.white),
                   text: 'Location',
                   screen: LocationHistoryScreen(),
                 ),
                 _buildElevatedButton(
-                  context: context,
+                  homeScreenState: homeScreenState,
                   icon: Icon(Icons.flag, size: iconSize, color: Colors.white),
                   text: 'Tour Guide',
                   screen: TourScreen(),
@@ -67,7 +97,7 @@ class HomeScreenContent extends StatelessWidget {
   }
 
   Widget _buildElevatedButton({
-    required BuildContext context,
+    required _HomeScreenContentState homeScreenState,
     required Icon icon,
     required String text,
     required Widget screen,
@@ -82,10 +112,7 @@ class HomeScreenContent extends StatelessWidget {
         foregroundColor: Colors.white,
       ),
       onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => screen),
-        );
+        homeScreenState._setCurrentScreen(screen);
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,

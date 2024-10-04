@@ -56,73 +56,88 @@ class _ResponseScreenState extends State<ResponseScreen>
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
-        centerTitle: true,
-        leading: const BackButton(color: Colors.black54),
-        title: TextField(
-          controller: searchController,
-          decoration: const InputDecoration(
-            hintText: 'Search by Title',
-          ),
-        ),
-      ),
-      body: Container(
-        height: screenHeight,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/images/background.jpg"),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: SingleChildScrollView(
-          child: Center(
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
-              child: Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage("assets/images/background.jpg"),
-                    fit: BoxFit.cover,
+    return Container(
+      color: Colors.transparent, // Transparent background
+      child: Column(
+        children: [
+          // Custom AppBar with transparent background and white text/icon
+          Padding(
+            padding: const EdgeInsets.only(top: 10.0), // Adjust for status bar padding
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white), // White back button
+                  onPressed: () {
+                    Navigator.pop(context); // Pop the current screen from the stack
+                  },
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: searchController,
+                    style: const TextStyle(color: Colors.white), // Search text in white
+                    decoration: const InputDecoration(
+                      hintText: 'Search by Title',
+                      hintStyle: TextStyle(color: Colors.white54), // White hint text
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white), // White underline
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white), // White underline on focus
+                      ),
+                    ),
                   ),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(
-                      height: 80,
-                    ),
-                    for (var response in displayedResponses)
-                      GestureDetector(
-                          onTap: () {
-                            // Navigate to the VideoResponseGridScreen when a returnTextBox is tapped.
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ImageNavigatorScreen(
+              ],
+            ),
+          ),
+
+          // Main content
+          Expanded(
+            child: SingleChildScrollView(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
+                  child: Container(
+                    color: Colors.transparent, // Transparent container background
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 80),
+                        for (var response in displayedResponses)
+                          GestureDetector(
+                            onTap: () {
+                              // Navigate to the ImageNavigatorScreen when a returnTextBox is tapped.
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ImageNavigatorScreen(
                                     ResponseParser.getRequestedResponseList(
-                                        response.title,
-                                        filterInterval: 3000)),
-                              ),
-                            );
-                          },
-                          child: ResponseBox(response,
-                              "${response.title}: ${ResponseParser.getTimeStampFromResponse(response)} (${ResponseParser.getHoursFromResponse(response)}) \nSeen at: ${response.address}")),
-                  ],
+                                      response.title,
+                                      filterInterval: 3000,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            child: ResponseBox(
+                              response,
+                              "${response.title}: ${ResponseParser.getTimeStampFromResponse(response)} (${ResponseParser.getHoursFromResponse(response)}) \nSeen at: ${response.address}",
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
+
 
   SizedBox addSpacingSizedBox() {
     return const SizedBox(
