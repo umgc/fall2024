@@ -30,7 +30,8 @@ class _EditQuestionsState extends State<EditQuestions> {
         itemBuilder: (context, index) {
           final question = myQuiz.questionList[index];
           return Dismissible(
-            key: Key(question.name),
+            // key: Key(question.name),
+            key: Key(question.toString()),
             background: Container(
               color: Colors.green,
               child: Align(
@@ -54,7 +55,7 @@ class _EditQuestionsState extends State<EditQuestions> {
             confirmDismiss: (direction) async {
               if (direction == DismissDirection.startToEnd) {
                 setState(() {
-                  // myQuiz.questionList[index] = Question.copyWith(isFavorite: !Question.isFavorite);
+                  myQuiz.questionList[index] = question.copyWith(isFavorite: !question.isFavorite);
                 });
                 return false;
               } else {
