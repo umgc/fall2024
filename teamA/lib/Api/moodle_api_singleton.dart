@@ -102,7 +102,10 @@ class MoodleApiSingleton
             //todo check neccessity of an id for modules (personally think that's a 'probably')
             String name = module['name'];
             String description = '';
+            //todo learn how to get the questions from quizzes
+            //all this is literally only enough to make the CarouselCards
             if (module.containsKey('intro')){
+              //while all the null-shorting is amazingly useful, I don't know if Dart has KeyErrors
               description = module['intro'];
             }
             if (module['modname'] == 'quiz'){
@@ -140,6 +143,23 @@ class MoodleApiSingleton
     List<Quiz> results = [];
     for (Object c in contents){
       if (c is Quiz){
+        results.insert(results.length, c);
+      }
+    }
+    return results;
+  }
+
+  Future<List<Essay>> getEssays(int? courseID) async {
+    List contents;
+    if (courseID != null){
+      contents = await getCourseContents(courseID);
+    }
+    else{
+      contents = await getAllContents();
+    }
+    List<Essay> results = [];
+    for (Object c in contents){
+      if (c is Essay){
         results.insert(results.length, c);
       }
     }
