@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../Api/moodle_api_singleton';
+// import '../Api/moodle_api_singleton';
 import '/controller/main_controller.dart';
-import '../Controller/beans.dart';
+// import '../Controller/beans.dart';
 import '../Views/dashboard.dart';
 
 class LoginApp extends StatelessWidget 
@@ -165,10 +165,7 @@ class _LoginScreenState extends State<LoginScreen>
                 var wasSuccessful = await LoginScreen.controller.loginToMoodle(_usernameController.text, _passwordController.text, _moodleURL.text);
                 if (wasSuccessful) 
                 {
-                  var mytestvar = MoodleApiSingleton();
-                  print(mytestvar.moodleFirstName);
-
-                  List<Course> courses = await MainController().getCourses();
+                  // List<Course> courses = await MainController().getCourses();
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => TeacherDashboard())

@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Test App",
+      title: "Learning Lens",
       home: DevLaunch(),
       theme: ThemeData(
         useMaterial3: true,

@@ -61,7 +61,6 @@ class MoodleApiSingleton
       throw HttpException(userinforesponse.body);
     }
     Map<String, dynamic> userData = jsonDecode(userinforesponse.body);
-    print(userData);
     moodleUserName = userData['username'];
     moodleFirstName = userData['firstname'];
     moodleLastName = userData['lastname'];
