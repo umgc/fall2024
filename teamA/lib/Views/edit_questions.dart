@@ -1,4 +1,3 @@
-// import '../controller/xml_converter.dart';
 import '../controller/beans.dart';
 import 'package:flutter/material.dart';
 
@@ -9,87 +8,105 @@ class EditQuestions extends StatefulWidget {
 
 class _EditQuestionsState extends State<EditQuestions> {
   late Quiz myQuiz;
+  final TextEditingController _textController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    //temporary code to load the quiz from the sample XML
+    // temporary code to load the quiz from the sample XML
     myQuiz = Quiz.fromXmlString(sampleXML);
     myQuiz.name = "My Quiz";
     myQuiz.description = "This is a quiz about the Pythagorean Theorem.";
   }
 
-   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Learning Lens - Edit Questions'),
       ),
-      body: ListView.builder(
-        itemCount: myQuiz.questionList.length,
-        itemBuilder: (context, index) {
-          final question = myQuiz.questionList[index];
-          return Dismissible(
-            // key: Key(question.name),
-            key: Key(question.toString()),
-            background: Container(
-              color: Colors.green,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 16),
-                  child: Icon(Icons.favorite),
-                ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _textController,
+              decoration: InputDecoration(
+                labelText: 'Prompt: ${myQuiz.promptUsed}',
+                border: OutlineInputBorder(),
               ),
             ),
-            secondaryBackground: Container(
-              color: Colors.red,
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 16),
-                  child: Icon(Icons.delete),
-                ),
-              ),
-            ),
-            confirmDismiss: (direction) async {
-              if (direction == DismissDirection.startToEnd) {
-                setState(() {
-                  myQuiz.questionList[index] = question.copyWith(isFavorite: !question.isFavorite);
-                });
-                return false;
-              } else {
-                bool delete = true;
-                final snackbarController = ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Deleted $Question'),
-                    action: SnackBarAction(label: 'Undo', onPressed: () => delete = false),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: myQuiz.questionList.length,
+              itemBuilder: (context, index) {
+                final question = myQuiz.questionList[index];
+                return Dismissible(
+                  key: Key(question.toString()),
+                  background: Container(
+                    color: Colors.green,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 16),
+                        child: Icon(Icons.favorite),
+                      ),
+                    ),
+                  ),
+                  secondaryBackground: Container(
+                    color: Colors.red,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 16),
+                        child: Icon(Icons.delete),
+                      ),
+                    ),
+                  ),
+                  confirmDismiss: (direction) async {
+                    if (direction == DismissDirection.startToEnd) {
+                      setState(() {
+                        myQuiz.questionList[index] = question.copyWith(isFavorite: !question.isFavorite);
+                      });
+                      return false;
+                    } else {
+                      bool delete = true;
+                      final snackbarController = ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Deleted $Question'),
+                          action: SnackBarAction(label: 'Undo', onPressed: () => delete = false),
+                        ),
+                      );
+                      await snackbarController.closed;
+                      return delete;
+                    }
+                  },
+                  onDismissed: (_) {
+                    setState(() {
+                      myQuiz.questionList.removeAt(index);
+                    });
+                  },
+                  child: ListTile(
+                    title: Text(question.toString()),
+                    tileColor: (index.isEven) ? Theme.of(context).colorScheme.secondary : Theme.of(context).colorScheme.secondaryContainer,
+                    textColor: (index.isEven) ? Theme.of(context).colorScheme.onSecondary : Theme.of(context).colorScheme.onSecondaryContainer,
                   ),
                 );
-                await snackbarController.closed;
-                return delete;
-              }
-            },
-            onDismissed: (_) {
-              setState(() {
-                myQuiz.questionList.removeAt(index);
-              });
-            },
-            child: ListTile(
-              title: Text(question.toString()),
-              // trailing: Icon(myQuiz.questionList.Question.isFavorite ? Icons.favorite : Icons.favorite_border),
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }
-  
 }
+
 
 String sampleXML = '''
 <?xml version="1.0" encoding="UTF-8"?>
 <quiz>
+    <promptused>Give me a quiz about the Pythagorean Theorem.</promptused>
     <question type="truefalse">
         <name>
             <text>Question 1</text>
