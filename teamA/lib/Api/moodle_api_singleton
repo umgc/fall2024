@@ -67,7 +67,7 @@ class MoodleApiSingleton
     moodleLastName = userData['lastname'];
     moodleSiteName = userData['sitename'];
     moodleFullName = userData['fullname'];
-    moodleProfile = userData['userpictureurl'];
+    moodleProfileImage = userData['userpictureurl'];
 
   }
 
