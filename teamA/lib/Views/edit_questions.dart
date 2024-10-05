@@ -1,3 +1,6 @@
+import 'package:learninglens_app/Api/moodle_api_singleton';
+import 'package:image_network/image_network.dart';
+
 import '../controller/beans.dart';
 import 'package:flutter/material.dart';
 
@@ -21,9 +24,35 @@ class _EditQuestionsState extends State<EditQuestions> {
 
   @override
   Widget build(BuildContext context) {
+    var myTempvar = MoodleApiSingleton().moodleProfileImage!;
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 100,
         title: Text('Learning Lens - Edit Questions'),
+        actions: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(right: 10.0),
+            child: InkWell(
+              onTap: () {
+                // Add your action here, like navigating to a new page
+                print("Profile image clicked!");
+                // Navigator.push(...);
+              },
+              child: Material(
+                color: Colors.transparent,
+              child: Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  // color: Colors.white, //remove this when you add image.
+                ),
+                child: ImageNetwork(image: myTempvar, height: 100, width: 100),
+              ),
+            ),
+            ),
+      ),
+        ],
       ),
       body: Column(
         children: [
@@ -67,15 +96,18 @@ class _EditQuestionsState extends State<EditQuestions> {
                   confirmDismiss: (direction) async {
                     if (direction == DismissDirection.startToEnd) {
                       setState(() {
-                        myQuiz.questionList[index] = question.copyWith(isFavorite: !question.isFavorite);
+                        myQuiz.questionList[index] =
+                            question.copyWith(isFavorite: !question.isFavorite);
                       });
                       return false;
                     } else {
                       bool delete = true;
-                      final snackbarController = ScaffoldMessenger.of(context).showSnackBar(
+                      final snackbarController =
+                          ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Deleted $Question'),
-                          action: SnackBarAction(label: 'Undo', onPressed: () => delete = false),
+                          action: SnackBarAction(
+                              label: 'Undo', onPressed: () => delete = false),
                         ),
                       );
                       await snackbarController.closed;
@@ -89,8 +121,12 @@ class _EditQuestionsState extends State<EditQuestions> {
                   },
                   child: ListTile(
                     title: Text(question.toString()),
-                    tileColor: (index.isEven) ? Theme.of(context).colorScheme.secondary : Theme.of(context).colorScheme.secondaryContainer,
-                    textColor: (index.isEven) ? Theme.of(context).colorScheme.onSecondary : Theme.of(context).colorScheme.onSecondaryContainer,
+                    tileColor: (index.isEven)
+                        ? Theme.of(context).colorScheme.secondary
+                        : Theme.of(context).colorScheme.secondaryContainer,
+                    textColor: (index.isEven)
+                        ? Theme.of(context).colorScheme.onSecondary
+                        : Theme.of(context).colorScheme.onSecondaryContainer,
                   ),
                 );
               },
@@ -101,7 +137,6 @@ class _EditQuestionsState extends State<EditQuestions> {
     );
   }
 }
-
 
 String sampleXML = '''
 <?xml version="1.0" encoding="UTF-8"?>
