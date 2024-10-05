@@ -80,21 +80,69 @@ class MoodleApiSingleton
   }
 
   // Gets the contents of the specified course.
-  void getCourseContents(int courseID) async {
+  Future<List> getCourseContents(int courseID) async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
     // Make the request.
-    final http.Response response = await http.get(Uri.parse('$serverUrl$_userToken$jsonFormat&wsfunction=core_course_get_contents&courseid=$courseID'))
+    final http.Response response = await http.get(Uri.parse('$serverUrl$_userToken$jsonFormat&wsfunction=core_course_get_contents&courseid=$courseID'));
     if (response.statusCode != 200) {
       throw HttpException(response.body);
     }
     
     // Decode the JSON to get the wanted information.
     Map<String, dynamic> temp = jsonDecode(response.body) as Map<String, dynamic>;
-    result = [];
-    temp.forEach((k,v) =>{
+    List results = [];
+    temp.forEach((k,v) {
       if (v['modules'] != []){
         //todo method for converting from json or xml
+        for (int i = 0; i < v['modules'].length; i++){
+          // Collect important identifying information.
+          Map<String, dynamic> module = v['modules'][i];
+          // Skip modules that are not a quiz or assignment. //todo specific filter for app-created stuff
+          if (module['modname'] == "quiz" || module['modname' == 'assign']){
+            //todo check neccessity of an id for modules (personally think that's a 'probably')
+            String name = module['name'];
+            String description = '';
+            if (module.containsKey('intro')){
+              description = module['intro'];
+            }
+            if (module['modname'] == 'quiz'){
+              results.insert(results.length, Quiz(name: name, description: description));
+            }
+            else{
+              results.insert(results.length, Essay(name: name, description: description));
+            }
+          }
+        }
+      };
+    });
+    return results;
+  }
+
+  // Gets the contents of all courses.
+  Future<List> getAllContents() async{
+    // Collect all the course ids.
+    List<Course> courses = await getCourses();
+    List results = [];
+    for (Course c in courses){
+      results = results + await getCourseContents(c.id);
+    }
+    return results;
+  }
+
+  Future<List<Quiz>> getQuizzes(int? courseID) async {
+    List contents;
+    if (courseID != null){
+      contents = await getCourseContents(courseID);
+    }
+    else{
+      contents = await getAllContents();
+    }
+    List<Quiz> results = [];
+    for (Object c in contents){
+      if (c is Quiz){
+        results.insert(results.length, c);
       }
-    })
+    }
+    return results;
   }
 }
