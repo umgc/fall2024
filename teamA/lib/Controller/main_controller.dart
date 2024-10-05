@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import '../Api/moodle_api_singleton';
+import '../Api/moodle_api_singleton.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:namer_app/Controller/beans.dart';
 
@@ -47,11 +47,8 @@ class MainController
     isLoggedIn = false;
   }
 
-  Future<List<Course>> getCourses() async 
+  Future<bool> updateCourses() async 
   {
-    if (courses != []){
-      return courses;
-    }
     var moodleApi = MoodleApiSingleton();
     try {
       courses = await moodleApi.getCourses();
@@ -59,12 +56,13 @@ class MainController
         courses.removeAt(
             0); // first course is always "Moodle" - no need to show it
       }
-      return courses;
+      return true;
     } catch (e) {
       if (kDebugMode) {
         print(e);
       }
-      return [];
+      courses = [];
+      return false;
     }
   }
 
@@ -81,13 +79,5 @@ class MainController
 
   Course? getSelectedCourse(){
     return selectedCourse;
-  }
-
-  List<Quiz>? getQuizzes(){
-    return quizzes;
-  }
-
-  List<Essay>? getEssays(){
-    return essays;
   }
 }
