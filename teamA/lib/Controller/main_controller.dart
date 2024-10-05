@@ -17,12 +17,12 @@ class MainController
   static bool isLoggedIn = false;
   final ValueNotifier<bool> isUserLoggedInNotifier = ValueNotifier(false);
 
-  Future<bool> loginToMoodle(String username, String password) async 
+  Future<bool> loginToMoodle(String username, String password, String moodleURL) async 
   {
     var moodleApi = MoodleApiSingleton();
     try 
     {
-      await moodleApi.login(username, password);
+      await moodleApi.login(username, password, moodleURL);
       isLoggedIn = true;
       return true;
     } catch (e) 

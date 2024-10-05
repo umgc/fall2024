@@ -7,8 +7,8 @@ import 'package:namer_app/Controller/beans.dart';
 // Singleton class for Moodle API access.
 class MoodleApiSingleton 
 {
-  static const baseUrl = 'https://www.swen670moodle.site';
-  static const serverUrl = '$baseUrl/webservice/rest/server.php?wstoken=';
+  // Constants for Moodle API.
+  static const serverUrl = '/webservice/rest/server.php?wstoken=';
   static const jsonFormat = '&moodlewsrestformat=json';
   static const errorKey = 'error';
 
@@ -17,6 +17,14 @@ class MoodleApiSingleton
 
   // User token is stored here.
   String? _userToken;
+  // User info
+  String? moodleURL;
+  String? moodleUserName;
+  String? moodleFirstName;
+  String? moodleLastName;
+  String? moodleSiteName;
+  String? moodleFullName;
+  String? moodleProfileImage;
 
   // Singleton accessor.
   factory MoodleApiSingleton() {
@@ -32,9 +40,9 @@ class MoodleApiSingleton
   }
 
   // Log in to Moodle and retrieve the user token. Throws HttpException if login failed.
-  Future<void> login(String username, String password) async {
+  Future<void> login(String username, String password, String baseURL) async {
     final response = await http.get(Uri.parse(
-        '$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app'
+        '$baseURL/login/token.php?username=$username&password=$password&service=moodle_mobile_app'
     ));
     Map<String, dynamic> data = jsonDecode(response.body);
     if (response.statusCode != 200) {
@@ -43,6 +51,24 @@ class MoodleApiSingleton
       throw HttpException(data[errorKey]);
     }
     _userToken = data['token'];
+    moodleURL = baseURL;
+
+    //get user info
+    final userinforesponse = await http.get(Uri.parse(
+        '$moodleURL$serverUrl$_userToken$jsonFormat&wsfunction=core_webservice_get_site_info'
+    ));
+    if (userinforesponse.statusCode != 200) {
+      throw HttpException(userinforesponse.body);
+    }
+    Map<String, dynamic> userData = jsonDecode(userinforesponse.body);
+    print(userData);
+    moodleUserName = userData['username'];
+    moodleFirstName = userData['firstname'];
+    moodleLastName = userData['lastname'];
+    moodleSiteName = userData['sitename'];
+    moodleFullName = userData['fullname'];
+    moodleProfile = userData['userpictureurl'];
+
   }
 
   // Log out of Moodle by deleting the stored user token.
@@ -50,26 +76,41 @@ class MoodleApiSingleton
     _userToken = null;
   }
 
-  // Get list of courses.
+  // Get list of courses the user is enrolled in. Throws HttpException if request fails.
   Future<List<Course>> getCourses() async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
-
+    var moodleURL = MoodleApiSingleton().moodleURL;
     final response = await http.get(Uri.parse(
-        '$serverUrl$_userToken$jsonFormat&wsfunction=core_course_get_courses'
+        // '$moodleURL$serverUrl$_userToken$jsonFormat&wsfunction=core_course_get_courses_by_field'
+        '$moodleURL$serverUrl$_userToken$jsonFormat&wsfunction=core_course_get_enrolled_courses_by_timeline_classification&classification=inprogress'
     ));
     if (response.statusCode != 200) {
       throw HttpException(response.body);
     }
-    List<Course> courses = (jsonDecode(response.body) as List).map((i) => Course.fromJson(i)).toList();
+   
+  // Decode the response body
+  var decodedJson = jsonDecode(response.body);
+  // Check if the response is a list or a map containing a list
+  List<Course> courses;
+  if (decodedJson is List) {
+    // If the response is directly a list
+    courses = decodedJson.map((i) => Course.fromJson(i)).toList();
+  } else if (decodedJson is Map<String, dynamic>) {
+    // If the response is a map containing a list of courses
+    var courseList = decodedJson['courses'] as List<dynamic>;
+    courses = courseList.map((i) => Course.fromJson(i)).toList();
+  } else {
+    throw StateError('Unexpected response format');
+  }
     return courses;
   }
 
-  // Import XML quiz into the specified course. Returns a list of IDs for newly imported questions.
-  Future<void> importQuiz(String courseid, String quizXml) async {
+  // Import XML quiz into the specified course using learninglens plugin.
+  Future<void> importQuizQuestions(String courseid, String quizXml) async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
 
     final http.Response response = await http.post(Uri.parse(
-      '$serverUrl$_userToken$jsonFormat&wsfunction=local_quizgen_import_questions&courseid=$courseid&questionxml=$quizXml'
+      '$moodleURL$serverUrl$_userToken$jsonFormat&wsfunction=local_learninglens_import_questions&courseid=$courseid&questionxml=$quizXml'
     ));
     if (response.statusCode != 200) {
       throw HttpException(response.body);
