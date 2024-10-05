@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'essay_generation.dart';
 import 'quiz_generator.dart';
-import 'edit_questions.dart';
+import '../main.dart';
 //import 'course.dart'; // Import the Courses page when available
 
 class TeacherDashboard extends StatelessWidget {
@@ -34,7 +34,7 @@ IconButton(
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EditQuestions(),
+                  builder: (context) => MyApp(),
                 ),
               );
             }
