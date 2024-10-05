@@ -1,6 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:namer_app/Views/login_page.dart';
+import '/Views/login_page.dart';
 import 'Views/dashboard.dart';
 import 'Views/essay_edit_page.dart';
 import 'Views/course_content.dart';

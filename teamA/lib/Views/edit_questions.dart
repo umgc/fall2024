@@ -23,7 +23,7 @@ class _EditQuestionsState extends State<EditQuestions> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flavors'),
+        title: Text('Learning Lens - Edit Questions'),
       ),
       body: ListView.builder(
         itemCount: myQuiz.questionList.length,

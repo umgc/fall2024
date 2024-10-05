@@ -1,7 +1,7 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:namer_app/general_form.dart';
+import '/general_form.dart';
 class CreateAssessment extends StatefulWidget {
 
   final String userName;
