@@ -162,6 +162,7 @@ class _LoginScreenState extends State<LoginScreen>
                 var wasSuccessful = await LoginScreen.controller.loginToMoodle(_usernameController.text, _passwordController.text);
                 if (wasSuccessful) 
                 {
+                  MainController().updateCourses();
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => TeacherDashboard())
