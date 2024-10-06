@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
         '/EditQuestions': (context) => EditQuestions(),
         // '/create': (context) => const CreatePage(),
         '/dashboard': (context) => TeacherDashboard(),
-        '/send_essay_to_moodle': (context) => EssayAssignmentSettings(),
+        '/send_essay_to_moodle': (context) => EssayAssignmentSettings(''),
         // '/viewExams': (context) => const ViewExamPage(),
         // '/settings': (context) => Setting(themeModeNotifier: _themeModeNotifier)
       },
@@ -116,7 +116,7 @@ class _DevLaunch extends State {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => EssayAssignmentSettings()),
+                      builder: (context) => EssayAssignmentSettings('')),
                 );
               }),
           ElevatedButton(
