@@ -34,6 +34,11 @@ class XmlConsts {
   static const html = 'html';
 }
 
+class Essay {
+  String? name;
+  String? description;
+}
+
 // A Moodle quiz containing a list of questions.
 class Quiz {
   String? name; // quiz name - optional.

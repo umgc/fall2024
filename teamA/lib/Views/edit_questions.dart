@@ -1,4 +1,4 @@
-import 'package:learninglens_app/Api/moodle_api_singleton';
+import '../Api/moodle_api_singleton.dart';
 import 'package:image_network/image_network.dart';
 import '../controller/beans.dart';
 import 'package:flutter/material.dart';
