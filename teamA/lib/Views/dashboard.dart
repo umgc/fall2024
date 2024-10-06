@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/Views/edit_questions.dart';
 import 'essay_generation.dart';
 import 'quiz_generator.dart';
 //import 'course.dart'; // Import the Courses page when available
@@ -56,7 +57,7 @@ IconButton(
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MyApp(),
+                  builder: (context) => EditQuestions(),
                 ),
               );
             }
