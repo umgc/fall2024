@@ -38,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen>
 {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _moodleURL = TextEditingController();
+  final TextEditingController _moodleURLController = TextEditingController();
 
   void _showLoginFailedDialog() 
   {
@@ -146,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen>
 
             // Moodle URL (optional if needed)
             TextField(
-              controller: _moodleURL,
+              controller: _moodleURLController,
               decoration: InputDecoration(
                 labelText: 'Moodle URL',
                 hintText: 'https://moodle.example.com',
@@ -162,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen>
             // Login Button
             ElevatedButton(
               onPressed: () async {
-                var wasSuccessful = await LoginScreen.controller.loginToMoodle(_usernameController.text, _passwordController.text, _moodleURL.text);
+                var wasSuccessful = await LoginScreen.controller.loginToMoodle(_usernameController.text, _passwordController.text, _moodleURLController.text);
                 if (wasSuccessful) 
                 {
                   // List<Course> courses = await MainController().getCourses();
