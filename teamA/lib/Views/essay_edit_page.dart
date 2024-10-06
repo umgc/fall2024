@@ -79,12 +79,6 @@ class EssayEditPageState extends State<EssayEditPage> {
   /// Create a Key for EditableState
   final _editableKey = GlobalKey<EditableState>(); 
 
-  /// Print only edited rows
-  void _printEditedRows() {
-    List editedRows = _editableKey.currentState!.editedRows;
-    print(editedRows);
-  }
-
   /// Merge edits into the original jsonData and return updated JSON
   String getUpdatedJson() {
     List editedRows = _editableKey.currentState!.editedRows;
@@ -107,7 +101,6 @@ class EssayEditPageState extends State<EssayEditPage> {
     Map<String, dynamic> updatedData = {
       "criteria": jsonData['criteria']
     };
-
     return jsonEncode(updatedData); // Return the JSON as a string
   }
 
@@ -120,8 +113,8 @@ class EssayEditPageState extends State<EssayEditPage> {
           ElevatedButton(
             child: const Text('Finish and Assign'),
             onPressed: () {
-              _printEditedRows();
               String updatedJson = getUpdatedJson();
+              // Navigate to the Essay Assignment Settings page with the updated JSON
               Navigator.of(context).push(MaterialPageRoute(builder: (context) => EssayAssignmentSettings(updatedJson)));
               print(updatedJson); // You can now see the updated JSON in the console
               ScaffoldMessenger.of(context).showSnackBar(
