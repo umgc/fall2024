@@ -25,8 +25,7 @@ class _EditQuestionsState extends State<EditQuestions> {
   Widget build(BuildContext context) {
     var userprofileurl = MoodleApiSingleton().moodleProfileImage!;
 
-    //debugging
-    var myTempvar = MoodleApiSingleton();
+    //debugging code for bottom row buttons
     String myXML = '''
 <?xml version="1.0" encoding="UTF-8"?>
 <quiz>
@@ -186,6 +185,7 @@ class _EditQuestionsState extends State<EditQuestions> {
     ]
 }
 ''';
+    
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 100,
