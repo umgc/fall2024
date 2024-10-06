@@ -1,31 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false, // Removed the debug banner
-      home: EssayAssignmentSettings(),
-      theme: ThemeData(
-        useMaterial3: true, // Using Material 3 design
-      ),
-      title: 'Learning Lens',
-    );
-  }
-}
+import '../Api/moodle_api_singleton.dart';
 
 class EssayAssignmentSettings extends StatefulWidget {
+  final String updatedJson;
+
+  EssayAssignmentSettings(this.updatedJson);
+
   @override
-  _EssayAssignmentSettingsState createState() =>
-      _EssayAssignmentSettingsState();
+  EssayAssignmentSettingsState createState() => EssayAssignmentSettingsState();
 }
 
-class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
+class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   // Date selection variables for "Allow submissions from"
   String selectedDaySubmission = '01';
   String selectedMonthSubmission = 'January';
@@ -301,9 +287,10 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: () {
-                    // Handle Send to Moodle action
-                  },
+                  onPressed: () async {
+                  var result = await MoodleApiSingleton().createAssignnment('2', '2', 'Sunday Assignment', '2024-10-6', '2024-10-14', widget.updatedJson, 'This is the description');
+                  print(result);
+                },
                   child: Text('Send to Moodle'),
                 ),
                 ElevatedButton(

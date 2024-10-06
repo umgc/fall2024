@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import '../Api/moodle_api_singleton';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:namer_app/Controller/beans.dart';
+import '../Api/moodle_api_singleton.dart';
+// import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '/Controller/beans.dart';
 
 class MainController 
 {
@@ -16,13 +16,17 @@ class MainController
   MainController._internal();
   static bool isLoggedIn = false;
   final ValueNotifier<bool> isUserLoggedInNotifier = ValueNotifier(false);
+  List<Course> courses = [];
+  Course? selectedCourse;
+  List<Quiz>? quizzes;
+  List<Essay>? essays;
 
-  Future<bool> loginToMoodle(String username, String password) async 
+  Future<bool> loginToMoodle(String username, String password, String moodleURL) async 
   {
     var moodleApi = MoodleApiSingleton();
     try 
     {
-      await moodleApi.login(username, password);
+      await moodleApi.login(username, password, moodleURL);
       isLoggedIn = true;
       return true;
     } catch (e) 
@@ -45,9 +49,12 @@ class MainController
 
   Future<List<Course>> getCourses() async 
   {
+    if (courses != []){
+      return courses;
+    }
     var moodleApi = MoodleApiSingleton();
     try {
-      List<Course> courses = await moodleApi.getCourses();
+      courses = await moodleApi.getCourses();
       if (courses.isNotEmpty) {
         courses.removeAt(
             0); // first course is always "Moodle" - no need to show it
@@ -64,5 +71,23 @@ class MainController
   Future<bool> isUserLoggedIn() async 
   {
     return isLoggedIn;
+  }
+
+  void selectCourse(int index){
+    if (index < courses.length){
+      selectedCourse = courses[index];
+    }
+  }
+
+  Course? getSelectedCourse(){
+    return selectedCourse;
+  }
+
+  List<Quiz>? getQuizzes(){
+    return quizzes;
+  }
+
+  List<Essay>? getEssays(){
+    return essays;
   }
 }
