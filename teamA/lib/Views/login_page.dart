@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-// import '../Api/moodle_api_singleton';
 import '/controller/main_controller.dart';
-// import '../Controller/beans.dart';
-import '../Views/dashboard.dart';
+import '/Views/dashboard.dart';
+
+
 
 class LoginApp extends StatelessWidget 
 {
@@ -189,7 +189,6 @@ class _LoginScreenState extends State<LoginScreen>
   {
     _usernameController.dispose();
     _passwordController.dispose();
-    _moodleURL.dispose();
     super.dispose();
   }
 }

@@ -1,8 +1,30 @@
 import 'package:flutter/material.dart';
 import 'essay_generation.dart';
 import 'quiz_generator.dart';
-import '../main.dart';
 //import 'course.dart'; // Import the Courses page when available
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: true, // Keeps the debug banner for now
+      home: const TeacherDashboard(),
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF6A5A99), // Custom primary color
+        ),
+      ),
+      title: 'Learning Lens',
+    );
+  }
+}
 
 class TeacherDashboard extends StatelessWidget {
   const TeacherDashboard({super.key});
