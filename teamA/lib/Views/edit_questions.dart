@@ -24,167 +24,6 @@ class _EditQuestionsState extends State<EditQuestions> {
   @override
   Widget build(BuildContext context) {
     var userprofileurl = MoodleApiSingleton().moodleProfileImage!;
-
-    //debugging code for bottom row buttons
-    String myXML = '''
-<?xml version="1.0" encoding="UTF-8"?>
-<quiz>
-
-  <!-- Define the category for the questions -->
-  <question type="category">
-    <category>
-      <text>\$course\$/top/2112 Quiz Category</text>
-    </category>
-  </question>
-
-  <!-- Multiple Choice Question -->
-  <question type="multichoice">
-    <name>
-      <text>Multiple Choice Question</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[What is the capital of France?]]></text>
-    </questiontext>
-    <answer fraction="100">
-      <text>Paris</text>
-      <feedback>
-        <text>Correct!</text>
-      </feedback>
-    </answer>
-    <answer fraction="0">
-      <text>London</text>
-      <feedback>
-        <text>Incorrect.</text>
-      </feedback>
-    </answer>
-    <answer fraction="0">
-      <text>Rome</text>
-      <feedback>
-        <text>Incorrect.</text>
-      </feedback>
-    </answer>
-    <answer fraction="0">
-      <text>Berlin</text>
-      <feedback>
-        <text>Incorrect.</text>
-      </feedback>
-    </answer>
-  </question>
-
-  <!-- True/False Question -->
-  <question type="truefalse">
-    <name>
-      <text>True/False Question</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[The Earth is flat.]]></text>
-    </questiontext>
-    <answer fraction="0">
-      <text>true</text>
-      <feedback>
-        <text>Incorrect.</text>
-      </feedback>
-    </answer>
-    <answer fraction="100">
-      <text>false</text>
-      <feedback>
-        <text>Correct!</text>
-      </feedback>
-    </answer>
-  </question>
-
-  <!-- Short Answer Question -->
-  <question type="shortanswer">
-    <name>
-      <text>Short Answer Question</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[What is the chemical symbol for water?]]></text>
-    </questiontext>
-    <answer fraction="100">
-      <text>H2O</text>
-      <feedback>
-        <text>Correct!</text>
-      </feedback>
-    </answer>
-  </question>
-
-  <!-- Matching Question -->
-  <question type="matching">
-    <name>
-      <text>Matching Question</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[Match the countries to their capitals.]]></text>
-    </questiontext>
-    <subquestion format="html">
-      <text><![CDATA[France]]></text>
-      <answer>
-        <text>Paris</text>
-      </answer>
-    </subquestion>
-    <subquestion format="html">
-      <text><![CDATA[Italy]]></text>
-      <answer>
-        <text>Rome</text>
-      </answer>
-    </subquestion>
-  </question>
-
-  <!-- Essay Question -->
-  <question type="essay">
-    <name>
-      <text>Essay Question</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[Describe the impact of climate change on global weather patterns.]]></text>
-    </questiontext>
-    <graderinfo format="html">
-      <text><![CDATA[Grading instructions for this question.]]></text>
-    </graderinfo>
-  </question>
-
-  <!-- Numerical Question -->
-  <question type="numerical">
-    <name>
-      <text>Numerical Question</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[What is the square root of 64?]]></text>
-    </questiontext>
-    <answer fraction="100">
-      <text>8</text>
-      <tolerance>0</tolerance>
-      <feedback>
-        <text>Correct!</text>
-      </feedback>
-    </answer>
-  </question>
-
-</quiz>
-''';
-    String rubricDefinition = '''
-{
-    "criteria": [
-        {
-            "description": "Content",
-            "levels": [
-                { "definition": "Excellent", "score": 5 },
-                { "definition": "Good", "score": 3 },
-                { "definition": "Poor", "score": 1 }
-            ]
-        },
-        {
-            "description": "Clarity",
-            "levels": [
-                { "definition": "Very Clear", "score": 5 },
-                { "definition": "Somewhat Clear", "score": 3 },
-                { "definition": "Unclear", "score": 1 }
-            ]
-        }
-    ]
-}
-''';
     
     return Scaffold(
       appBar: AppBar(
@@ -339,6 +178,166 @@ class _EditQuestionsState extends State<EditQuestions> {
   }
 }
 
+ //debugging code for bottom row buttons and temp quiz information
+String myXML = '''
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+  <!-- Define the category for the questions -->
+  <question type="category">
+    <category>
+      <text>\$course\$/top/2112 Quiz Category</text>
+    </category>
+  </question>
+
+  <!-- Multiple Choice Question -->
+  <question type="multichoice">
+    <name>
+      <text>Multiple Choice Question</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[What is the capital of France?]]></text>
+    </questiontext>
+    <answer fraction="100">
+      <text>Paris</text>
+      <feedback>
+        <text>Correct!</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>London</text>
+      <feedback>
+        <text>Incorrect.</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>Rome</text>
+      <feedback>
+        <text>Incorrect.</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>Berlin</text>
+      <feedback>
+        <text>Incorrect.</text>
+      </feedback>
+    </answer>
+  </question>
+
+  <!-- True/False Question -->
+  <question type="truefalse">
+    <name>
+      <text>True/False Question</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[The Earth is flat.]]></text>
+    </questiontext>
+    <answer fraction="0">
+      <text>true</text>
+      <feedback>
+        <text>Incorrect.</text>
+      </feedback>
+    </answer>
+    <answer fraction="100">
+      <text>false</text>
+      <feedback>
+        <text>Correct!</text>
+      </feedback>
+    </answer>
+  </question>
+
+  <!-- Short Answer Question -->
+  <question type="shortanswer">
+    <name>
+      <text>Short Answer Question</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[What is the chemical symbol for water?]]></text>
+    </questiontext>
+    <answer fraction="100">
+      <text>H2O</text>
+      <feedback>
+        <text>Correct!</text>
+      </feedback>
+    </answer>
+  </question>
+
+  <!-- Matching Question -->
+  <question type="matching">
+    <name>
+      <text>Matching Question</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[Match the countries to their capitals.]]></text>
+    </questiontext>
+    <subquestion format="html">
+      <text><![CDATA[France]]></text>
+      <answer>
+        <text>Paris</text>
+      </answer>
+    </subquestion>
+    <subquestion format="html">
+      <text><![CDATA[Italy]]></text>
+      <answer>
+        <text>Rome</text>
+      </answer>
+    </subquestion>
+  </question>
+
+  <!-- Essay Question -->
+  <question type="essay">
+    <name>
+      <text>Essay Question</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[Describe the impact of climate change on global weather patterns.]]></text>
+    </questiontext>
+    <graderinfo format="html">
+      <text><![CDATA[Grading instructions for this question.]]></text>
+    </graderinfo>
+  </question>
+
+  <!-- Numerical Question -->
+  <question type="numerical">
+    <name>
+      <text>Numerical Question</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[What is the square root of 64?]]></text>
+    </questiontext>
+    <answer fraction="100">
+      <text>8</text>
+      <tolerance>0</tolerance>
+      <feedback>
+        <text>Correct!</text>
+      </feedback>
+    </answer>
+  </question>
+
+</quiz>
+''';
+String rubricDefinition = '''
+{
+    "criteria": [
+        {
+            "description": "Content",
+            "levels": [
+                { "definition": "Excellent", "score": 5 },
+                { "definition": "Good", "score": 3 },
+                { "definition": "Poor", "score": 1 }
+            ]
+        },
+        {
+            "description": "Clarity",
+            "levels": [
+                { "definition": "Very Clear", "score": 5 },
+                { "definition": "Somewhat Clear", "score": 3 },
+                { "definition": "Unclear", "score": 1 }
+            ]
+        }
+    ]
+}
+''';
 String sampleXML = '''
 <?xml version="1.0" encoding="UTF-8"?>
 <quiz>
