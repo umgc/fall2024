@@ -116,6 +116,11 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
             ),
             SizedBox(height: 12),
 
+            // Rubric Section
+            SectionTitle(title: 'Rubric'),
+            _buildRubricTable(),
+            SizedBox(height: 20),
+
             // Description with Quill Rich Text Editor
             SectionTitle(title: 'Description'),
             Container(

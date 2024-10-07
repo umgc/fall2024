@@ -116,7 +116,7 @@ class _DevLaunch extends State {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => EssayAssignmentSettings('')),
+                      builder: (context) => EssayAssignmentSettings()),
                 );
               }),
           ElevatedButton(
