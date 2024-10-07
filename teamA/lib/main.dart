@@ -1,6 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:namer_app/Views/login_page.dart';
+import 'Api/moodle_api_singleton.dart';
+import 'Controller/main_controller.dart';
+import 'Views/login_page.dart';
 import 'Views/dashboard.dart';
 import 'Views/essay_edit_page.dart';
 import 'Views/course_content.dart';
@@ -83,7 +85,15 @@ class _DevLaunch extends State {
               }),
           ElevatedButton(
               child: const Text('Open Contents Carousel'),
-              onPressed: () {
+              onPressed: () async {
+                MoodleApiSingleton api = MoodleApiSingleton();
+                MainController main = MainController();
+                await api.login('insert test username', 'insert test pw');
+                await main.updateCourses();
+                await main.selectCourse(1);
+                // current issue: while the courses do come in, the quiz and essay list do not seem to come in quickly enough.
+                // Solution for this is to go back using the navigator and open the page again, then it'll work.
+                // I'm not fixing this because it's just for test purposes.
                 Navigator.push(
                   context,
                   MaterialPageRoute(

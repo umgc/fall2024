@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../Api/moodle_api_singleton.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:namer_app/Controller/beans.dart';
+import '../Controller/beans.dart';
 
 class MainController 
 {
@@ -71,13 +70,24 @@ class MainController
     return isLoggedIn;
   }
 
-  void selectCourse(int index){
+  Future<bool> selectCourse(int index) async{
     if (index < courses.length){
       selectedCourse = courses[index];
     }
+    setQuizzes();
+    setEssays();
+    return true;
   }
 
   Course? getSelectedCourse(){
     return selectedCourse;
+  }
+
+  void setQuizzes() async{
+    quizzes = await MoodleApiSingleton().getQuizzes(selectedCourse?.id);
+  }
+
+  void setEssays() async{
+    essays = await MoodleApiSingleton().getEssays(selectedCourse?.id);
   }
 }
