@@ -461,7 +461,8 @@ class _ViewAssignmentsPage extends State<ViewAssignmentsPage> {
                                             //onChanged: //_handleSearch,
                                             decoration: InputDecoration(
                                               border: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(50),
+                                                borderRadius:
+                                                    BorderRadius.circular(50),
                                               ),
                                               hintText: "Search",
                                             ),
@@ -580,7 +581,6 @@ class _ViewAssignmentsPage extends State<ViewAssignmentsPage> {
                             },
                             child: const Text('Create Exam'),
                           ),
-                          const SizedBox(height: 400),
                         ],
                       ),
                     )

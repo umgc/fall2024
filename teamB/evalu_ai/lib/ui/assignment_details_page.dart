@@ -26,6 +26,7 @@ class AssignmentDetailsPage extends StatefulWidget {
 
 class _AssignmentDetailsPage extends State<AssignmentDetailsPage> {
   Quiz quiz = new Quiz(); //will hold the quiz object passed into the page
+  bool summaryIsSelected = true;
 
   @override
   void initState() {
@@ -66,17 +67,12 @@ class _AssignmentDetailsPage extends State<AssignmentDetailsPage> {
                   Container(
                     width: 1150,
                     height: 60,
-                    decoration: BoxDecoration(
-                        // border: Border.all(
-                        //   color: Colors.blueGrey,
-                        //   width: 0.5,
-                        // ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.green.withOpacity(0.2),
-                            spreadRadius: 3,
-                          )
-                        ]),
+                    decoration: BoxDecoration(boxShadow: [
+                      BoxShadow(
+                        color: Colors.green.withOpacity(0.2),
+                        spreadRadius: 3,
+                      )
+                    ]),
                     child: Row(
                       //row for the assignemnt header
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -125,6 +121,26 @@ class _AssignmentDetailsPage extends State<AssignmentDetailsPage> {
                       ],
                     ), //row for the assignemnt header,
                   ), //container for the row so it takes the whole page
+                  SizedBox(height: 10),
+                  Container(
+                    child: Row(
+                      children: [
+                        SizedBox(width: 30),
+                        TextButton(
+                          onPressed: () {
+                            summaryIsSelected = true;
+                          },
+                          child: const Text('Summary'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            summaryIsSelected = false;
+                          },
+                          child: const Text('Submissions'),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
