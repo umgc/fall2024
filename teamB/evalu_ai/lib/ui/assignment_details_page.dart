@@ -128,19 +128,36 @@ class _AssignmentDetailsPage extends State<AssignmentDetailsPage> {
                         SizedBox(width: 30),
                         TextButton(
                           onPressed: () {
-                            summaryIsSelected = true;
+                            setState(() {
+                              summaryIsSelected =
+                                  true; // Update to show Summary
+                            });
                           },
                           child: const Text('Summary'),
                         ),
                         TextButton(
                           onPressed: () {
-                            summaryIsSelected = false;
+                            setState(() {
+                              summaryIsSelected =
+                                  false; // Update to show Submissions
+                            });
                           },
                           child: const Text('Submissions'),
                         ),
                       ],
                     ),
                   ),
+                  summaryIsSelected
+                      ? Column(
+                          children: [
+                            Text("Summary"),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            Text("Submissions"),
+                          ],
+                        )
                 ],
               ),
             ),
