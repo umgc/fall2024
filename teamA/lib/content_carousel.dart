@@ -29,10 +29,10 @@ class _ContentState extends State<ContentCarousel>{
   factory _ContentState(String type, List? input) {
     //generate the full list of cards
     if (type == "assessment"){
-      return _ContentState._(type, CarouselCard.fromQuizzes(input) ?? [CarouselCard('Real Test','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test 2','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test3','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test4','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test5','Test Information\nWould Go\nHere','assessment')]);
+      return _ContentState._(type, CarouselCard.fromQuizzes(input) ?? [Text('This course has no generated quizzes.')]);
     }
     else if (type == 'essay'){
-      return _ContentState._(type, CarouselCard.fromEssays(input) ?? [CarouselCard('Real Essay','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test 2','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test3','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test4','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test5','Test Information\nWould Go\nHere','essay')]);
+      return _ContentState._(type, CarouselCard.fromEssays(input) ?? [Text('This course has no generated essays.')]);
     }
     //todo: add submission type
     else {
