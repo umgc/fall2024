@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '/controller/main_controller.dart';
-import '/Views/dashboard.dart';
-
-
+import '../Controller/beans.dart';
+import '../Views/dashboard.dart';
 
 class LoginApp extends StatelessWidget 
 {
