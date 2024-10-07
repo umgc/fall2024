@@ -1,0 +1,10 @@
+.vs
+.dart_tool
+teamA/android
+teamA/build
+teamA/ios
+teamA/linux
+teamA/macos
+teamA/windows
+.flutter*
+*.lock*
