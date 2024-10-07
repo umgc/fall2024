@@ -8,3 +8,6 @@ teamA/macos
 teamA/windows
 .flutter*
 *.lock*
+
+generated_plugin_registrant.*
+GeneratedPluginRegistrant.*

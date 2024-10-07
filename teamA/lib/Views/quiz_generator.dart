@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:namer_app/Controller/beans.dart';
-import 'package:namer_app/api/llm/prompt_engine.dart';
+import 'package:learninglens_app/Controller/beans.dart';
+import 'package:learninglens_app/api/llm/prompt_engine.dart';
 class CreateAssessment extends StatefulWidget {
 
   final String userName;

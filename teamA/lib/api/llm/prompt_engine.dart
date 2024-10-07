@@ -1,4 +1,4 @@
-import 'package:namer_app/Controller/beans.dart';
+import 'package:learninglens_app/Controller/beans.dart';
 
 class PromptEngine {
 
