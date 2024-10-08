@@ -57,12 +57,13 @@ class MainController {
       List<int> questionsToRegenerate, Quiz quiz) async {
     try {
       String propmt =
-      'The following query was used to generate a quiz. Please regenerate a new quiz following the same instuctions, but replace question(s) ${questionsToRegenerate.map((q) => q + 1).join(", ")} with different questions.\n\n'
-      'Prompt: ${quiz.promptUsed}\n\n'
-      'Quiz generated: ${XmlConverter.convertQuizToXml(quiz).toXmlString()}\n\n';      
+          'The following query was used to generate a quiz. Please regenerate a new quiz following the same instuctions, but replace question(s) ${questionsToRegenerate.map((q) => q + 1).join(", ")} with different questions.\n\n'
+          'Prompt: ${quiz.promptUsed}\n\n'
+          'Quiz generated: ${XmlConverter.convertQuizToXml(quiz).toXmlString()}\n\n';
       Quiz newQuiz = await generateQuiz(propmt, quiz.name ?? '');
       for (var i = 0; i < questionsToRegenerate.length; i++) {
-        quiz.questionList[questionsToRegenerate[i]] = newQuiz.questionList[questionsToRegenerate[i]];
+        quiz.questionList[questionsToRegenerate[i]] =
+            newQuiz.questionList[questionsToRegenerate[i]];
       }
       updateFileLocally(quiz);
     } catch (e) {
@@ -234,7 +235,7 @@ class MainController {
     for (Quiz q in XmlConverter.splitQuiz(quiz)) {
       String xml = XmlConverter.convertQuizToXml(q, true).toString();
       try {
-        await moodleApi.importQuiz(courseId, xml);
+        await moodleApi.importQuizQuestions(courseId, xml);
         if (kDebugMode) {
           print('Questions successfully imported!');
         }
@@ -253,7 +254,8 @@ class MainController {
   Future<bool> loginToMoodle(String username, String password) async {
     var moodleApi = MoodleApiSingleton();
     try {
-      await moodleApi.login(username, password);
+      await moodleApi.login(
+          username, password, 'https://www.swen670moodle.site/');
       isLoggedIn = true;
       return true;
     } catch (e) {
@@ -274,7 +276,7 @@ class MainController {
   Future<List<Course>> getCourses() async {
     var moodleApi = MoodleApiSingleton();
     try {
-      List<Course> courses = await moodleApi.getCourses();
+      List<Course> courses = (await moodleApi.getCourses()).cast<Course>();
       if (courses.isNotEmpty) {
         courses.removeAt(
             0); // first course is always "Moodle" - no need to show it
