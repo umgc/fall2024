@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:namer_app/Controller/main_controller.dart';
+import '/Controller/main_controller.dart';
 import '../content_carousel.dart';
 
 

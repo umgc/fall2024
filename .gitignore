@@ -25,5 +25,15 @@ doc/api/
 
 .flutter-plugins
 .flutter-plugins-dependencies
+<<<<<<< HEAD
 .vs/*
 .vscode/
+=======
+.vs*
+*/ios/
+linux/
+macos/
+web/
+windows/
+Flutter/
+>>>>>>> TeamAB_Common

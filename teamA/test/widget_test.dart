@@ -8,7 +8,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+<<<<<<< HEAD
 import 'package:namer_app/main.dart';
+=======
+import 'package:learninglens_app/main.dart';
+>>>>>>> TeamAB_Common
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
