@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 import '/controller/main_controller.dart';
 import '/Views/dashboard.dart';
 
-
-
-class LoginApp extends StatelessWidget 
-{
-
+class LoginApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -25,8 +21,7 @@ class LoginApp extends StatelessWidget
   }
 }
 
-class LoginScreen extends StatefulWidget 
-{
+class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
   static MainController controller = MainController();
 
@@ -34,20 +29,19 @@ class LoginScreen extends StatefulWidget
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> 
-{
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _moodleURLController = TextEditingController();
 
-  void _showLoginFailedDialog() 
-  {
+  void _showLoginFailedDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Login Failed"),
-          content: const Text("Incorrect username or password. Please try again."),
+          content:
+              const Text("Incorrect username or password. Please try again."),
           actions: <Widget>[
             TextButton(
               child: const Text("OK"),
@@ -66,127 +60,272 @@ class _LoginScreenState extends State<LoginScreen>
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      // Use background color from colorScheme
-
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: colorScheme
-
-            // Use primaryContainer color for the AppBar
-            .primaryContainer,
+        backgroundColor: colorScheme.primaryContainer,
       ),
-      body: Container(
-        color: colorScheme
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth < 350) {
+            // Small screen (less than 350px) - Switch to vertical layout
+            return Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Title Section
+                    Text(
+                      'Welcome to Learning Lens Application!',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onPrimaryContainer,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
 
-            // Use primaryContainer for the body background
-            .primaryContainer,
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Title Section
-            Text(
-              'Welcome to Learning Lens Application!',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: colorScheme
+                    // Instruction Section
+                    Text(
+                      'Please, enter your username and password below and click Login to access the Dashboard.',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: colorScheme.onPrimaryContainer,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 32),
 
-                    // Text color based on the primaryContainer contrast color
-                    .onPrimaryContainer,
+                    // Vertical layout of the image, text fields, and login button
+                    SizedBox(
+                      height: 200,
+                      width: 210,
+                      child: Image.asset(
+                        'lib/assets/login_image.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Username Input
+                    SizedBox(
+                      width: 246,
+                      child: TextField(
+                        controller: _usernameController,
+                        decoration: InputDecoration(
+                          labelText: 'Username',
+                          hintText: 'Enter your username',
+                          border: const OutlineInputBorder(),
+                          fillColor: colorScheme.surface,
+                          filled: true,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Password Input
+                    SizedBox(
+                      width: 246,
+                      child: TextField(
+                        controller: _passwordController,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          hintText: 'Enter your password',
+                          border: const OutlineInputBorder(),
+                          fillColor: colorScheme.surface,
+                          filled: true,
+                        ),
+                        obscureText: true,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Moodle URL Input
+                    SizedBox(
+                      width: 246,
+                      child: TextField(
+                        controller: _moodleURLController,
+                        decoration: InputDecoration(
+                          labelText: 'Moodle URL',
+                          hintText: 'https://moodle.example.com',
+                          border: const OutlineInputBorder(),
+                          fillColor: colorScheme.surface,
+                          filled: true,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Login Button
+                    SizedBox(
+                      width: 246,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          var wasSuccessful =
+                              await LoginScreen.controller.loginToMoodle(
+                            _usernameController.text,
+                            _passwordController.text,
+                            _moodleURLController.text,
+                          );
+                          if (wasSuccessful) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => TeacherDashboard()),
+                            );
+                          } else {
+                            _showLoginFailedDialog();
+                          }
+                        },
+                        child: const Text('Login'),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
+            );
+          } else {
+            // Normal screen size - Default layout (Row layout)
+            return Container(
+              color: colorScheme.primaryContainer,
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Title Section
+                  Text(
+                    'Welcome to Learning Lens Application!',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onPrimaryContainer,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
 
-            // Instruction Section
-            Text(
-              'Please, enter your username and password below and click Login, to access the Dashboard.',
-              style: TextStyle(
-                fontSize: 16,
-                color: colorScheme
+                  // Instruction Section
+                  Text(
+                    'Please, enter your username and password below and click Login to access the Dashboard.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: colorScheme.onPrimaryContainer,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 32),
 
-                    // Text color for instructions
-                    .onPrimaryContainer,
+                  // Row containing the image and text fields
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Image with more accurate height
+                      Container(
+                        height: 234,
+                        width: 210,
+                        child: Image.asset(
+                          'lib/assets/login_image.png',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+
+                      // Column for text fields and button
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Username Input
+                          SizedBox(
+                            width: 246,
+                            child: TextField(
+                              controller: _usernameController,
+                              decoration: InputDecoration(
+                                labelText: 'Username',
+                                hintText: 'Enter your username',
+                                border: const OutlineInputBorder(),
+                                fillColor: colorScheme.surface,
+                                filled: true,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Password Input
+                          SizedBox(
+                            width: 246,
+                            child: TextField(
+                              controller: _passwordController,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                hintText: 'Enter your password',
+                                border: const OutlineInputBorder(),
+                                fillColor: colorScheme.surface,
+                                filled: true,
+                              ),
+                              obscureText: true,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Moodle URL Input
+                          SizedBox(
+                            width: 246,
+                            child: TextField(
+                              controller: _moodleURLController,
+                              decoration: InputDecoration(
+                                labelText: 'Moodle URL',
+                                hintText: 'https://moodle.example.com',
+                                border: const OutlineInputBorder(),
+                                fillColor: colorScheme.surface,
+                                filled: true,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+
+                          // Login Button
+                          SizedBox(
+                            width: 246,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                var wasSuccessful =
+                                    await LoginScreen.controller.loginToMoodle(
+                                  _usernameController.text,
+                                  _passwordController.text,
+                                  _moodleURLController.text,
+                                );
+                                if (wasSuccessful) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            TeacherDashboard()),
+                                  );
+                                } else {
+                                  _showLoginFailedDialog();
+                                }
+                              },
+                              child: const Text('Login'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                ],
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-
-            // Username Input
-            TextField(
-              controller: _usernameController,
-              decoration: InputDecoration(
-                labelText: 'Username',
-                hintText: 'Enter your username',
-                border: const OutlineInputBorder(),
-
-                // Input field background
-                fillColor: colorScheme.surface,
-                filled: true,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Password Input
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                hintText: 'Enter your password',
-                border: const OutlineInputBorder(),
-
-                // Input field background
-                fillColor: colorScheme.surface,
-                filled: true,
-              ),
-              obscureText: true,
-            ),
-            const SizedBox(height: 16),
-
-            // Moodle URL (optional if needed)
-            TextField(
-              controller: _moodleURLController,
-              decoration: InputDecoration(
-                labelText: 'Moodle URL',
-                hintText: 'https://moodle.example.com',
-                border: const OutlineInputBorder(),
-
-                // Input field background
-                fillColor: colorScheme.surface,
-                filled: true,
-              ),
-            ),
-            const SizedBox(height: 32),
-
-            // Login Button
-            ElevatedButton(
-              onPressed: () async {
-                var wasSuccessful = await LoginScreen.controller.loginToMoodle(_usernameController.text, _passwordController.text, _moodleURLController.text);
-                if (wasSuccessful) 
-                {
-                  // List<Course> courses = await MainController().getCourses();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => TeacherDashboard())
-                  );
-                } else {
-                  _showLoginFailedDialog();
-                }
-              },
-              child: const Text('Login'),
-            ),
-
-            const SizedBox(height: 16),
-          ],
-        ),
+            );
+          }
+        },
       ),
     );
   }
 
   @override
-  void dispose() 
-  {
+  void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();

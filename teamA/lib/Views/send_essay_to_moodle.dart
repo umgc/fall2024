@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 //import '../api/moodle_api_singleton.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:http/http.dart' as http;
+import 'package:learninglens_app/Views/essay_edit_page.dart';
 import '../controller/main_controller.dart';
 import '/Controller/beans.dart'; // Import the file that contains the Course class
 import 'dart:convert';
@@ -536,9 +537,13 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Handle Go Back to Edit Assignment action
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => EssayEditPage(),
+                      ),
+                    );
                   },
-                  child: Text('Go back to edit assignment'),
+                  child: Text('Go Back to Edit Essay'),
                 ),
               ],
             ),
