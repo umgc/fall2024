@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'calendar_screen.dart';
 import 'assistant_screen.dart';
 import 'gallery_screen.dart';
 import 'response_screen.dart';
@@ -14,12 +15,14 @@ class HomeScreenContent extends StatefulWidget {
 }
 
 class _HomeScreenContentState extends State<HomeScreenContent> {
-  Widget _currentScreen = const HomeScreenContentBody(); // Start with the home content
+  Widget _currentScreen =
+      const HomeScreenContentBody(); // Start with the home content
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent, // Set scaffold background to transparent
+      backgroundColor:
+          Colors.transparent, // Set scaffold background to transparent
       body: _currentScreen,
     );
   }
@@ -39,7 +42,7 @@ class HomeScreenContentBody extends StatelessWidget {
   Widget build(BuildContext context) {
     double iconSize = 65;
     _HomeScreenContentState homeScreenState =
-    context.findAncestorStateOfType<_HomeScreenContentState>()!;
+        context.findAncestorStateOfType<_HomeScreenContentState>()!;
 
     return Container(
       color: Colors.transparent, // Set container background to transparent
@@ -72,13 +75,15 @@ class HomeScreenContentBody extends StatelessWidget {
                 ),
                 _buildElevatedButton(
                   homeScreenState: homeScreenState,
-                  icon: Icon(Icons.mic_rounded, size: iconSize, color: Colors.white),
+                  icon: Icon(Icons.mic_rounded,
+                      size: iconSize, color: Colors.white),
                   text: 'Record Audio',
                   screen: AudioScreen(),
                 ),
                 _buildElevatedButton(
                   homeScreenState: homeScreenState,
-                  icon: Icon(Icons.location_history, size: iconSize, color: Colors.white),
+                  icon: Icon(Icons.location_history,
+                      size: iconSize, color: Colors.white),
                   text: 'Location',
                   screen: LocationHistoryScreen(),
                 ),
@@ -87,6 +92,13 @@ class HomeScreenContentBody extends StatelessWidget {
                   icon: Icon(Icons.flag, size: iconSize, color: Colors.white),
                   text: 'Tour Guide',
                   screen: TourScreen(),
+                ),
+                _buildElevatedButton(
+                  homeScreenState: homeScreenState,
+                  icon: Icon(Icons.calendar_view_month,
+                      size: iconSize, color: Colors.white),
+                  text: 'Calendar',
+                  screen: CalendarPage(),
                 ),
               ],
             ),
