@@ -1,24 +1,17 @@
 import 'package:flutter/material.dart';
-import '../api/moodle_api_singleton.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
-import 'package:http/http.dart' as http;
-import '../controller/main_controller.dart';
-import '/Controller/beans.dart'; // Import the file that contains the Course class
-import 'dart:convert';
-import 'dart:io';
-import 'package:editable/editable.dart';
+import '../Api/moodle_api_singleton.dart';
 
 class EssayAssignmentSettings extends StatefulWidget {
-  final String updatedJson; // Rubric data passed from the edit essay page
+  final String updatedJson;
 
-  EssayAssignmentSettings(this.updatedJson, {super.key});
+  EssayAssignmentSettings(this.updatedJson);
 
   @override
-  _EssayAssignmentSettingsState createState() =>
-      _EssayAssignmentSettingsState();
+  EssayAssignmentSettingsState createState() => EssayAssignmentSettingsState();
 }
 
-class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
+class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   // Date selection variables for "Allow submissions from"
   String selectedDaySubmission = '01';
   String selectedMonthSubmission = 'January';
@@ -67,241 +60,29 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   List<String> minutes =
       List.generate(60, (index) => index.toString().padLeft(2, '0'));
 
-  final TextEditingController _assignmentNameController =
-      TextEditingController();
+  TextEditingController _courseNameController = TextEditingController();
+  TextEditingController _assignmentNameController = TextEditingController();
 
   // Quill Editor controller
-  final quill.QuillController _quillController = quill.QuillController.basic();
-
-  // List of courses fetched from the controller
-  List<Course> courses = [];
-  String selectedCourse = 'Select a course';
-
-  @override
-  void initState() {
-    super.initState();
-    fetchCourses(); // Fetch courses on page load
-    populateHeadersAndRows();
-  }
-
-  // Fetch courses from the controller
-  Future<void> fetchCourses() async {
-    try {
-      List<Course> courseList = await MainController().getCourses();
-      setState(() {
-        courses = courseList;
-        if (courses.isNotEmpty) {
-          selectedCourse = courses.first.fullName;
-        } else {
-          selectedCourse = 'No courses available'; // Handle the empty case
-        }
-      });
-      // Debugging courses fetched
-      //  debugPrint('Courses fetched: ${courses.map((c) => c.fullName).toList()}'); i dnt need it for now
-    } catch (e) {
-      debugPrint('Error fetching courses: $e');
-    }
-  }
-
-  // Headers and Rows for Rubric Display
-  List headers = [];
-  List rows = [];
-
-  // Function to populate headers and rows for rubric display
-  void populateHeadersAndRows() {
-    try {
-      Map<String, dynamic> jsonData = jsonDecode(widget.updatedJson);
-      // Debugging JSON passed from edit essay page
-      // debugPrint('Rubric JSON from edit page: ${widget.updatedJson}');
-
-      // Build headers dynamically based on the number of levels in the first criterion
-      List<dynamic> levels =
-          List<dynamic>.from(jsonData['criteria'][0]['levels'] as List);
-      headers = [
-        {"title": 'Criteria', 'index': 1, 'key': 'name'},
-      ];
-
-      for (int i = 0; i < levels.length; i++) {
-        headers.add({
-          "title": '${levels[i]['score']}', // The score (5, 3, 1) as headers
-          'index': i + 2,
-          'key': 'level_$i'
-        });
-      }
-
-      // Build rows by mapping each criterion and its levels dynamically
-      rows = (jsonData['criteria'] ?? []).map((criterion) {
-        Map<String, dynamic> row = {
-          "name": criterion['description'],
-        };
-
-        for (int i = 0; i < (criterion['levels'] as List).length; i++) {
-          row['level_$i'] = (criterion['levels'] as List)[i]['definition'];
-        }
-
-        return row;
-      }).toList();
-    } catch (e) {
-      debugPrint('Error parsing rubric JSON: $e');
-    }
-
-    setState(() {});
-  }
-
-// Create and send assignment to Moodle
-  Future<void> createAssignment(
-      String token,
-      String courseId,
-      String assignmentName,
-      String description,
-      String dueDate,
-      String startDate) async {
-    // API Endpoint URL
-    const String url = 'webservice/rest/server.php';
-    final fullUrl = 'https://www.swen670moodle.site/$url'; // Full URL
-
-    // Use the same rubric data format from the working code
-    String rubrickinjsonformat = '''
-{
-    "criteria": [
-        {
-            "description": "Content",
-            "levels": [
-                { "definition": "Excellent", "score": 5 },
-                { "definition": "Good", "score": 3 },
-                { "definition": "Poor", "score": 1 }
-            ]
-        },
-        {
-            "description": "Clarity",
-            "levels": [
-                { "definition": "Very Clear", "score": 5 },
-                { "definition": "Somewhat Clear", "score": 3 },
-                { "definition": "Unclear", "score": 1 }
-            ]
-        }
-    ]
-}
-''';
-
-    // Debugging rubric data
-    debugPrint('Rubric JSON Data: $rubrickinjsonformat');
-
-    try {
-      // Prepare POST request body with the same parameter names as the working code
-      final response = await http.post(
-        Uri.parse(fullUrl),
-        body: {
-          'wstoken': token,
-          'wsfunction': 'local_learninglens_create_assignment',
-          'moodlewsrestformat': 'json',
-          'courseid': courseId,
-          'sectionid': '1', // Ensure the section ID is valid
-          'enddate': dueDate, // You can keep this as a readable string
-          'startdate': startDate, // You can keep this as a readable string
-          'description': description, // Assignment description
-          'rubricJson': rubrickinjsonformat, // Sending rubric as string
-          'assignmentName': assignmentName, // Assignment name
-        },
-      );
-
-      // Check response status
-      if (response.statusCode == 200) {
-        debugPrint('Assignment sent to Moodle successfully.');
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Assignment sent to Moodle successfully!')));
-      } else {
-        debugPrint(
-            'Failed to send assignment to Moodle. Status Code: ${response.statusCode}');
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to send assignment to Moodle.')));
-      }
-    } catch (error) {
-      debugPrint('Error occurred while sending assignment: $error');
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('An error occurred: $error')));
-    }
-  }
-
-  // Dropdown to display courses
-  DropdownButtonFormField<String> _buildCourseDropdown() {
-    return DropdownButtonFormField<String>(
-      value: courses.isNotEmpty && selectedCourse != 'No courses available'
-          ? selectedCourse
-          : null,
-      decoration: InputDecoration(
-        labelText: 'Course name',
-        border: OutlineInputBorder(),
-      ),
-      onChanged: (String? newValue) {
-        setState(() {
-          selectedCourse = newValue!;
-        });
-        debugPrint('Selected course: $selectedCourse');
-      },
-      items: courses.isNotEmpty
-          ? courses.map<DropdownMenuItem<String>>((Course course) {
-              return DropdownMenuItem<String>(
-                value: course.fullName,
-                child: Text(course.fullName),
-              );
-            }).toList()
-          : [
-              DropdownMenuItem<String>(
-                value: 'No courses available',
-                child: Text('No courses available'),
-              ),
-            ],
-      isExpanded: true,
-    );
-  }
-
-  // Custom Widget to build rubric table without editable package
-  Widget buildRubricTable() {
-    return Table(
-      border: TableBorder.all(),
-      children: [
-        // Header Row
-        TableRow(children: [
-          _buildTableCell('Criteria'),
-          for (var header in headers.skip(1)) _buildTableCell(header['title']),
-        ]),
-        // Data Rows
-        for (var row in rows)
-          TableRow(children: [
-            _buildTableCell(row['name']),
-            for (var i = 0; i < headers.length - 1; i++)
-              _buildTableCell(row['level_$i']),
-          ]),
-      ],
-    );
-  }
-
-  Widget _buildTableCell(String text) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Text(
-        text,
-        style: TextStyle(fontWeight: FontWeight.bold),
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
+  quill.QuillController _quillController = quill.QuillController.basic();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
+        centerTitle: true, // Center the title in the AppBar
         title: Text('Learning Lens',
             style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        backgroundColor: Theme.of(context)
+            .colorScheme
+            .primaryContainer, // Use primary container color
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(14.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Page Title Centered Below the AppBar
             Center(
               child: Padding(
                 padding: const EdgeInsets.only(top: 14.0),
@@ -314,10 +95,18 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
             ),
             SizedBox(height: 20),
 
-            // Course Dropdown with dynamic course fetching
+            // Course Name
             SectionTitle(title: 'General'),
-            _buildCourseDropdown(),
+            TextField(
+              controller: _courseNameController,
+              decoration: InputDecoration(
+                labelText: 'Course name',
+                border: OutlineInputBorder(),
+              ),
+            ),
             SizedBox(height: 12),
+
+            // Assignment Name
             TextField(
               controller: _assignmentNameController,
               decoration: InputDecoration(
@@ -326,11 +115,6 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
               ),
             ),
             SizedBox(height: 12),
-
-            // Rubric Section
-            SectionTitle(title: 'Rubric'),
-            buildRubricTable(), // Manually create rubric table
-            SizedBox(height: 20),
 
             // Description with Quill Rich Text Editor
             SectionTitle(title: 'Description'),
@@ -343,7 +127,9 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
               ),
               child: Column(
                 children: [
-                  quill.QuillToolbar.simple(controller: _quillController),
+                  quill.QuillToolbar.simple(
+                    controller: _quillController,
+                  ),
                   Expanded(
                     child: quill.QuillEditor(
                       controller: _quillController,
@@ -354,9 +140,10 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                 ],
               ),
             ),
+
             SizedBox(height: 20),
 
-            // Availability Section
+            // Availability
             SectionTitle(title: 'Availability'),
             SizedBox(height: 14),
 
@@ -500,29 +287,10 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: () {
-                    String courseId = courses
-                        .firstWhere(
-                            (course) => course.fullName == selectedCourse)
-                        .id
-                        .toString();
-                    String assignmentName = _assignmentNameController.text;
-                    String description =
-                        _quillController.document.toPlainText();
-                    String dueDate =
-                        '$selectedDayDue $selectedMonthDue $selectedYearDue $selectedHourDue:$selectedMinuteDue';
-                    String allowSubmissionFrom =
-                        '$selectedDaySubmission $selectedMonthSubmission $selectedYearSubmission $selectedHourSubmission:$selectedMinuteSubmission';
-
-                    createAssignment(
-                      '130bde328dbbbe61eaea301c5ad2dcc8', // Add your token here
-                      courseId,
-                      assignmentName,
-                      description,
-                      dueDate,
-                      allowSubmissionFrom,
-                    );
-                  },
+                  onPressed: () async {
+                  var result = await MoodleApiSingleton().createAssignnment('2', '2', 'Sunday Assignment', '2024-10-6', '2024-10-14', widget.updatedJson, 'This is the description');
+                  print(result);
+                },
                   child: Text('Send to Moodle'),
                 ),
                 ElevatedButton(

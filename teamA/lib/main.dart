@@ -88,7 +88,8 @@ class _DevLaunch extends State {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ViewCourseContents()),
+                  MaterialPageRoute(
+                      builder: (context) => ViewCourseContents()),
                 );
               }),
           ElevatedButton(
