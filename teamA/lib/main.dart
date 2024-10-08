@@ -42,8 +42,7 @@ class MyApp extends StatelessWidget {
         'LoginPage': (context) => LoginApp(),
         '/EssayEditPage': (context) => EssayEditPage(),
         '/Content': (context) => ViewCourseContents(),
-        '/EssayGenerationPage': (context) =>
-            EssayGeneration(title: 'Essay Generation'),
+        '/EssayGenerationPage': (context) => EssayGeneration(title: 'Essay Generation'),
         '/QuizGenerationPage': (context) => CreateAssessment('Tester'),
         '/EditQuestions': (context) => EditQuestions(),
         // '/create': (context) => const CreatePage(),
@@ -90,7 +89,7 @@ class _DevLaunch extends State {
               onPressed: () async {
                 MoodleApiSingleton api = MoodleApiSingleton();
                 MainController main = MainController();
-                await api.login('insert test username', 'insert test pw', 'insert test url');
+                //await api.login('insert test username', 'insert test pw', 'insert test url');
                 await main.updateCourses();
                 await main.selectCourse(1);
                 // current issue: while the courses do come in, the quiz and essay list do not seem to come in quickly enough.

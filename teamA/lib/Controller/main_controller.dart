@@ -50,7 +50,8 @@ class MainController
   {
     var moodleApi = MoodleApiSingleton();
     try {
-      courses = await moodleApi.getCourses();
+      // courses = await moodleApi.getCourses();
+      courses = await moodleApi.getUserCourses();
       if (courses.isNotEmpty) {
         courses.removeAt(
             0); // first course is always "Moodle" - no need to show it

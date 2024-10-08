@@ -82,9 +82,16 @@ class MoodleApiSingleton {
   Future<List<Course>> getCourses() async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
 
-    final response = await http.get(Uri.parse(
-        '$serverUrl$_userToken$jsonFormat&wsfunction=core_course_get_courses'
-    ));
+    final response = await http.post(Uri.parse(moodleURL + serverUrl
+            ),
+        body: {
+          'wstoken': _userToken,
+          'wsfunction':'core_course_get_courses',
+          'moodlewsrestformat': 'json',
+        });
+
+        // '$moodleURL$serverUrl&wstoken=$_userToken$jsonFormat&wsfunction=core_course_get_courses'
+    // ));
     if (response.statusCode != 200) {
       throw HttpException(response.body);
     }
@@ -153,7 +160,8 @@ class MoodleApiSingleton {
   // Gets the contents of all courses.
   Future<List> getAllContents() async{
     // Collect all the course ids.
-    List<Course> courses = await getCourses();
+    // List<Course> courses = await getCourses();
+    List<Course> courses = await getUserCourses();
     List results = [];
     for (Course c in courses){
       results = results + await getCourseContents(c.id);
