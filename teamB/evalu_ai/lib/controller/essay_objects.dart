@@ -84,7 +84,7 @@ class Criterion {
         defaultDesc = json['Description'];
 
   void setWeight(num weight) {
-    this.points = weight;
+    points = weight;
   }
 
   void addDescriptions(List<String> scale, List<String> values) {

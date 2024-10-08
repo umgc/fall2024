@@ -25,7 +25,7 @@ class AssignmentDetailsPage extends StatefulWidget {
 */
 
 class _AssignmentDetailsPage extends State<AssignmentDetailsPage> {
-  Quiz quiz = new Quiz(); //will hold the quiz object passed into the page
+  Quiz quiz = Quiz(); //will hold the quiz object passed into the page
   bool summaryIsSelected = true;
 
   @override

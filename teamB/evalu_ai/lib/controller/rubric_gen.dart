@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 //App that constructs the table widget
 class TableApp extends StatelessWidget {
-  const TableApp(this.tableData, this.headerData);
+  const TableApp(this.tableData, this.headerData, {super.key});
 
   final List<Map<String, String>> tableData;
   final List<String> headerData;
@@ -13,7 +13,7 @@ class TableApp extends StatelessWidget {
       title: 'Editable Table',
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Rubric'),
+          title: const Text('Rubric'),
         ),
         body: Center(
           child: Padding(
@@ -31,7 +31,7 @@ class EditableTable extends StatefulWidget {
   final List<Map<String, String>> tableData;
   final List<String> headerData;
 
-  EditableTable({required this.tableData, required this.headerData});
+  const EditableTable({super.key, required this.tableData, required this.headerData});
 
   @override
   _EditableTableState createState() => _EditableTableState();
@@ -72,7 +72,7 @@ class _EditableTableState extends State<EditableTable> {
             padding: const EdgeInsets.all(8.0),
             child: Text(header,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.bold)),
+                style: const TextStyle(fontWeight: FontWeight.bold)),
           );
         }).toList(),
       ),
@@ -89,7 +89,7 @@ class _EditableTableState extends State<EditableTable> {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(widget.tableData[i][header] ?? '',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                     )),
               );
@@ -102,7 +102,7 @@ class _EditableTableState extends State<EditableTable> {
                 onChanged: (value) {
                   widget.tableData[i][header] = value; // Update the data
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.multiline,
