@@ -41,19 +41,20 @@ class MainController {
     isLoggedIn = false;
   }
 
-/* //// original file either daanish code or scott code
-  Future<List<Course>> getCourses() async 
-  {
-    if (courses != []){
+  //// original file either daanish code or scott code
+  Future<List<Course>> getCourses() async {
+    //if (courses != []) {
+    if (courses.isNotEmpty) {
+      // this above line changed by safia because in dart we use isempty instead of !=
       return courses;
     }
     var moodleApi = MoodleApiSingleton();
     try {
       courses = await moodleApi.getCourses();
-      if (courses.isNotEmpty) {
-        courses.removeAt(
-            0); // first course is always "Moodle" - no need to show it
-      }
+      // if (courses.isNotEmpty) { commented by safia in original code because of this first course is getting removed
+      // courses.removeAt(
+      //    0); // first course is always "Moodle" - no need to show it
+      //  }
       return courses;
     } catch (e) {
       if (kDebugMode) {
@@ -62,7 +63,8 @@ class MainController {
       return [];
     }
   }
-*/
+
+/*
 
   // Fetch courses using Moodle API Singleton, modified method by Safia
   Future<List<Course>> getCourses() async {
@@ -81,7 +83,7 @@ class MainController {
       rethrow;
     }
   }
-
+*/
   Future<bool> isUserLoggedIn() async {
     return isLoggedIn;
   }

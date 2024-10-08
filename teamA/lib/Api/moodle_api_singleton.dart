@@ -82,7 +82,7 @@ class MoodleApiSingleton {
   // ********************************************************************************************************************
   // Get list of courses the user is enrolled in.
   // ********************************************************************************************************************
-/*// original code by scott
+// original code by scott
 
   Future<List<Course>> getCourses() async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
@@ -118,7 +118,7 @@ class MoodleApiSingleton {
     return courses;
   }
 
-*/
+/*
 // code modified by safia
   Future<List<Course>> getCourses() async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
@@ -155,7 +155,7 @@ class MoodleApiSingleton {
 
     return courses;
   }
-
+*/
   // ********************************************************************************************************************
   // Get list of assignments for a course. Throws HttpException if request fails.
   // ********************************************************************************************************************

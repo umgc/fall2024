@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../api/moodle_api_singleton.dart';
+//import '../api/moodle_api_singleton.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:http/http.dart' as http;
 import '../controller/main_controller.dart';
@@ -7,6 +7,7 @@ import '/Controller/beans.dart'; // Import the file that contains the Course cla
 import 'dart:convert';
 import 'dart:io';
 import 'package:editable/editable.dart';
+import '../Api/moodle_api_singleton.dart'; // Import the Moodle API Singleton
 
 class EssayAssignmentSettings extends StatefulWidget {
   final String updatedJson; // Rubric data passed from the edit essay page
@@ -160,7 +161,7 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
     const String url = 'webservice/rest/server.php';
     final fullUrl = 'https://www.swen670moodle.site/$url'; // Full URL
 
-    // Use the same rubric data format from the working code
+    // Rubric data as a JSON string
     String rubrickinjsonformat = '''
 {
     "criteria": [
@@ -184,28 +185,24 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
 }
 ''';
 
-    // Debugging rubric data
-    debugPrint('Rubric JSON Data: $rubrickinjsonformat');
-
     try {
-      // Prepare POST request body with the same parameter names as the working code
+      // Prepare POST request body with the parameters
       final response = await http.post(
         Uri.parse(fullUrl),
         body: {
-          'wstoken': token,
+          'wstoken': token, // Use the token parameter here
           'wsfunction': 'local_learninglens_create_assignment',
           'moodlewsrestformat': 'json',
           'courseid': courseId,
           'sectionid': '1', // Ensure the section ID is valid
-          'enddate': dueDate, // You can keep this as a readable string
-          'startdate': startDate, // You can keep this as a readable string
+          'enddate': dueDate, // Due date string
+          'startdate': startDate, // Start date string
           'description': description, // Assignment description
-          'rubricJson': rubrickinjsonformat, // Sending rubric as string
+          'rubricJson': rubrickinjsonformat, // Rubric as a JSON string
           'assignmentName': assignmentName, // Assignment name
         },
       );
 
-      // Check response status
       if (response.statusCode == 200) {
         debugPrint('Assignment sent to Moodle successfully.');
         ScaffoldMessenger.of(context).showSnackBar(
@@ -500,28 +497,40 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: () {
-                    String courseId = courses
-                        .firstWhere(
-                            (course) => course.fullName == selectedCourse)
-                        .id
-                        .toString();
-                    String assignmentName = _assignmentNameController.text;
-                    String description =
-                        _quillController.document.toPlainText();
-                    String dueDate =
-                        '$selectedDayDue $selectedMonthDue $selectedYearDue $selectedHourDue:$selectedMinuteDue';
-                    String allowSubmissionFrom =
-                        '$selectedDaySubmission $selectedMonthSubmission $selectedYearSubmission $selectedHourSubmission:$selectedMinuteSubmission';
+                  onPressed: () async {
+                    // Fetch the user token dynamically from the MoodleApiSingleton instance
+                    var userInfo =
+                        MoodleApiSingleton(); // Get Singleton instance
+                    String? token = userInfo.userToken; // Fetch the user token
 
-                    createAssignment(
-                      '130bde328dbbbe61eaea301c5ad2dcc8', // Add your token here
-                      courseId,
-                      assignmentName,
-                      description,
-                      dueDate,
-                      allowSubmissionFrom,
-                    );
+                    if (token != null && token.isNotEmpty) {
+                      // Continue with assignment creation
+                      String courseId = courses
+                          .firstWhere(
+                              (course) => course.fullName == selectedCourse)
+                          .id
+                          .toString();
+                      String assignmentName = _assignmentNameController.text;
+                      String description =
+                          _quillController.document.toPlainText();
+                      String dueDate =
+                          '$selectedDayDue $selectedMonthDue $selectedYearDue $selectedHourDue:$selectedMinuteDue';
+                      String allowSubmissionFrom =
+                          '$selectedDaySubmission $selectedMonthSubmission $selectedYearSubmission $selectedHourSubmission:$selectedMinuteSubmission';
+
+                      await createAssignment(
+                        token, // Use the dynamically fetched token
+                        courseId,
+                        assignmentName,
+                        description,
+                        dueDate,
+                        allowSubmissionFrom,
+                      );
+                    } else {
+                      // Handle the case where the token is not available
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('Failed to retrieve user token.')));
+                    }
                   },
                   child: Text('Send to Moodle'),
                 ),
