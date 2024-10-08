@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:namer_app/Views/course_list.dart';
+import 'Views/course_list.dart';
+import '/Views/login_page.dart';
 import 'Views/dashboard.dart';
 import 'Views/essay_edit_page.dart';
 import 'Views/course_content.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
       ),
       scrollBehavior: CustomScrollBehavior(),
       routes: {
+        'LoginPage': (context) => LoginApp(),
         '/EssayEditPage': (context) => EssayEditPage(),
         '/Content': (context) => ViewCourseContents('Test Course'),
         '/EssayGenerationPage': (context) =>
@@ -65,6 +67,14 @@ class _DevLaunch extends State {
     return Scaffold(
         appBar: AppBar(title: Text('Dev Launch Page')),
         body: Column(children: [
+          ElevatedButton(
+              child: const Text('Login'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginApp()),
+                );
+              }),
           ElevatedButton(
               child: const Text('Open Edit Essay'),
               onPressed: () {
