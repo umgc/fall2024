@@ -23,7 +23,6 @@ class XmlConsts {
   static const graderinfo = 'graderinfo';
   static const promptUsed = 'promptused';
 
-
   // not tags but useful constants
   static const multichoice = 'multichoice';
   static const truefalse = 'truefalse';
@@ -89,16 +88,22 @@ class Quiz {
 
 // Abstract class that represents a single question.
 class Question {
-
-
-
-  Question copyWith({String? name, List? answerList, String? type, String? questionText, bool? isFavorite}) =>
-      Question(name: this.name, answerList: this.answerList,type: this.type, questionText: this.questionText, isFavorite: isFavorite ?? this.isFavorite);
-
-
+  Question copyWith(
+          {String? name,
+          List? answerList,
+          String? type,
+          String? questionText,
+          bool? isFavorite}) =>
+      Question(
+          name: this.name,
+          answerList: this.answerList,
+          type: this.type,
+          questionText: this.questionText,
+          isFavorite: isFavorite ?? this.isFavorite);
 
   String name; // question name - required.
-  String type; // question type (multichoice, truefalse, shortanswer, essay) - required.
+  String
+      type; // question type (multichoice, truefalse, shortanswer, essay) - required.
   String questionText; // question text - required.
   String? generalFeedback;
   String? defaultGrade;
@@ -143,15 +148,23 @@ class Question {
               ?.innerText ??
           'UNKNOWN',
       generalFeedback: questionElement
-              .getElement(XmlConsts.generalfeedback)
-              ?.getElement(XmlConsts.text)
-              ?.innerText,
-      defaultGrade: questionElement.getElement(XmlConsts.defaultgrade)?.innerText,
-      responseFormat: questionElement.getElement(XmlConsts.responseformat)?.innerText,
-      responseRequired: questionElement.getElement(XmlConsts.responserequired)?.innerText,
-      attachmentsRequired: questionElement.getElement(XmlConsts.attachmentsrequired)?.innerText,
-      responseTemplate: questionElement.getElement(XmlConsts.responsetemplate)?.innerText,
-      graderInfo: questionElement.getElement(XmlConsts.graderinfo)?.getElement(XmlConsts.text)?.innerText,
+          .getElement(XmlConsts.generalfeedback)
+          ?.getElement(XmlConsts.text)
+          ?.innerText,
+      defaultGrade:
+          questionElement.getElement(XmlConsts.defaultgrade)?.innerText,
+      responseFormat:
+          questionElement.getElement(XmlConsts.responseformat)?.innerText,
+      responseRequired:
+          questionElement.getElement(XmlConsts.responserequired)?.innerText,
+      attachmentsRequired:
+          questionElement.getElement(XmlConsts.attachmentsrequired)?.innerText,
+      responseTemplate:
+          questionElement.getElement(XmlConsts.responsetemplate)?.innerText,
+      graderInfo: questionElement
+          .getElement(XmlConsts.graderinfo)
+          ?.getElement(XmlConsts.text)
+          ?.innerText,
     );
 
     for (XmlElement answerElement
@@ -160,7 +173,6 @@ class Question {
     }
     return question;
   }
-
 
 // Question copyWith({
 //    String? name
@@ -215,6 +227,7 @@ class Answer {
   }
 }
 
+// ** original code either by scott or Daanish**
 // Represents a course in Moodle.
 class Course {
   int id;
@@ -237,6 +250,29 @@ class Course {
     };
   }
 }
+/*
+// this code below is modified by safia 
+class Course {
+  int id;
+  String shortName;
+  String fullName;
+
+  Course(this.id, this.shortName, this.fullName);
+
+  factory Course.fromJson(Map<String, dynamic> json) {
+    return Course(
+      json['id'] as int,
+      json['shortname'] as String,
+      json['fullname'] as String,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'Course{id: $id, shortName: $shortName, fullName: $fullName}';
+  }
+} 
+*/
 
 enum QuestionType {
   multichoice(displayName: 'Multiple Choice', xmlName: 'multichoice'),
