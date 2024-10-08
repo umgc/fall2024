@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '/controller/main_controller.dart';
-import '/Views/dashboard.dart';
-
-
+import '../Views/dashboard.dart';
 
 class LoginApp extends StatelessWidget 
 {
@@ -165,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen>
                 var wasSuccessful = await LoginScreen.controller.loginToMoodle(_usernameController.text, _passwordController.text, _moodleURLController.text);
                 if (wasSuccessful) 
                 {
-                  // List<Course> courses = await MainController().getCourses();
+                  MainController().updateCourses();
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => TeacherDashboard())

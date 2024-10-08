@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import '/Controller/beans.dart';
+import '../Controller/beans.dart';
 
 // Singleton class for Moodle API access.
 class MoodleApiSingleton {
@@ -117,20 +117,24 @@ class MoodleApiSingleton {
     }
     
     // Decode the JSON to get the wanted information.
-    Map<String, dynamic> temp = jsonDecode(response.body) as Map<String, dynamic>;
+    List<dynamic> temp = jsonDecode(response.body) as List<dynamic>;
     List results = [];
-    temp.forEach((k,v) {
+    for (int i = 0; i < temp.length; i++){
+      var v = temp[i];
       if (v['modules'] != []){
         //todo method for converting from json or xml
         for (int i = 0; i < v['modules'].length; i++){
           // Collect important identifying information.
           Map<String, dynamic> module = v['modules'][i];
           // Skip modules that are not a quiz or assignment. //todo specific filter for app-created stuff
-          if (module['modname'] == "quiz" || module['modname' == 'assign']){
+          if (module['modname'] == "quiz" || module['modname'] == 'assign'){
             //todo check neccessity of an id for modules (personally think that's a 'probably')
             String name = module['name'];
             String description = '';
+            //todo learn how to get the questions from quizzes
+            //all this is literally only enough to make the CarouselCards
             if (module.containsKey('intro')){
+              //while all the null-shorting is amazingly useful, I don't know if Dart has KeyErrors
               description = module['intro'];
             }
             if (module['modname'] == 'quiz'){
@@ -141,8 +145,8 @@ class MoodleApiSingleton {
             }
           }
         }
-      };
-    });
+      }
+    }
     return results;
   }
 
@@ -171,6 +175,25 @@ class MoodleApiSingleton {
         results.insert(results.length, c);
       }
     }
+    print(results.toString());
+    return results;
+  }
+
+  Future<List<Essay>> getEssays(int? courseID) async {
+    List contents;
+    if (courseID != null){
+      contents = await getCourseContents(courseID);
+    }
+    else{
+      contents = await getAllContents();
+    }
+    List<Essay> results = [];
+    for (Object c in contents){
+      if (c is Essay){
+        results.insert(results.length, c);
+      }
+    }
+    print(results.toString());
     return results;
   }
 

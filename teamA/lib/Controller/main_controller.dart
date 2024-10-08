@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../Api/moodle_api_singleton.dart';
-// import 'package:flutter_dotenv/flutter_dotenv.dart';
-import '/Controller/beans.dart';
+import '../Controller/beans.dart';
 
 class MainController 
 {
@@ -47,11 +46,8 @@ class MainController
     isLoggedIn = false;
   }
 
-  Future<List<Course>> getCourses() async 
+  Future<bool> updateCourses() async 
   {
-    if (courses != []){
-      return courses;
-    }
     var moodleApi = MoodleApiSingleton();
     try {
       courses = await moodleApi.getCourses();
@@ -59,12 +55,13 @@ class MainController
         courses.removeAt(
             0); // first course is always "Moodle" - no need to show it
       }
-      return courses;
+      return true;
     } catch (e) {
       if (kDebugMode) {
         print(e);
       }
-      return [];
+      courses = [];
+      return false;
     }
   }
 
@@ -73,21 +70,24 @@ class MainController
     return isLoggedIn;
   }
 
-  void selectCourse(int index){
+  Future<bool> selectCourse(int index) async{
     if (index < courses.length){
       selectedCourse = courses[index];
     }
+    setQuizzes();
+    setEssays();
+    return true;
   }
 
   Course? getSelectedCourse(){
     return selectedCourse;
   }
 
-  List<Quiz>? getQuizzes(){
-    return quizzes;
+  void setQuizzes() async{
+    quizzes = await MoodleApiSingleton().getQuizzes(selectedCourse?.id);
   }
 
-  List<Essay>? getEssays(){
-    return essays;
+  void setEssays() async{
+    essays = await MoodleApiSingleton().getEssays(selectedCourse?.id);
   }
 }

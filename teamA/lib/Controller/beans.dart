@@ -33,8 +33,11 @@ class XmlConsts {
 }
 
 class Essay {
+  //todo more vars as needed (like the Rubric for starters)
   String? name;
   String? description;
+
+  Essay({this.name,this.description});
 }
 
 // A Moodle quiz containing a list of questions.

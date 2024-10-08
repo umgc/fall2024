@@ -4,12 +4,13 @@ import "Controller/beans.dart";
 //Provides a carousel of either assessments, essays, or submission
 class ContentCarousel extends StatefulWidget{
   final String type;
+  final List? children;
 
-  ContentCarousel(this.type);
+  ContentCarousel(this.type, this.children);
 
   @override
   State<ContentCarousel> createState() {
-    return _ContentState(type);
+    return _ContentState(type, children);
   }
 }
 
@@ -25,14 +26,13 @@ class _ContentState extends State<ContentCarousel>{
     children = _children;
   }
   
-  factory _ContentState(String type) {
+  factory _ContentState(String type, List? input) {
     //generate the full list of cards
-    //todo: do this via the Moodle API
     if (type == "assessment"){
-      return _ContentState._(type, [CarouselCard('Real Test','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test 2','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test3','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test4','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test5','Test Information\nWould Go\nHere','assessment')]);
+      return _ContentState._(type, CarouselCard.fromQuizzes(input) ?? [Text('This course has no generated quizzes.')]);
     }
     else if (type == 'essay'){
-      return _ContentState._(type, [CarouselCard('Real Essay','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test 2','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test3','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test4','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test5','Test Information\nWould Go\nHere','essay')]);
+      return _ContentState._(type, CarouselCard.fromEssays(input) ?? [Text('This course has no generated essays.')]);
     }
     //todo: add submission type
     else {
@@ -44,7 +44,6 @@ class _ContentState extends State<ContentCarousel>{
 
   @override
   Widget build(BuildContext context){
-    
     return ConstrainedBox(
       constraints: BoxConstraints(maxHeight: 400), //testing width
       child: CarouselView(
@@ -68,28 +67,36 @@ class CarouselCard extends StatelessWidget{
 
   CarouselCard(this.title, this.information, this.type);
 
-  CarouselCard fromQuiz(Quiz input){
-    //todo
-    return CarouselCard('test', 'test', 'assessment');
+  static CarouselCard fromQuiz(Quiz input){
+    return CarouselCard(input.name ?? "Unnamed Quiz", input.description ?? '', 'assessment');
   }
 
-  List<CarouselCard> fromQuizzes(List<Quiz> input){
+  static List<CarouselCard>? fromQuizzes(List? input){
+    if (input == null){
+      return null;
+    }
     List<CarouselCard> output = [];
-    for (Quiz quiz in input){
-      output.insert(output.length, fromQuiz(quiz));
+    for (Object c in input){
+      if (c is Quiz){
+        output.insert(output.length, fromQuiz(c));
+      }
     }
     return output;
   }
 
-  CarouselCard fromEssay(Essay input){
-    //todo
-    return CarouselCard('test', 'test', 'essay');
+  static CarouselCard fromEssay(Essay input){
+    return CarouselCard(input.name ?? "Unnamed Essay", input.description ?? '', 'essay');
   }
 
-  List<CarouselCard> fromEssays(List<Essay> input){
+  static List<CarouselCard>? fromEssays(List? input){
+    if (input == null){
+      return null;
+    }
     List<CarouselCard> output = [];
-    for (Essay essay in input){
-      output.insert(output.length, fromEssay(essay));
+    for (Object c in input){
+      if (c is Essay){
+        output.insert(output.length, fromEssay(c));
+      }
     }
     return output;
   }
