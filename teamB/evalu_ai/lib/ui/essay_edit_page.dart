@@ -39,6 +39,7 @@ class _EssayEditPage extends State<EssayEditPage> {
               ),
               child: CustomNavigationBar(selectedIndex: selectedIndex),
             ),
+            Text("Put your stuff here"),
           ],
         );
       }),
