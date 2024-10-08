@@ -62,7 +62,7 @@ class MoodleApiSingleton {
     if (userinforesponse.statusCode != 200) {
       throw HttpException(userinforesponse.body);
     }
-    moodleCourses = await getCourses();
+    moodleCourses = await getUserCourses();
     Map<String, dynamic> userData = jsonDecode(userinforesponse.body);
     moodleUserName = userData['username'];
     moodleFirstName = userData['firstname'];
