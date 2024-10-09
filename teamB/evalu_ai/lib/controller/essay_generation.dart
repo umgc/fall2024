@@ -55,7 +55,7 @@ class _MyHomePageState extends State<EssayGeneration> {
   }
 
   Future<dynamic> apiTest(String inputs) async {
-    String apiKey = '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';
+    String apiKey = '';
     LlmApi myLLM = LlmApi(apiKey);
     String queryPrompt = '''
 I am building a program that creates rubrics when provided with assignment information. I will provide you with the following information about the assignment that needs a rubric:
