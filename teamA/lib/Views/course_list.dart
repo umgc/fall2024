@@ -74,7 +74,7 @@ class CourseList extends StatelessWidget {
                 ],
               )),
             ),
-            body: Padding(
+            body: SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(15, 10, 0, 10),
               child: Align(
                   alignment: Alignment.center,
