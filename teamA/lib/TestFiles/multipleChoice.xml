@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <quiz>
+  <question type="category">
+    <category>
+    <text>Pythagorean Theorem</text>
+    </category>
+  </question>
   <question type="multichoice">
     <name><text>Pythagorean Theorem Question 1</text></name>
     <questiontext format="html"><text>What is the formula for the Pythagorean theorem?</text></questiontext>

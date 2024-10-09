@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:learninglens_app/Controller/beans.dart';
+import 'package:learninglens_app/Views/edit_questions.dart';
 import 'package:learninglens_app/api/llm/prompt_engine.dart';
 class CreateAssessment extends StatefulWidget {
 
@@ -17,13 +20,13 @@ class CreateAssessment extends StatefulWidget {
 
 class _AssessmentState extends State<CreateAssessment> {
   double paddingHeight = 16.0, paddingWidth=32;
-  TextEditingController nameController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
-  TextEditingController sourceController = TextEditingController();
-  TextEditingController multipleChoiceController = TextEditingController();
-  TextEditingController trueFalseController = TextEditingController();
-  TextEditingController shortAnswerController = TextEditingController();
-  TextEditingController topicController = TextEditingController();
+  static TextEditingController nameController = TextEditingController();
+  static TextEditingController descriptionController = TextEditingController();
+  static TextEditingController sourceController = TextEditingController();
+  static TextEditingController multipleChoiceController = TextEditingController();
+  static TextEditingController trueFalseController = TextEditingController();
+  static TextEditingController shortAnswerController = TextEditingController();
+  static TextEditingController topicController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
   _AssessmentState();
@@ -88,7 +91,8 @@ class _AssessmentState extends State<CreateAssessment> {
                                                   "topic" : topicController,
                                                   "multipleChoice" : multipleChoiceController,
                                                   "trueFalse" :  trueFalseController,
-                                                  "shortAns" : shortAnswerController,}, _formKey)
+                                                  "shortAns" : shortAnswerController,}, _formKey,
+                                                  context)
                       ],
                     ),
                   )
@@ -104,12 +108,13 @@ class SubmitButton extends StatelessWidget {
   final String buttonText;
   final Map<String, TextEditingController> fields;
   final GlobalKey<FormState> formKey;
+  final BuildContext context;
 
-  SubmitButton._(this.buttonText, this.fields, this.formKey);
+  SubmitButton._(this.buttonText, this.fields, this.formKey, this.context);
 
-  void _submitToLLM() {
+  Future<void> _submitToLLM() async {
     if(formKey.currentState!.validate()) {
-      AssignmentForm af = new AssignmentForm(
+      AssignmentForm af = AssignmentForm(
       questionType: QuestionType.shortanswer, //Potentially not necessary? Need to see about essay generator
       subject: 'Algebra', // Get these programatically?
       topic: fields['topic']!.text, 
@@ -119,7 +124,15 @@ class SubmitButton extends StatelessWidget {
       shortAnswerCount: int.parse(fields['shortAns']!.text),
       multipleChoiceCount: int.parse(fields['multipleChoice']!.text),
       maximumGrade: 100);
-      print(PromptEngine.generatePrompt(af));
+      //print(PromptEngine.generatePrompt(af));
+
+      if (await File("J:\\Users\\Conor Moore\\Downloads\\UMGC\\fall2024\\teamA\\lib\\TestFiles\\allThree.xml").exists()) {
+        File('J:\\Users\\Conor Moore\\Downloads\\UMGC\\fall2024\\teamA\\lib\\TestFiles\\allThree.xml').readAsString().then((String fileContents) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => EditQuestions(fileContents)));
+        });
+      } else {
+        print("No file boss");
+      }
     }
   }
 
