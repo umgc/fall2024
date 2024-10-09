@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:intelligrade/api/llm/llm_api.dart';
 import 'package:intelligrade/controller/model/essay_editor.dart';
@@ -19,7 +21,107 @@ class EssayGeneration extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<EssayGeneration> {
-  final int point = 0;
+  //Holds values for user input fields
+  int _selectedPointScale = 3; // Default value
+  String _selectedGradeLevel =
+      'Advanced'; // Default value for GradeLevelDropdown
+
+  // Variables to store the text inputs
+  final TextEditingController _standardObjectiveController =
+      TextEditingController();
+  final TextEditingController _assignmentDescriptionController =
+      TextEditingController();
+  final TextEditingController _additionalCustomizationController =
+      TextEditingController();
+
+  dynamic globalRubric;
+
+  // Function to store the selected value
+  void _handlePointScaleChanged(int? newValue) {
+    setState(() {
+      if (newValue != null) {
+        _selectedPointScale = newValue;
+      }
+    });
+  }
+
+  // Function to store the selected grade level value
+  void _handleGradeLevelChanged(String? newValue) {
+    setState(() {
+      if (newValue != null) {
+        _selectedGradeLevel = newValue;
+      }
+    });
+  }
+
+  Future<dynamic> apiTest(String inputs) async {
+    String apiKey = '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';
+    LlmApi myLLM = LlmApi(apiKey);
+    String queryPrompt = '''
+I am building a program that creates rubrics when provided with assignment information. I will provide you with the following information about the assignment that needs a rubric:
+Difficulty level, point scale, assignment objective, assignment description. You may also receive additional customization rules.
+
+Using this information, you will reply with a rubric that includes 3-5 criteria. Your reply must only contain the JSON information, and begin with a {.
+Remove any ``` from your output.
+
+
+You must reply with a representation of the rubric in JSON format that matches this format: 
+{
+    "criteria": [
+        {
+            "description": #CriteriaName,
+            "levels": [
+                { "definition": #CriteriaDef, "score": #ScoreValue },
+            ]
+        }
+	]
+}
+
+#CriteriaName must be replaced with the name of the criteria.
+#CriteriaDef must be replaced with a detailed description of what meeting that criteria would look like for each scale value.
+#ScoreValue must be replaced with a number representing the score. The score for the lowest scale value will be 0, and the scores will increase by 1 for each scale.
+You should create as many "levels" objects as there are point scale values.
+
+Here is the assignment information:
+$inputs
+''';
+    String rubric = await myLLM.postToLlm(queryPrompt);
+    return jsonDecode(rubric);
+    //globalRubric = jsonDecode(rubric);
+    //genRubricFromAI(rubric);
+  }
+
+/*
+  dynamic genRubricFromAI(String inputs) {
+    apiTest(inputs).then((String results) {
+      print('tets');
+    });
+    Object result = jsonDecode(waitRubric);
+    //final result1 = (json.decode(waitRubric) as List).cast<Map<String, dynamic>>();
+    print('result');
+    return result;
+    //WARNING
+  }
+*/
+// Method to return a summary of the selected dropdown and text box values
+  String getSelectedResponses() {
+    return '''
+Selected Difficulty Level: $_selectedGradeLevel
+Selected Point Scale: $_selectedPointScale
+Standard / Objective: ${_standardObjectiveController.text}
+Assignment Description: ${_assignmentDescriptionController.text}
+Additional Customization: ${_additionalCustomizationController.text}
+    ''';
+  }
+
+  @override
+  void dispose() {
+    // Dispose the controllers when the widget is removed from the widget tree
+    _standardObjectiveController.dispose();
+    _assignmentDescriptionController.dispose();
+    _additionalCustomizationController.dispose();
+    super.dispose();
+  }
 
   _MyHomePageState();
 
@@ -48,19 +150,17 @@ class _MyHomePageState extends State<EssayGeneration> {
 
                   // Grade Level Dropdown
                   GradeLevelDropdown(
-                    selectedGradeLevel: 'Advanced', // Default value
-                    onChanged: (newValue) {
-                      // If the user changes the value of the grade
-                    },
+                    selectedGradeLevel: _selectedGradeLevel, // Current value
+                    onChanged:
+                        _handleGradeLevelChanged, // Update selected value
                   ),
                   const SizedBox(height: 16),
 
                   // Point Scale Dropdown
                   PointScaleDropdown(
-                    selectedPointScale: 3, // Default value
-                    onChanged: (newValue) {
-                      // If the user changes the value of the point scale
-                    },
+                    selectedPointScale: _selectedPointScale, // Current value
+                    onChanged:
+                        _handlePointScaleChanged, // Update selected value
                   ),
                   const SizedBox(height: 16),
 
@@ -69,10 +169,7 @@ class _MyHomePageState extends State<EssayGeneration> {
                     label: "Standard / Objective",
                     icon: Icons.mic,
                     secondaryIcon: Icons.attachment,
-                    initialValue: '',
-                    onChanged: (newValue) {
-                      // If the user puts in text
-                    },
+                    controller: _standardObjectiveController,
                   ),
                   const SizedBox(height: 16),
 
@@ -81,10 +178,7 @@ class _MyHomePageState extends State<EssayGeneration> {
                     label: "Assignment Description",
                     icon: Icons.mic,
                     secondaryIcon: Icons.attachment,
-                    initialValue: '',
-                    onChanged: (newValue) {
-                      // If the user puts in text
-                    },
+                    controller: _assignmentDescriptionController,
                   ),
                   const SizedBox(height: 16),
 
@@ -93,16 +187,41 @@ class _MyHomePageState extends State<EssayGeneration> {
                     label: "Additional Customization for Rubric (Optional)",
                     icon: Icons.mic,
                     secondaryIcon: Icons.attachment,
-                    initialValue: '',
-                    onChanged: (newValue) {
-                      // Will also be handled as query to API
-                    },
+                    controller: _additionalCustomizationController,
                   ),
 
                   const SizedBox(height: 16),
 
-                  // Generate Button
-                  Button('essay')
+                  // Generate Essay Button
+                  Button(
+                    'essay',
+                    onPressed: () {
+                      final result = getSelectedResponses();
+
+                      apiTest(result).then((dynamic results) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EssayEditor(results),
+                          ),
+                        );
+                      });
+                      //apiTest(result);
+                      //print('rubric: $globalRubric');
+                      //apiTest(result);
+                      /*
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              EssayEditor(genRubricFromAI(apiTest(result))),
+                        ),
+                        
+                      );
+                      */
+                    },
+                  ),
                 ],
               ),
             ),
@@ -147,13 +266,19 @@ class Button extends StatelessWidget {
   final String type;
   final String text;
   final String filters = "";
-  Button._(this.type, this.text);
+  final VoidCallback? onPressed;
 
-  factory Button(String type) {
+  Button._(this.type, this.text, {this.onPressed});
+
+  factory Button(String type, {VoidCallback? onPressed}) {
     if (type == "assessment") {
       return Button._(type, "Send to Moodle");
     } else if (type == "essay") {
-      return Button._(type, "Generate Essay");
+      return Button._(
+        type,
+        "Generate Essay",
+        onPressed: onPressed,
+      );
     } else {
       return Button._(type, "");
     }
@@ -162,14 +287,7 @@ class Button extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EssayEditor(genRubricFromAI()),
-            ),
-          );
-        },
+        onPressed: onPressed,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [Icon(Icons.create), Text(text)],
@@ -177,35 +295,25 @@ class Button extends StatelessWidget {
   }
 }
 
+// Modify TextBox to accept a TextEditingController
 class TextBox extends StatelessWidget {
-  // Each text box will have icons for attachments and playback, and event handlers
   final String label;
   final IconData icon;
   final IconData secondaryIcon;
-  final String initialValue;
-  // We need to store the value of the string the user inputs
-  final ValueChanged<String?> onChanged;
+  final TextEditingController controller;
 
-  // Constructor for textbok requires user input
   const TextBox({
     Key? key,
     required this.label,
     required this.icon,
     required this.secondaryIcon,
-    required this.initialValue,
-    required this.onChanged,
+    required this.controller,
   }) : super(key: key);
-
-  void _handleTextChanged(String? newValue) {
-    // Additional Logic
-    onChanged(newValue); // Call the passed onChanged function
-  }
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: TextEditingController(
-          text: initialValue), // To handle the initial value
+      controller: controller, // Use the persistent controller
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Column(
@@ -217,7 +325,6 @@ class TextBox extends StatelessWidget {
           ],
         ),
       ),
-      onChanged: _handleTextChanged,
     );
   }
 }
@@ -285,61 +392,4 @@ class GradeLevelDropdown extends StatelessWidget {
       onChanged: _handleTextChanged,
     );
   }
-}
-
-Future<void> apiTest() async {
-  String apiKey = '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';
-  LlmApi myLLM = LlmApi(apiKey);
-  String queryPrompt = 'How many stars are there in our galaxy?';
-  String ans1 = await myLLM.postToLlm(queryPrompt);
-  print(ans1);
-}
-
-Map<String, List<Map<String, Object>>> genRubricFromAI() {
-  String gradeLevel;
-  var ans = {
-    "criteria": [
-      {
-        "description": "Theme Analysis",
-        "levels": [
-          {
-            "definition":
-                "Identifies and discusses the main themes of the text with clarity.",
-            "score": 1
-          },
-          {
-            "definition":
-                "Analyzes the text's themes with adequate depth, offering reasonable interpretations.",
-            "score": 2
-          },
-          {
-            "definition":
-                "Demonstrates a thorough and insightful analysis of the text's themes, providing nuanced interpretations.",
-            "score": 3
-          }
-        ]
-      },
-      {
-        "description": "Word Choice",
-        "levels": [
-          {
-            "definition":
-                "Uses basic and repetitive word choices that are appropriate but lack sophistication.",
-            "score": 1
-          },
-          {
-            "definition":
-                "Employs a variety of appropriate word choices, showing some attention to tone and style.",
-            "score": 2
-          },
-          {
-            "definition":
-                "Selects precise, evocative words that enhance meaning and contribute to the tone and style of the work.",
-            "score": 3
-          }
-        ]
-      }
-    ]
-  };
-  return ans;
 }

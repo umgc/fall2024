@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'send_essay_to_moodle.dart'; // Import for JSON encoding
 
 class EssayEditor extends StatefulWidget {
-  final Map<String, List<Map<String, Object>>> jsonData;
+  final dynamic jsonData;
   const EssayEditor(this.jsonData);
   @override
   EssayEditorState createState() => EssayEditorState(); // Public State class
@@ -14,7 +14,7 @@ class EssayEditor extends StatefulWidget {
 class EssayEditorState extends State<EssayEditor> {
   // JSON data to be used
 
-  late Map<String, List<Map<String, Object>>> jsonData;
+  late dynamic jsonData;
   /*
   final jsonData = {
     "criteria": [
