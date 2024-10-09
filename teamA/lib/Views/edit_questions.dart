@@ -2,6 +2,7 @@ import '../Api/moodle_api_singleton.dart';
 import 'package:image_network/image_network.dart';
 import '../controller/beans.dart';
 import 'package:flutter/material.dart';
+import 'package:llm_api_modules/openai_api.dart';
 
 class EditQuestions extends StatefulWidget {
   @override
@@ -96,6 +97,8 @@ class _EditQuestionsState extends State<EditQuestions> {
                   ),
                   confirmDismiss: (direction) async {
                     if (direction == DismissDirection.startToEnd) {
+                      //********************************************************************************************
+
                       setState(() {
                         myQuiz.questionList[index] =
                             question.copyWith(isFavorite: !question.isFavorite);
@@ -186,56 +189,180 @@ String myXML = '''
   <!-- Define the category for the questions -->
   <question type="category">
     <category>
-      <text>\$course\$/top/2112 Quiz Category</text>
+      <text>\$course\$/top/Key Signature Quiz Category</text>
     </category>
   </question>
 
-  <!-- Multiple Choice Question -->
+  <!-- Multiple Choice Question 1 -->
   <question type="multichoice">
     <name>
-      <text>Multiple Choice Question</text>
+      <text>Multiple Choice Question 1</text>
     </name>
     <questiontext format="html">
-      <text><![CDATA[What is the capital of France?]]></text>
+      <text><![CDATA[What is the key signature with one sharp?]]></text>
     </questiontext>
     <answer fraction="100">
-      <text>Paris</text>
+      <text>G Major</text>
       <feedback>
         <text>Correct!</text>
       </feedback>
     </answer>
     <answer fraction="0">
-      <text>London</text>
+      <text>D Major</text>
       <feedback>
-        <text>Incorrect.</text>
+        <text>Incorrect. D Major has two sharps.</text>
       </feedback>
     </answer>
     <answer fraction="0">
-      <text>Rome</text>
+      <text>A Major</text>
       <feedback>
-        <text>Incorrect.</text>
+        <text>Incorrect. A Major has three sharps.</text>
       </feedback>
     </answer>
     <answer fraction="0">
-      <text>Berlin</text>
+      <text>E Major</text>
       <feedback>
-        <text>Incorrect.</text>
+        <text>Incorrect. E Major has four sharps.</text>
       </feedback>
     </answer>
   </question>
 
-  <!-- True/False Question -->
-  <question type="truefalse">
+  <!-- Multiple Choice Question 2 -->
+  <question type="multichoice">
     <name>
-      <text>True/False Question</text>
+      <text>Multiple Choice Question 2</text>
     </name>
     <questiontext format="html">
-      <text><![CDATA[The Earth is flat.]]></text>
+      <text><![CDATA[What is the key signature with two flats?]]></text>
+    </questiontext>
+    <answer fraction="100">
+      <text>B♭ Major</text>
+      <feedback>
+        <text>Correct!</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>E♭ Major</text>
+      <feedback>
+        <text>Incorrect. E♭ Major has three flats.</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>A♭ Major</text>
+      <feedback>
+        <text>Incorrect. A♭ Major has four flats.</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>F Major</text>
+      <feedback>
+        <text>Incorrect. F Major has one flat.</text>
+      </feedback>
+    </answer>
+  </question>
+
+  <!-- Multiple Choice Question 3 -->
+  <question type="multichoice">
+    <name>
+      <text>Multiple Choice Question 3</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[Which key has no sharps or flats?]]></text>
+    </questiontext>
+    <answer fraction="100">
+      <text>C Major</text>
+      <feedback>
+        <text>Correct!</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>G Major</text>
+      <feedback>
+        <text>Incorrect. G Major has one sharp.</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>F Major</text>
+      <feedback>
+        <text>Incorrect. F Major has one flat.</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>D Major</text>
+      <feedback>
+        <text>Incorrect. D Major has two sharps.</text>
+      </feedback>
+    </answer>
+  </question>
+
+  <!-- Multiple Choice Question 4 -->
+  <question type="multichoice">
+    <name>
+      <text>Multiple Choice Question 4</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[Which of the following keys has three sharps?]]></text>
+    </questiontext>
+    <answer fraction="100">
+      <text>A Major</text>
+      <feedback>
+        <text>Correct!</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>G Major</text>
+      <feedback>
+        <text>Incorrect. G Major has one sharp.</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>D Major</text>
+      <feedback>
+        <text>Incorrect. D Major has two sharps.</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>E Major</text>
+      <feedback>
+        <text>Incorrect. E Major has four sharps.</text>
+      </feedback>
+    </answer>
+  </question>
+
+  <!-- True/False Question 1 -->
+  <question type="truefalse">
+    <name>
+      <text>True/False Question 1</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[C Major has no sharps or flats.]]></text>
+    </questiontext>
+    <answer fraction="100">
+      <text>true</text>
+      <feedback>
+        <text>Correct!</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>false</text>
+      <feedback>
+        <text>Incorrect. C Major has no accidentals.</text>
+      </feedback>
+    </answer>
+  </question>
+
+  <!-- True/False Question 2 -->
+  <question type="truefalse">
+    <name>
+      <text>True/False Question 2</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[D Major has three sharps.]]></text>
     </questiontext>
     <answer fraction="0">
       <text>true</text>
       <feedback>
-        <text>Incorrect.</text>
+        <text>Incorrect. D Major has two sharps.</text>
       </feedback>
     </answer>
     <answer fraction="100">
@@ -246,74 +373,113 @@ String myXML = '''
     </answer>
   </question>
 
-  <!-- Short Answer Question -->
+  <!-- True/False Question 3 -->
+  <question type="truefalse">
+    <name>
+      <text>True/False Question 3</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[F Major has one flat.]]></text>
+    </questiontext>
+    <answer fraction="100">
+      <text>true</text>
+      <feedback>
+        <text>Correct!</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>false</text>
+      <feedback>
+        <text>Incorrect. F Major has one flat, which is B♭.</text>
+      </feedback>
+    </answer>
+  </question>
+
+  <!-- True/False Question 4 -->
+  <question type="truefalse">
+    <name>
+      <text>True/False Question 4</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[E Major has five sharps.]]></text>
+    </questiontext>
+    <answer fraction="0">
+      <text>true</text>
+      <feedback>
+        <text>Incorrect. E Major has four sharps.</text>
+      </feedback>
+    </answer>
+    <answer fraction="100">
+      <text>false</text>
+      <feedback>
+        <text>Correct!</text>
+      </feedback>
+    </answer>
+  </question>
+
+  <!-- Short Answer Question 1 -->
   <question type="shortanswer">
     <name>
-      <text>Short Answer Question</text>
+      <text>Short Answer Question 1</text>
     </name>
     <questiontext format="html">
-      <text><![CDATA[What is the chemical symbol for water?]]></text>
+      <text><![CDATA[Name the key that has one flat.]]></text>
     </questiontext>
     <answer fraction="100">
-      <text>H2O</text>
+      <text>F Major</text>
       <feedback>
         <text>Correct!</text>
       </feedback>
     </answer>
   </question>
 
-  <!-- Matching Question -->
-  <question type="matching">
+  <!-- Short Answer Question 2 -->
+  <question type="shortanswer">
     <name>
-      <text>Matching Question</text>
+      <text>Short Answer Question 2</text>
     </name>
     <questiontext format="html">
-      <text><![CDATA[Match the countries to their capitals.]]></text>
-    </questiontext>
-    <subquestion format="html">
-      <text><![CDATA[France]]></text>
-      <answer>
-        <text>Paris</text>
-      </answer>
-    </subquestion>
-    <subquestion format="html">
-      <text><![CDATA[Italy]]></text>
-      <answer>
-        <text>Rome</text>
-      </answer>
-    </subquestion>
-  </question>
-
-  <!-- Essay Question -->
-  <question type="essay">
-    <name>
-      <text>Essay Question</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[Describe the impact of climate change on global weather patterns.]]></text>
-    </questiontext>
-    <graderinfo format="html">
-      <text><![CDATA[Grading instructions for this question.]]></text>
-    </graderinfo>
-  </question>
-
-  <!-- Numerical Question -->
-  <question type="numerical">
-    <name>
-      <text>Numerical Question</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[What is the square root of 64?]]></text>
+      <text><![CDATA[Name the key that has three flats.]]></text>
     </questiontext>
     <answer fraction="100">
-      <text>8</text>
-      <tolerance>0</tolerance>
+      <text>E♭ Major</text>
       <feedback>
         <text>Correct!</text>
       </feedback>
     </answer>
   </question>
 
+  <!-- Short Answer Question 3 -->
+  <question type="shortanswer">
+    <name>
+      <text>Short Answer Question 3</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[What is the relative minor of C Major?]]></text>
+    </questiontext>
+    <answer fraction="100">
+      <text>A minor</text>
+      <feedback>
+        <text>Correct! A minor is the relative minor of C Major.</text>
+      </feedback>
+    </answer>
+  </question>
+
+  <!-- Short Answer Question 4 -->
+  <question type="shortanswer">
+    <name>
+      <text>Short Answer Question 4</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[Name the key that has five sharps.]]></text>
+    </questiontext>
+    <answer fraction="100">
+      <text>B Major</text>
+      <feedback>
+        <text>Correct!</text>
+      </feedback>
+    </answer>
+  </question>
 </quiz>
 ''';
 String rubricDefinition = '''
