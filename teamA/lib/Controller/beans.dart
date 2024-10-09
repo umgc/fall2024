@@ -263,7 +263,9 @@ class AssignmentForm {
   String gradeLevel;
   int maximumGrade;
   int? assignmentCount;
-  int questionCount;
+  int trueFalseCount;
+  int shortAnswerCount;
+  int multipleChoiceCount;
   String? codingLanguage;
   String title;
 
@@ -273,7 +275,9 @@ class AssignmentForm {
       required this.topic,
       required this.gradeLevel,
       required this.title,
-      required this.questionCount,
+      required this.trueFalseCount,
+      required this.shortAnswerCount,
+      required this.multipleChoiceCount,
       required this.maximumGrade,
       this.assignmentCount,
       this.gradingCriteria,
