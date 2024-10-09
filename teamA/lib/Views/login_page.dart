@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/main.dart';
 import '/controller/main_controller.dart';
-import '/Views/dashboard.dart';
-
-
+import '../Views/dashboard.dart';
 
 class LoginApp extends StatelessWidget 
 {
@@ -165,10 +164,12 @@ class _LoginScreenState extends State<LoginScreen>
                 var wasSuccessful = await LoginScreen.controller.loginToMoodle(_usernameController.text, _passwordController.text, _moodleURLController.text);
                 if (wasSuccessful) 
                 {
-                  // List<Course> courses = await MainController().getCourses();
+                  MainController().updateCourses();
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => TeacherDashboard())
+                    // MaterialPageRoute(builder: (context) => TeacherDashboard())
+                    // For now, go to DEV view
+                    MaterialPageRoute(builder: (context) => DevLaunch())
                   );
                 } else {
                   _showLoginFailedDialog();

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import '/Controller/beans.dart';
+import '../Controller/beans.dart';
 
 // Singleton class for Moodle API access.
 class MoodleApiSingleton {
@@ -62,7 +62,7 @@ class MoodleApiSingleton {
     if (userinforesponse.statusCode != 200) {
       throw HttpException(userinforesponse.body);
     }
-    moodleCourses = await getCourses();
+    moodleCourses = await getUserCourses();
     Map<String, dynamic> userData = jsonDecode(userinforesponse.body);
     moodleUserName = userData['username'];
     moodleFirstName = userData['firstname'];
@@ -78,16 +78,142 @@ class MoodleApiSingleton {
     _userToken = null;
   }
 
+  // Get list of courses.
+  Future<List<Course>> getCourses() async {
+    if (_userToken == null) throw StateError('User not logged in to Moodle');
+
+    final response = await http.post(Uri.parse(moodleURL + serverUrl
+            ),
+        body: {
+          'wstoken': _userToken,
+          'wsfunction':'core_course_get_courses',
+          'moodlewsrestformat': 'json',
+        });
+
+        // '$moodleURL$serverUrl&wstoken=$_userToken$jsonFormat&wsfunction=core_course_get_courses'
+    // ));
+    if (response.statusCode != 200) {
+      throw HttpException(response.body);
+    }
+    List<Course> courses = (jsonDecode(response.body) as List).map((i) => Course.fromJson(i)).toList();
+    return courses;
+  }
+
+  // Import XML quiz into the specified course. Returns a list of IDs for newly imported questions.
+  Future<void> importQuiz(String courseid, String quizXml) async {
+    if (_userToken == null) throw StateError('User not logged in to Moodle');
+
+    final http.Response response = await http.post(Uri.parse(
+      '$serverUrl$_userToken$jsonFormat&wsfunction=local_quizgen_import_questions&courseid=$courseid&questionxml=$quizXml'
+    ));
+    if (response.statusCode != 200) {
+      throw HttpException(response.body);
+    }
+    if (response.body.contains('error')) {
+      throw HttpException(response.body);
+    }
+  }
+
+  // Gets the contents of the specified course.
+  Future<List> getCourseContents(int courseID) async {
+    if (_userToken == null) throw StateError('User not logged in to Moodle');
+    // Make the request.
+    final http.Response response = await http.get(Uri.parse('$serverUrl$_userToken$jsonFormat&wsfunction=core_course_get_contents&courseid=$courseID'));
+    if (response.statusCode != 200) {
+      throw HttpException(response.body);
+    }
+    
+    // Decode the JSON to get the wanted information.
+    List<dynamic> temp = jsonDecode(response.body) as List<dynamic>;
+    List results = [];
+    for (int i = 0; i < temp.length; i++){
+      var v = temp[i];
+      if (v['modules'] != []){
+        //todo method for converting from json or xml
+        for (int i = 0; i < v['modules'].length; i++){
+          // Collect important identifying information.
+          Map<String, dynamic> module = v['modules'][i];
+          // Skip modules that are not a quiz or assignment. //todo specific filter for app-created stuff
+          if (module['modname'] == "quiz" || module['modname'] == 'assign'){
+            //todo check neccessity of an id for modules (personally think that's a 'probably')
+            String name = module['name'];
+            String description = '';
+            //todo learn how to get the questions from quizzes
+            //all this is literally only enough to make the CarouselCards
+            if (module.containsKey('intro')){
+              //while all the null-shorting is amazingly useful, I don't know if Dart has KeyErrors
+              description = module['intro'];
+            }
+            if (module['modname'] == 'quiz'){
+              results.insert(results.length, Quiz(name: name, description: description));
+            }
+            else{
+              // results.insert(results.length, Essay(name: name, description: description));
+            }
+          }
+        }
+      }
+    }
+    return results;
+  }
+
+  // Gets the contents of all courses.
+  Future<List> getAllContents() async{
+    // Collect all the course ids.
+    // List<Course> courses = await getCourses();
+    List<Course> courses = await getUserCourses();
+    List results = [];
+    for (Course c in courses){
+      results = results + await getCourseContents(c.id);
+    }
+    return results;
+  }
+
+  Future<List<Quiz>> getQuizzes(int? courseID) async {
+    List contents;
+    if (courseID != null){
+      contents = await getCourseContents(courseID);
+    }
+    else{
+      contents = await getAllContents();
+    }
+    List<Quiz> results = [];
+    for (Object c in contents){
+      if (c is Quiz){
+        results.insert(results.length, c);
+      }
+    }
+    print(results.toString());
+    return results;
+  }
+
+  Future<List<Essay>> getEssays(int? courseID) async {
+    List contents;
+    if (courseID != null){
+      contents = await getCourseContents(courseID);
+    }
+    else{
+      contents = await getAllContents();
+    }
+    List<Essay> results = [];
+    for (Object c in contents){
+      if (c is Essay){
+        results.insert(results.length, c);
+      }
+    }
+    print(results.toString());
+    return results;
+  }
+
   // ********************************************************************************************************************
   // Get list of courses the user is enrolled in.
   // ********************************************************************************************************************
 
-  Future<List<Course>> getCourses() async {
+  Future<List<Course>> getUserCourses() async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
     // var moodleURL = MoodleApiSingleton().moodleURL;
     final response = await http.post(
         Uri.parse(moodleURL + serverUrl
-            // '$moodleURL$serverUrl$_userToken$jsonFormat&wsfunction=core_course_get_enrolled_courses_by_timeline_classification&classification=inprogress'
             ),
         body: {
           'wstoken': _userToken,
