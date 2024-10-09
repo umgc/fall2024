@@ -1,38 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:namer_app/main.dart';
 
-final ColorScheme customColorScheme = ColorScheme(
-  primary: Color(0xFF6A5A99), // Purple color as primary
-  onPrimary: Color(0xFFFFFFFF), // White text on primary
-  primaryContainer: Color(0xFFEDE6FF), // Light lavender
-  onPrimaryContainer: Color(0xFF2D004A), // Dark purple
-  secondary: Color(0xFF6A5A99), // Using similar purple as secondary
-  onSecondary: Colors.white, // Black text on background
-  surface: Color(0xFFFFFFFF), // White surface color
-  onSurface: Colors.black, // Black text on surface
-  error: Colors.red, // Error color red
-  onError: Colors.white, // White on error
-  brightness: Brightness.light, // Light mode
-);
-
 // This is the course list UI
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: CourseList(),
-      theme: ThemeData(
-        colorScheme: customColorScheme,
-        useMaterial3: true,
-      ),
-      title: 'Learning Lens',
-    );
-  }
-}
-
 class CourseList extends StatelessWidget {
+  const CourseList({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
