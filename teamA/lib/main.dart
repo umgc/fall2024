@@ -7,6 +7,7 @@ import 'Views/course_content.dart';
 import 'Views/send_essay_to_moodle.dart';
 import 'Views/essay_generation.dart';
 import 'Views/quiz_generator.dart';
+import 'Views/send_quiz_to_moodle.dart';
 
 void main() {
   runApp(MyApp());
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
         // '/create': (context) => const CreatePage(),
         '/dashboard': (context) => TeacherDashboard(),
         '/send_essay_to_moodle': (context) => EssayAssignmentSettings(),
+        '/send_quiz_to_moodle': (contet) => QuizMoodle(),
         // '/viewExams': (context) => const ViewExamPage(),
         // '/settings': (context) => Setting(themeModeNotifier: _themeModeNotifier)
       },
@@ -115,6 +117,14 @@ class _DevLaunch extends State {
                   context,
                   MaterialPageRoute(
                       builder: (context) => EssayAssignmentSettings()),
+                );
+              }),
+          ElevatedButton(
+              child: const Text('Send Quiz to Moodle'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => QuizMoodle()),
                 );
               }),
           ElevatedButton(

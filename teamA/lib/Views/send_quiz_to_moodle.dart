@@ -1,18 +1,5 @@
 import 'package:flutter/material.dart';
-
-final ColorScheme customColorScheme = ColorScheme(
-  primary: Color(0xFF6A5A99), // Purple color as primary
-  onPrimary: Color(0xFFFFFFFF), // White text on primary
-  primaryContainer: Color(0xFFEDE6FF), // Light lavender
-  onPrimaryContainer: Color(0xFF2D004A), // Dark purple
-  secondary: Color(0xFF6A5A99), // Using similar purple as secondary
-  onSecondary: Colors.white, // Black text on background
-  surface: Color(0xFFFFFFFF), // White surface color
-  onSurface: Colors.black, // Black text on surface
-  error: Colors.red, // Error color red
-  onError: Colors.white, // White on error
-  brightness: Brightness.light, // Light mode
-);
+import 'package:namer_app/main.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -26,6 +13,8 @@ class MyApp extends StatelessWidget {
         title: 'Learning Lens');
   }
 }
+
+// This is the Send quiz to moodle UI
 
 class QuizMoodle extends StatefulWidget {
   @override
@@ -114,10 +103,39 @@ class _QuizMoodleState extends State<QuizMoodle> {
         home: new Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Learning Lens',
-            textDirection: TextDirection.ltr,
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        backgroundColor: Theme.of(context)
+            .colorScheme
+            .primaryContainer, // Use primary container color
+        elevation: 0,
+        flexibleSpace: SafeArea(
+            child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DevLaunch()),
+                );
+                //to do something once pressed
+              },
+            ),
+            Expanded(
+              child: Align(
+                alignment: Alignment.center,
+                child: Text(
+                  'Learning Lens',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        )),
       ), // Use primary container color
       body: SingleChildScrollView(
         padding: EdgeInsets.all(15.0),
