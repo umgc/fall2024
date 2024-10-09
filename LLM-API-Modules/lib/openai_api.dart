@@ -119,7 +119,7 @@ class OpenAiLLM {
     for (var respChoice in httpPackageResponseJson['choices']) {
       retResponse += respChoice['message']['content'];
     }
-    // print("In queryAI - content :  $retResponse");
+    print("In queryAI - content :  $retResponse");
     return retResponse;
   }
 }

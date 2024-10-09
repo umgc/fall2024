@@ -13,6 +13,7 @@ class _EditQuestionsState extends State<EditQuestions> {
   late Quiz myQuiz;
   final TextEditingController _textController = TextEditingController();
 
+  final openai = OpenAiLLM('apikey');
   @override
   void initState() {
     super.initState();
@@ -98,7 +99,7 @@ class _EditQuestionsState extends State<EditQuestions> {
                   confirmDismiss: (direction) async {
                     if (direction == DismissDirection.startToEnd) {
                       //********************************************************************************************
-
+                      var result = await openai.postToLlm('How High is the moon');
                       setState(() {
                         myQuiz.questionList[index] =
                             question.copyWith(isFavorite: !question.isFavorite);
