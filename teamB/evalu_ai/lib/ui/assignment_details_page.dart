@@ -148,10 +148,180 @@ class _AssignmentDetailsPage extends State<AssignmentDetailsPage> {
                     ),
                   ),
                   summaryIsSelected
-                      ? Column(
-                          children: [
-                            Text("Summary"),
-                          ],
+                      ? Container(
+                          //outer container for the assignment content
+                          margin: EdgeInsets.symmetric(horizontal: 30),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.blueGrey,
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Container(
+                                //container for the content header
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                  color: Colors.blueGrey,
+                                  width: 0.5,
+                                ))),
+                                child: Row(
+                                  //header row
+                                  children: [
+                                    SizedBox(width: 60),
+                                    Text("Question"),
+                                    SizedBox(width: 700),
+                                    Text("Type"),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                //first question
+                                //container for the content header
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                  color: Colors.blueGrey,
+                                  width: 0.5,
+                                ))),
+                                child: Row(
+                                  //header row
+                                  children: [
+                                    SizedBox(width: 60),
+                                    Text("What is 2 + 2?"),
+                                    SizedBox(width: 600),
+                                    Text("Multiple Choice"),
+                                    SizedBox(width: 100),
+                                    IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(Icons.edit_rounded)),
+                                    SizedBox(width: 30),
+                                    IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(Icons.delete)),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                //first question
+                                //container for the content header
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                  color: Colors.blueGrey,
+                                  width: 0.5,
+                                ))),
+                                child: Row(
+                                  //header row
+                                  children: [
+                                    SizedBox(width: 60),
+                                    Text("Who wrote the constitution?"),
+                                    SizedBox(width: 600),
+                                    Text("Short Answer"),
+                                    SizedBox(width: 100),
+                                    IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(Icons.edit_rounded)),
+                                    SizedBox(width: 30),
+                                    IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(Icons.delete)),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                //first question
+                                //container for the content header
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                  color: Colors.blueGrey,
+                                  width: 0.5,
+                                ))),
+                                child: Row(
+                                  //header row
+                                  children: [
+                                    SizedBox(width: 60),
+                                    Text(
+                                        "Does the moon revolve around the earth?"),
+                                    SizedBox(width: 600),
+                                    Text("True/False"),
+                                    SizedBox(width: 100),
+                                    IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(Icons.edit_rounded)),
+                                    SizedBox(width: 30),
+                                    IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(Icons.delete)),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                //first question
+                                //container for the content header
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                  color: Colors.blueGrey,
+                                  width: 0.5,
+                                ))),
+                                child: Row(
+                                  //header row
+                                  children: [
+                                    SizedBox(width: 60),
+                                    Text(
+                                        "Is the absence of evidence the evidence of abscence?"),
+                                    SizedBox(width: 600),
+                                    Text("True/False"),
+                                    SizedBox(width: 100),
+                                    IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(Icons.edit_rounded)),
+                                    SizedBox(width: 30),
+                                    IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(Icons.delete)),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                //first question
+                                //container for the content header
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                  color: Colors.blueGrey,
+                                  width: 0.5,
+                                ))),
+                                child: Row(
+                                  //header row
+                                  children: [
+                                    SizedBox(width: 60),
+                                    Text("What is 2 + 2?"),
+                                    SizedBox(width: 600),
+                                    Text("Multiple Choice"),
+                                    SizedBox(width: 100),
+                                    IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(Icons.edit_rounded)),
+                                    SizedBox(width: 30),
+                                    IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(Icons.delete)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         )
                       : Column(
                           children: [
