@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:intelligrade/ui/header.dart';
 import 'package:intelligrade/ui/custom_navigation_bar.dart';
@@ -40,22 +38,11 @@ class _EssayEditPage extends State<EssayEditPage> {
               ),
               child: CustomNavigationBar(selectedIndex: selectedIndex),
             ),
-            //Insert button here
+            // Replace the button with the EssayGeneration page
             Expanded(
-              child: Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EssayGeneration(
-                          title: 'Gen',
-                        ), // Replace with your page
-                      ),
-                    );
-                  },
-                  child: Text("Go to Essay Gen Page"),
-                ),
+              child: EssayGeneration(
+                title:
+                    'Create an Essay Assignment', // Pass the required parameters
               ),
             ),
           ],

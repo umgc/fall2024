@@ -13,30 +13,8 @@ class EssayEditor extends StatefulWidget {
 
 class EssayEditorState extends State<EssayEditor> {
   // JSON data to be used
-
   late dynamic jsonData;
-  /*
-  final jsonData = {
-    "criteria": [
-      {
-        "description": "Content",
-        "levels": [
-          {"definition": "Excellent", "score": 5},
-          {"definition": "Good", "score": 3},
-          {"definition": "Poor", "score": 1}
-        ]
-      },
-      {
-        "description": "Clarity",
-        "levels": [
-          {"definition": "Very Clear", "score": 5},
-          {"definition": "Somewhat Clear", "score": 3},
-          {"definition": "Unclear", "score": 1}
-        ]
-      }
-    ]
-  };
-*/
+  late String essayPrompt;
 
   // Convert JSON to rows compatible with Editable
   List rows = [];
@@ -71,7 +49,7 @@ class EssayEditorState extends State<EssayEditor> {
     // Step 2: Build rows by mapping each criterion and its levels dynamically
     rows = (jsonData['criteria'] ?? []).map((criterion) {
       Map<String, dynamic> row = {
-        "name": criterion['description'],
+        "name": criterion['description'] ?? '',
       };
 
       for (int i = 0; i < (criterion['levels'] as List).length; i++) {
