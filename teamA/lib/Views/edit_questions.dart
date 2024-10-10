@@ -12,8 +12,11 @@ class EditQuestions extends StatefulWidget {
 class _EditQuestionsState extends State<EditQuestions> {
   late Quiz myQuiz;
   final TextEditingController _textController = TextEditingController();
+  static const apikey = String.fromEnvironment('openai_apikey');
+  final openai = OpenAiLLM(apikey);
 
-  final openai = OpenAiLLM('apikey');
+  //Need to insert subject and related to values from the promptbuilder page
+  String promptstart = 'Remake this question that is compatible with Moodle XML import. Do not include the original question in your response. Make sure the xml specification is included and the question is wrapped in the quiz xml element required by Moodle. The quiz is to be on the subject of Music Theory and should be related to Key Signatures. The quiz should be the same level of difficulty for high school students of the English-speaking language.  ';
   @override
   void initState() {
     super.initState();
@@ -73,7 +76,7 @@ class _EditQuestionsState extends State<EditQuestions> {
             child: ListView.builder(
               itemCount: myQuiz.questionList.length,
               itemBuilder: (context, index) {
-                final question = myQuiz.questionList[index];
+                var question = myQuiz.questionList[index];
                 return Dismissible(
                   key: Key(question.toString()),
                   background: Container(
@@ -99,11 +102,15 @@ class _EditQuestionsState extends State<EditQuestions> {
                   confirmDismiss: (direction) async {
                     if (direction == DismissDirection.startToEnd) {
                       //********************************************************************************************
-                      var result = await openai.postToLlm('How High is the moon');
+                      var result = await openai.postToLlm(promptstart + question.toString());
+                      if (result.isNotEmpty){
                       setState(() {
+                        question = Quiz.fromXmlString(result).questionList[0];
+                        question.setName = 'Question ${index + 1}';
                         myQuiz.questionList[index] =
                             question.copyWith(isFavorite: !question.isFavorite);
                       });
+                      }
                       return false;
                     } else {
                       bool delete = true;

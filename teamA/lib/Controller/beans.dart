@@ -164,12 +164,9 @@ class Question {
     return question;
   }
 
-
-// Question copyWith({
-//    String? name
-//   }){
-//      return Question(name: name ?? this.name, type: type, questionText: questionText, isFavorite: isFavorite ?? isFavorite,);
-//  }
+  set setName(String newname) {
+    name = newname;
+  }
 
   @override
   String toString() {
