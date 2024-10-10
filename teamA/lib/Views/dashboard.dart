@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/Views/edit_questions.dart';
 import 'essay_generation.dart';
 import 'quiz_generator.dart';
 //import 'course.dart'; // Import the Courses page when available
@@ -45,6 +46,21 @@ class TeacherDashboard extends StatelessWidget {
               // Handle profile/account actions here
             },
           ),
+          IconButton(
+            icon: Icon(
+              Icons.edit, // Icon for Edit Questions button
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
+            ),
+            onPressed: () {
+              // Navigate to the EditQuestions page
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditQuestions(),
+                ),
+              );
+            }
+          )
         ],
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,

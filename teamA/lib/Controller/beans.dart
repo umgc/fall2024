@@ -92,9 +92,12 @@ class Quiz {
 
 // Abstract class that represents a single question.
 class Question {
+
+  Question copyWith({String? name, List? answerList, String? type, String? questionText, bool? isFavorite}) =>
+      Question(name: this.name, answerList: this.answerList,type: this.type, questionText: this.questionText, isFavorite: isFavorite ?? this.isFavorite);
+
   String name; // question name - required.
-  String
-      type; // question type (multichoice, truefalse, shortanswer, essay) - required.
+  String type; // question type (multichoice, truefalse, shortanswer, essay) - required.
   String questionText; // question text - required.
   String? generalFeedback;
   String? defaultGrade;
@@ -103,6 +106,7 @@ class Question {
   String? attachmentsRequired;
   String? responseTemplate;
   String? graderInfo;
+  final bool isFavorite;
   // String description;
   List<Answer> answerList =
       <Answer>[]; // list of answers. Not needed for essay.
@@ -119,6 +123,7 @@ class Question {
     this.attachmentsRequired,
     this.responseTemplate,
     this.graderInfo,
+    this.isFavorite = false,
     List<Answer>? answerList,
   }) : answerList = answerList ?? [];
 
@@ -155,6 +160,12 @@ class Question {
     return question;
   }
 
+// Question copyWith({
+//    String? name
+//   }){
+//      return Question(name: name ?? this.name, type: type, questionText: questionText, isFavorite: isFavorite ?? isFavorite,);
+//  }
+  
   @override
   String toString() {
     final sb = StringBuffer();

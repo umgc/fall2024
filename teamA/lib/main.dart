@@ -9,6 +9,7 @@ import 'Views/course_content.dart';
 import 'Views/send_essay_to_moodle.dart';
 import 'Views/essay_generation.dart';
 import 'Views/quiz_generator.dart';
+import 'Views/edit_questions.dart';
 
 void main() {
   runApp(MyApp());
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Test App",
+      title: "Learning Lens",
       home: DevLaunch(),
       theme: ThemeData(
         useMaterial3: true,
@@ -41,12 +42,12 @@ class MyApp extends StatelessWidget {
         'LoginPage': (context) => LoginApp(),
         '/EssayEditPage': (context) => EssayEditPage(),
         '/Content': (context) => ViewCourseContents(),
-        '/EssayGenerationPage': (context) =>
-            EssayGeneration(title: 'Essay Generation'),
+        '/EssayGenerationPage': (context) => EssayGeneration(title: 'Essay Generation'),
         '/QuizGenerationPage': (context) => CreateAssessment('Tester'),
+        '/EditQuestions': (context) => EditQuestions(),
         // '/create': (context) => const CreatePage(),
         '/dashboard': (context) => TeacherDashboard(),
-        '/send_essay_to_moodle': (context) => EssayAssignmentSettings(),
+        '/send_essay_to_moodle': (context) => EssayAssignmentSettings(''),
         // '/viewExams': (context) => const ViewExamPage(),
         // '/settings': (context) => Setting(themeModeNotifier: _themeModeNotifier)
       },
@@ -88,7 +89,7 @@ class _DevLaunch extends State {
               onPressed: () async {
                 MoodleApiSingleton api = MoodleApiSingleton();
                 MainController main = MainController();
-                await api.login('insert test username', 'insert test pw');
+                //await api.login('insert test username', 'insert test pw', 'insert test url');
                 await main.updateCourses();
                 await main.selectCourse(1);
                 // current issue: while the courses do come in, the quiz and essay list do not seem to come in quickly enough.
@@ -124,7 +125,7 @@ class _DevLaunch extends State {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => EssayAssignmentSettings()),
+                      builder: (context) => EssayAssignmentSettings('')),
                 );
               }),
           ElevatedButton(
@@ -134,6 +135,13 @@ class _DevLaunch extends State {
                   context,
                   MaterialPageRoute(
                       builder: (context) => CreateAssessment('Tester')));
+            },
+          ),
+          ElevatedButton(
+            child: const Text('Edit Questions'),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => EditQuestions()));
             },
           )
         ]));

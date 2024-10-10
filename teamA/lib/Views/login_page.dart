@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/main.dart';
 import '/controller/main_controller.dart';
 import '../Views/dashboard.dart';
 
@@ -9,6 +10,7 @@ class LoginApp extends StatelessWidget
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Login App',
+      title: 'Learning Lens Login',
       theme: ThemeData(
         // Enable Material 3, flutter
         useMaterial3: true,
@@ -36,6 +38,7 @@ class _LoginScreenState extends State<LoginScreen>
 {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _moodleURLController = TextEditingController();
 
   void _showLoginFailedDialog() 
   {
@@ -64,8 +67,7 @@ class _LoginScreenState extends State<LoginScreen>
 
     return Scaffold(
       // Use background color from colorScheme
-
-      backgroundColor: colorScheme.background,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: colorScheme
 
@@ -143,6 +145,7 @@ class _LoginScreenState extends State<LoginScreen>
 
             // Moodle URL (optional if needed)
             TextField(
+              controller: _moodleURLController,
               decoration: InputDecoration(
                 labelText: 'Moodle URL',
                 hintText: 'https://moodle.example.com',
@@ -158,13 +161,15 @@ class _LoginScreenState extends State<LoginScreen>
             // Login Button
             ElevatedButton(
               onPressed: () async {
-                var wasSuccessful = await LoginScreen.controller.loginToMoodle(_usernameController.text, _passwordController.text);
+                var wasSuccessful = await LoginScreen.controller.loginToMoodle(_usernameController.text, _passwordController.text, _moodleURLController.text);
                 if (wasSuccessful) 
                 {
                   MainController().updateCourses();
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => TeacherDashboard())
+                    // MaterialPageRoute(builder: (context) => TeacherDashboard())
+                    // For now, go to DEV view
+                    MaterialPageRoute(builder: (context) => DevLaunch())
                   );
                 } else {
                   _showLoginFailedDialog();

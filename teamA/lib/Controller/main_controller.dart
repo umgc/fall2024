@@ -20,12 +20,13 @@ class MainController
   List<Quiz>? quizzes;
   List<Essay>? essays;
 
-  Future<bool> loginToMoodle(String username, String password) async 
+
+  Future<bool> loginToMoodle(String username, String password, String moodleURL) async 
   {
     var moodleApi = MoodleApiSingleton();
     try 
     {
-      await moodleApi.login(username, password);
+      await moodleApi.login(username, password, moodleURL);
       isLoggedIn = true;
       return true;
     } catch (e) 
@@ -50,7 +51,8 @@ class MainController
   {
     var moodleApi = MoodleApiSingleton();
     try {
-      courses = await moodleApi.getCourses();
+      // courses = await moodleApi.getCourses();
+      courses = await moodleApi.getUserCourses();
       if (courses.isNotEmpty) {
         courses.removeAt(
             0); // first course is always "Moodle" - no need to show it
