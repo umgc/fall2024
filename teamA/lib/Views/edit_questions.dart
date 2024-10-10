@@ -5,11 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:llm_api_modules/openai_api.dart';
 
 class EditQuestions extends StatefulWidget {
+  final String questionXML;
+
+  EditQuestions(this.questionXML);
+
   @override
-  State<EditQuestions> createState() => _EditQuestionsState();
+  EditQuestionsState createState() => EditQuestionsState();
 }
 
-class _EditQuestionsState extends State<EditQuestions> {
+class EditQuestionsState extends State<EditQuestions> {
   late Quiz myQuiz;
   final TextEditingController _textController = TextEditingController();
   static const apikey = String.fromEnvironment('openai_apikey');
@@ -21,7 +25,7 @@ class _EditQuestionsState extends State<EditQuestions> {
   void initState() {
     super.initState();
     // temporary code to load the quiz from the sample XML
-    myQuiz = Quiz.fromXmlString(sampleXML);
+    myQuiz = Quiz.fromXmlString(widget.questionXML);
     myQuiz.name = "My Quiz";
     myQuiz.description = "This is a quiz about the Pythagorean Theorem.";
   }

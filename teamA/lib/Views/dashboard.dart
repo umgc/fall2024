@@ -57,7 +57,7 @@ IconButton(
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EditQuestions(),
+                  builder: (context) => EditQuestions(''),
                 ),
               );
             }
