@@ -62,8 +62,9 @@ class _AssignmentDetailsPage extends State<AssignmentDetailsPage> {
               //for the remainder of the page
               child: Column(
                 //remaining page data
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+                  SizedBox(height: 50),
                   Container(
                     width: 1150,
                     height: 60,
@@ -144,6 +145,18 @@ class _AssignmentDetailsPage extends State<AssignmentDetailsPage> {
                           },
                           child: const Text('Submissions'),
                         ),
+                        !summaryIsSelected
+                            ? Container(
+                                child: Row(
+                                children: [
+                                  SizedBox(width: 850),
+                                  TextButton(
+                                    onPressed: () {},
+                                    child: const Text('Assign Student'),
+                                  ),
+                                ],
+                              ))
+                            : SizedBox(width: 500)
                       ],
                     ),
                   ),
@@ -193,7 +206,7 @@ class _AssignmentDetailsPage extends State<AssignmentDetailsPage> {
                                   children: [
                                     SizedBox(width: 60),
                                     Text("What is 2 + 2?"),
-                                    SizedBox(width: 600),
+                                    SizedBox(width: 650),
                                     Text("Multiple Choice"),
                                     SizedBox(width: 100),
                                     IconButton(
@@ -221,7 +234,7 @@ class _AssignmentDetailsPage extends State<AssignmentDetailsPage> {
                                   children: [
                                     SizedBox(width: 60),
                                     Text("Who wrote the constitution?"),
-                                    SizedBox(width: 600),
+                                    SizedBox(width: 570),
                                     Text("Short Answer"),
                                     SizedBox(width: 100),
                                     IconButton(
@@ -250,7 +263,7 @@ class _AssignmentDetailsPage extends State<AssignmentDetailsPage> {
                                     SizedBox(width: 60),
                                     Text(
                                         "Does the moon revolve around the earth?"),
-                                    SizedBox(width: 600),
+                                    SizedBox(width: 500),
                                     Text("True/False"),
                                     SizedBox(width: 100),
                                     IconButton(
@@ -279,7 +292,7 @@ class _AssignmentDetailsPage extends State<AssignmentDetailsPage> {
                                     SizedBox(width: 60),
                                     Text(
                                         "Is the absence of evidence the evidence of abscence?"),
-                                    SizedBox(width: 600),
+                                    SizedBox(width: 420),
                                     Text("True/False"),
                                     SizedBox(width: 100),
                                     IconButton(
@@ -307,7 +320,7 @@ class _AssignmentDetailsPage extends State<AssignmentDetailsPage> {
                                   children: [
                                     SizedBox(width: 60),
                                     Text("What is 2 + 2?"),
-                                    SizedBox(width: 600),
+                                    SizedBox(width: 650),
                                     Text("Multiple Choice"),
                                     SizedBox(width: 100),
                                     IconButton(
@@ -323,10 +336,227 @@ class _AssignmentDetailsPage extends State<AssignmentDetailsPage> {
                             ],
                           ),
                         )
-                      : Column(
-                          children: [
-                            Text("Submissions"),
-                          ],
+                      : Container(
+                          //outer container for the assignment content
+                          margin: EdgeInsets.symmetric(horizontal: 30),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.blueGrey,
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Container(
+                                //container for the content header
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                  color: Colors.blueGrey,
+                                  width: 0.5,
+                                ))),
+                                child: Row(
+                                  //header row
+                                  children: [
+                                    SizedBox(width: 60),
+                                    Text("NAME"),
+                                    SizedBox(width: 160),
+                                    Text("USERNAME"),
+                                    SizedBox(width: 160),
+                                    Text("EMAIL"),
+                                    SizedBox(width: 160),
+                                    Text("STATUS"),
+                                    SizedBox(width: 100),
+                                    Text("GRADE"),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                //first question
+                                //container for the content header
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                  color: Colors.blueGrey,
+                                  width: 0.5,
+                                ))),
+                                child: Row(
+                                  //header row
+                                  children: [
+                                    SizedBox(width: 60),
+                                    Text(
+                                      "Matthew Martinez",
+                                      style: TextStyle(fontSize: 12),
+                                      textAlign: TextAlign.left,
+                                      textWidthBasis: TextWidthBasis.parent,
+                                    ),
+                                    SizedBox(width: 90),
+                                    Text("mmartinez1997"),
+                                    SizedBox(width: 90),
+                                    Text("mmartinez1997@gmail.com"),
+                                    SizedBox(width: 60),
+                                    Text(
+                                        "Not Finalized"), //May need to style more
+                                    SizedBox(width: 110),
+                                    Text("32%"),
+                                    SizedBox(width: 50),
+                                    TextButton(
+                                      onPressed: () {},
+                                      child: Text("Edit Grade"),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                //first question
+                                //container for the content header
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                  color: Colors.blueGrey,
+                                  width: 0.5,
+                                ))),
+                                child: Row(
+                                  //header row
+                                  children: [
+                                    SizedBox(width: 60),
+                                    Text(
+                                      "Mariah White",
+                                      style: TextStyle(fontSize: 12),
+                                      textAlign: TextAlign.left,
+                                      textWidthBasis: TextWidthBasis.parent,
+                                    ),
+                                    SizedBox(width: 120),
+                                    Text("mariah_white"),
+                                    SizedBox(width: 110),
+                                    Text("mariah_white@gmail.com"),
+                                    SizedBox(width: 70),
+                                    Text(
+                                        "Not Submitted"), //May need to style more
+                                    SizedBox(width: 110),
+                                    Text("NG"),
+                                    SizedBox(width: 50),
+                                    TextButton(
+                                      onPressed: () {},
+                                      child: Text("Edit Grade"),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                //first question
+                                //container for the content header
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                  color: Colors.blueGrey,
+                                  width: 0.5,
+                                ))),
+                                child: Row(
+                                  //header row
+                                  children: [
+                                    SizedBox(width: 60),
+                                    Text(
+                                      "Caleb Jones",
+                                      style: TextStyle(fontSize: 12),
+                                      textAlign: TextAlign.left,
+                                      textWidthBasis: TextWidthBasis.parent,
+                                    ),
+                                    SizedBox(width: 130),
+                                    Text("calebjones"),
+                                    SizedBox(width: 110),
+                                    Text("calebjones8@gmail.com"),
+                                    SizedBox(width: 100),
+                                    Text("Finalized"), //May need to style more
+                                    SizedBox(width: 110),
+                                    Text("93%"),
+                                    SizedBox(width: 70),
+                                    TextButton(
+                                      onPressed: () {},
+                                      child: Text("Edit Grade"),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                //first question
+                                //container for the content header
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                  color: Colors.blueGrey,
+                                  width: 0.5,
+                                ))),
+                                child: Row(
+                                  //header row
+                                  children: [
+                                    SizedBox(width: 60),
+                                    Text(
+                                      "Devante Young",
+                                      style: TextStyle(fontSize: 12),
+                                      textAlign: TextAlign.left,
+                                      textWidthBasis: TextWidthBasis.parent,
+                                    ),
+                                    SizedBox(width: 110),
+                                    Text("dY9283"),
+                                    SizedBox(width: 140),
+                                    Text("dY9283@gmail.com"),
+                                    SizedBox(width: 112),
+                                    Text("Finalized"), //May need to style more
+                                    SizedBox(width: 110),
+                                    Text("82%"),
+                                    SizedBox(width: 80),
+                                    TextButton(
+                                      onPressed: () {},
+                                      child: Text("Edit Grade"),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                //first question
+                                //container for the content header
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                  color: Colors.blueGrey,
+                                  width: 0.5,
+                                ))),
+                                child: Row(
+                                  //header row
+                                  children: [
+                                    SizedBox(width: 60),
+                                    Text(
+                                      "Samuel Ross",
+                                      style: TextStyle(fontSize: 12),
+                                      textAlign: TextAlign.left,
+                                      textWidthBasis: TextWidthBasis.parent,
+                                    ),
+                                    SizedBox(width: 120),
+                                    Text("samRoss"),
+                                    SizedBox(width: 110),
+                                    Text("samRoss258@gmail.com"),
+                                    SizedBox(width: 90),
+                                    Text(
+                                        "Not Finalized"), //May need to style more
+                                    SizedBox(width: 110),
+                                    Text("77%"),
+                                    SizedBox(width: 65),
+                                    TextButton(
+                                      onPressed: () {},
+                                      child: Text("Edit Grade"),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         )
                 ],
               ),
