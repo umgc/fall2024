@@ -93,6 +93,15 @@ class _QuizMoodleState extends State<QuizMoodle> {
     'Low Grade',
   ];
 
+  // List for course drop down
+  var items4 = [
+    'No selection',
+    'Course 1',
+    'Course 2',
+    'Course 3',
+    'Course 4',
+  ];
+
   TextEditingController courseNameController = TextEditingController();
   TextEditingController quizNameController = TextEditingController();
   TextEditingController gradeController = TextEditingController();
@@ -153,29 +162,41 @@ class _QuizMoodleState extends State<QuizMoodle> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 30,
+            SizedBox(height: 30),
+
+            SizedBox(width: 50),
+            sectionTitle(title: 'Course Name'),
+            DropdownButton(
+              value: dropdownvalue,
+              icon: Icon(Icons.keyboard_arrow_down),
+              items: items4.map((String items) {
+                return DropdownMenuItem<String>(
+                  value: items,
+                  child: Text(items),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  dropdownvalue = newValue!;
+                });
+              },
             ),
 
-            sectionTitle(title: 'Quiz Information'),
-            TextField(
-              controller: courseNameController,
-              decoration: InputDecoration(
-                labelText: 'Course Name',
-                border: OutlineInputBorder(),
-              ),
-            ),
             SizedBox(height: 15),
 
+            sectionTitle(title: 'Quiz Name'),
+            SizedBox(height: 15),
+            SizedBox(width: 50),
             TextField(
               controller: quizNameController,
               decoration: InputDecoration(
-                labelText: 'Quiz name',
+                labelText: 'Enter quiz name',
                 border: OutlineInputBorder(),
               ),
             ),
             SizedBox(height: 15),
 
+            SizedBox(width: 50),
             sectionTitle(title: 'Availability'),
             SizedBox(height: 15),
 
@@ -298,6 +319,7 @@ class _QuizMoodleState extends State<QuizMoodle> {
             SizedBox(height: 16),
 
             // Grade to pass
+            SizedBox(width: 50),
             sectionTitle(title: 'Grade to Pass:'),
             TextField(
               controller: gradeController,
@@ -307,6 +329,7 @@ class _QuizMoodleState extends State<QuizMoodle> {
               ),
             ),
             SizedBox(height: 16),
+            SizedBox(width: 50),
 
             // Attempts Allowed
             SizedBox(width: 10),
