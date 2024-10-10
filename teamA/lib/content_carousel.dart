@@ -44,15 +44,27 @@ class _ContentState extends State<ContentCarousel>{
 
   @override
   Widget build(BuildContext context){
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxHeight: 400), //testing width
-      child: CarouselView(
-        backgroundColor: Theme.of(context).primaryColor,
-        itemExtent: 600,
-        shrinkExtent: 350,
-        children: children
-      )
-    );
+    //For empty contents, we don't build a carousel
+    if (_children.length == 1 && _children[0].runtimeType == Text){
+      return ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: 400),
+        child: Center(
+          child: _children[0]
+        )
+      );
+    }
+
+    else{
+      return ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: 400), //testing width
+        child: CarouselView(
+          backgroundColor: Theme.of(context).primaryColor,
+          itemExtent: 600,
+          shrinkExtent: 350,
+          children: children
+        )
+      );
+    }
   }
 }
 

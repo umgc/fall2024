@@ -41,3 +41,10 @@ teamA/macos/Flutter/GeneratedPluginRegistrant.swift
 teamA/windows/flutter/generated_plugin_registrant.cc
 teamA/windows/flutter/generated_plugin_registrant.h
 teamA/windows/flutter/generated_plugins.cmake
+teamA/linux/flutter/generated_plugin_registrant.cc
+teamA/linux/flutter/generated_plugin_registrant.h
+teamA/linux/flutter/generated_plugins.cmake
+teamA/macos/Flutter/GeneratedPluginRegistrant.swift
+teamA/windows/flutter/generated_plugin_registrant.cc
+teamA/windows/flutter/generated_plugin_registrant.h
+teamA/windows/flutter/generated_plugins.cmake
