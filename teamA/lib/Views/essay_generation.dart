@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import '../Api/llm_api';
 
 // Required Components:
 // 2 Dropdowns: 1 for the Grade Level and 1 for the Point Scale
@@ -19,8 +21,96 @@ class EssayGeneration extends StatefulWidget
 
 class _MyHomePageState extends State<EssayGeneration> 
 {
-  final int point = 0;
+    //Holds values for user input fields
+  int _selectedPointScale = 3; // Default value
+  String _selectedGradeLevel =
+      'Advanced'; // Default value for GradeLevelDropdown
+  // Variables to store the text inputs
+  final TextEditingController _standardObjectiveController =
+      TextEditingController();
+  final TextEditingController _assignmentDescriptionController =
+      TextEditingController();
+  final TextEditingController _additionalCustomizationController =
+      TextEditingController();
+  dynamic globalRubric;
+  // Function to store the selected value
+  void _handlePointScaleChanged(int? newValue) {
+    setState(() {
+      if (newValue != null) {
+        _selectedPointScale = newValue;
+      }
+    });
+  }
+  // Function to store the selected grade level value
+  void _handleGradeLevelChanged(String? newValue) {
+    setState(() {
+      if (newValue != null) {
+        _selectedGradeLevel = newValue;
+      }
+    });
+  }
+  Future<dynamic> apiTest(String inputs) async {
+    String apiKey = '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';
+    LlmApi myLLM = LlmApi(apiKey);
+    String queryPrompt = '''
+      I am building a program that creates rubrics when provided with assignment information. I will provide you with the following information about the assignment that needs a rubric:
+      Difficulty level, point scale, assignment objective, assignment description. You may also receive additional customization rules.
+      Using this information, you will reply with a rubric that includes 3-5 criteria. Your reply must only contain the JSON information, and begin with a {.
+      Remove any ``` from your output.
 
+      You must reply with a representation of the rubric in JSON format that matches this format: 
+      {
+          "criteria": [
+              {
+                  "description": #CriteriaName,
+                  "levels": [
+                      { "definition": #CriteriaDef, "score": #ScoreValue },
+                  ]
+              }
+        ]
+      }
+      #CriteriaName must be replaced with the name of the criteria.
+      #CriteriaDef must be replaced with a detailed description of what meeting that criteria would look like for each scale value.
+      #ScoreValue must be replaced with a number representing the score. The score for the lowest scale value will be 0, and the scores will increase by 1 for each scale.
+      You should create as many "levels" objects as there are point scale values.
+      Here is the assignment information:
+      $inputs
+    ''';
+    String rubric = await myLLM.postToLlm(queryPrompt);
+    return jsonDecode(rubric);
+    //globalRubric = jsonDecode(rubric);
+    //genRubricFromAI(rubric);
+  }
+/*
+  dynamic genRubricFromAI(String inputs) {
+    apiTest(inputs).then((String results) {
+      print('tets');
+    });
+    Object result = jsonDecode(waitRubric);
+    //final result1 = (json.decode(waitRubric) as List).cast<Map<String, dynamic>>();
+    print('result');
+    return result;
+    //WARNING
+  }
+*/
+// Method to return a summary of the selected dropdown and text box values
+  String getSelectedResponses() {
+    return '''
+      Selected Difficulty Level: $_selectedGradeLevel
+      Selected Point Scale: $_selectedPointScale
+      Standard / Objective: ${_standardObjectiveController.text}
+      Assignment Description: ${_assignmentDescriptionController.text}
+      Additional Customization: ${_additionalCustomizationController.text}
+    ''';
+  }
+  @override
+  void dispose() {
+    // Dispose the controllers when the widget is removed from the widget tree
+    _standardObjectiveController.dispose();
+    _assignmentDescriptionController.dispose();
+    _additionalCustomizationController.dispose();
+    super.dispose();
+  }
   _MyHomePageState();
 
   @override
@@ -51,7 +141,10 @@ class _MyHomePageState extends State<EssayGeneration>
                     selectedGradeLevel: '12th grade',  // Default value
                     onChanged: (newValue) 
                     {
-                      // If the user changes the value of the grade
+                      setState(() 
+                      {
+                        this.selectedGradeLevel = newValue!;
+                      });
                     },
                   ),
                   const SizedBox(height: 16),
@@ -59,9 +152,10 @@ class _MyHomePageState extends State<EssayGeneration>
                   // Point Scale Dropdown
                   PointScaleDropdown(
                     selectedPointScale: 3,  // Default value
-                    onChanged: (newValue) 
-                    {
-                      // If the user changes the value of the point scale
+                    onChanged: (newValue) {
+                      setState(() {
+                        selectedPointScale = newValue!;
+                      });
                     },
                   ),
                   const SizedBox(height: 16),

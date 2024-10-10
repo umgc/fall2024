@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import '../Api/moodle_api_singleton';
 import 'package:namer_app/Controller/beans.dart';
+import '../Api/llm_api';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class MainController 
 {
@@ -14,6 +16,7 @@ class MainController
   // Internal constructor
   MainController._internal();
   static bool isLoggedIn = false;
+  final llm = LlmApi(dotenv.env['PERPLEXITY_API_KEY']!);
   final ValueNotifier<bool> isUserLoggedInNotifier = ValueNotifier(false);
 
   Future<bool> loginToMoodle(String username, String password) async 
