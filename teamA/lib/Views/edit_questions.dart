@@ -105,6 +105,7 @@ class _EditQuestionsState extends State<EditQuestions> {
                       var result = await openai.postToLlm(promptstart + question.toString());
                       if (result.isNotEmpty){
                       setState(() {
+                        //replace the old question with the new one from the api call
                         question = Quiz.fromXmlString(result).questionList[0];
                         question.setName = 'Question ${index + 1}';
                         myQuiz.questionList[index] =
