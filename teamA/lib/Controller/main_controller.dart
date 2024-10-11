@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import '../Api/moodle_api_singleton';
+import '../Api/moodle_api_singleton.dart';
 import 'package:namer_app/Controller/beans.dart';
-import '../Api/llm_api';
+import '../Api/llm_api.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class MainController 

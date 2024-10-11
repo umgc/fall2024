@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import '../Api/llm_api';
+import '../Api/llm_api.dart';
 
 // Required Components:
 // 2 Dropdowns: 1 for the Grade Level and 1 for the Point Scale
@@ -23,80 +23,77 @@ class _MyHomePageState extends State<EssayGeneration>
 {
     //Holds values for user input fields
   int _selectedPointScale = 3; // Default value
-  String _selectedGradeLevel =
-      'Advanced'; // Default value for GradeLevelDropdown
+  String _selectedGradeLevel = '12th grade'; // Default value for GradeLevelDropdown
+
   // Variables to store the text inputs
-  final TextEditingController _standardObjectiveController =
-      TextEditingController();
-  final TextEditingController _assignmentDescriptionController =
-      TextEditingController();
-  final TextEditingController _additionalCustomizationController =
-      TextEditingController();
+  final TextEditingController _standardObjectiveController = TextEditingController();
+  final TextEditingController _assignmentDescriptionController = TextEditingController();
+  final TextEditingController _additionalCustomizationController = TextEditingController();
+
   dynamic globalRubric;
-  // Function to store the selected value
-  void _handlePointScaleChanged(int? newValue) {
+
+  void _handlePointScaleChanged(int? newValue) 
+  {
     setState(() {
       if (newValue != null) {
         _selectedPointScale = newValue;
       }
     });
   }
+
   // Function to store the selected grade level value
-  void _handleGradeLevelChanged(String? newValue) {
+  void _handleGradeLevelChanged(String? newValue) 
+  {
     setState(() {
       if (newValue != null) {
         _selectedGradeLevel = newValue;
       }
     });
   }
-  Future<dynamic> apiTest(String inputs) async {
-    String apiKey = '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';
-    LlmApi myLLM = LlmApi(apiKey);
-    String queryPrompt = '''
-      I am building a program that creates rubrics when provided with assignment information. I will provide you with the following information about the assignment that needs a rubric:
-      Difficulty level, point scale, assignment objective, assignment description. You may also receive additional customization rules.
-      Using this information, you will reply with a rubric that includes 3-5 criteria. Your reply must only contain the JSON information, and begin with a {.
-      Remove any ``` from your output.
 
-      You must reply with a representation of the rubric in JSON format that matches this format: 
-      {
-          "criteria": [
-              {
-                  "description": #CriteriaName,
-                  "levels": [
-                      { "definition": #CriteriaDef, "score": #ScoreValue },
-                  ]
-              }
-        ]
-      }
-      #CriteriaName must be replaced with the name of the criteria.
-      #CriteriaDef must be replaced with a detailed description of what meeting that criteria would look like for each scale value.
-      #ScoreValue must be replaced with a number representing the score. The score for the lowest scale value will be 0, and the scores will increase by 1 for each scale.
-      You should create as many "levels" objects as there are point scale values.
-      Here is the assignment information:
-      $inputs
-    ''';
-    String rubric = await myLLM.postToLlm(queryPrompt);
-    return jsonDecode(rubric);
-    //globalRubric = jsonDecode(rubric);
-    //genRubricFromAI(rubric);
+  Future<dynamic> apiTest(String inputs) async {
+    try
+    {
+      String apiKey = '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';
+      LlmApi myLLM = LlmApi(apiKey);
+      String queryPrompt = '''
+        I am building a program that creates rubrics when provided with assignment information. I will provide you with the following information about the assignment that needs a rubric:
+        Difficulty level, point scale, assignment objective, assignment description. You may also receive additional customization rules.
+        Using this information, you will reply with a rubric that includes 3-5 criteria. Your reply must only contain the JSON information, and begin with a {.
+        Remove any ``` from your output.
+
+        You must reply with a representation of the rubric in JSON format that matches this format: 
+        {
+            "criteria": [
+                {
+                    "description": #CriteriaName,
+                    "levels": [
+                        { "definition": #CriteriaDef, "score": #ScoreValue },
+                    ]
+                }
+          ]
+        }
+        #CriteriaName must be replaced with the name of the criteria.
+        #CriteriaDef must be replaced with a detailed description of what meeting that criteria would look like for each scale value.
+        #ScoreValue must be replaced with a number representing the score. The score for the lowest scale value will be 0, and the scores will increase by 1 for each scale.
+        You should create as many "levels" objects as there are point scale values.
+        Here is the assignment information:
+        $inputs
+      ''';
+      globalRubric = await myLLM.postToLlm(queryPrompt);
+      globalRubric = globalRubric.replaceAll('```', '').trim();
+      return jsonDecode(globalRubric);
+    }
+    catch (e) 
+    {
+      print("Error in API request: $e");
+      return null;
+    }
   }
-/*
-  dynamic genRubricFromAI(String inputs) {
-    apiTest(inputs).then((String results) {
-      print('tets');
-    });
-    Object result = jsonDecode(waitRubric);
-    //final result1 = (json.decode(waitRubric) as List).cast<Map<String, dynamic>>();
-    print('result');
-    return result;
-    //WARNING
-  }
-*/
-// Method to return a summary of the selected dropdown and text box values
+  
   String getSelectedResponses() {
     return '''
-      Selected Difficulty Level: $_selectedGradeLevel
+      Selected Grade Level: $_selectedGradeLevel
       Selected Point Scale: $_selectedPointScale
       Standard / Objective: ${_standardObjectiveController.text}
       Assignment Description: ${_assignmentDescriptionController.text}
@@ -138,26 +135,18 @@ class _MyHomePageState extends State<EssayGeneration>
 
                   // Grade Level Dropdown
                   GradeLevelDropdown(
-                    selectedGradeLevel: '12th grade',  // Default value
-                    onChanged: (newValue) 
-                    {
-                      setState(() 
-                      {
-                        this.selectedGradeLevel = newValue!;
-                      });
-                    },
+                    selectedGradeLevel: _selectedGradeLevel,
+                    onChanged: _handleGradeLevelChanged,
                   ),
+
                   const SizedBox(height: 16),
 
                   // Point Scale Dropdown
                   PointScaleDropdown(
-                    selectedPointScale: 3,  // Default value
-                    onChanged: (newValue) {
-                      setState(() {
-                        selectedPointScale = newValue!;
-                      });
-                    },
+                    selectedPointScale: _selectedPointScale,
+                    onChanged: _handlePointScaleChanged,
                   ),
+
                   const SizedBox(height: 16),
 
                   // Standard/Objective TextBox
@@ -165,10 +154,11 @@ class _MyHomePageState extends State<EssayGeneration>
                     label: "Standard / Objective",
                     icon: Icons.mic,
                     secondaryIcon: Icons.attachment,
+                    controller: _standardObjectiveController,
                     initialValue: '',
                     onChanged: (newValue) 
                     {
-                      // If the user puts in text
+                      _standardObjectiveController.text = newValue!;
                     },
                   ),
                   const SizedBox(height: 16),
@@ -178,10 +168,11 @@ class _MyHomePageState extends State<EssayGeneration>
                     label: "Assignment Description",
                     icon: Icons.mic,
                     secondaryIcon: Icons.attachment,
+                    controller: _assignmentDescriptionController,
                     initialValue: '',
                     onChanged: (newValue) 
                     {
-                      // If the user puts in text
+                      _assignmentDescriptionController.text = newValue!;
                     },
                   ),
                   const SizedBox(height: 16),
@@ -191,17 +182,33 @@ class _MyHomePageState extends State<EssayGeneration>
                     label: "Additional Customization for Rubric (Optional)",
                     icon: Icons.mic,
                     secondaryIcon: Icons.attachment,
+                    controller: _additionalCustomizationController,
                     initialValue: '',
                     onChanged: (newValue) 
                     {
-                      // Will also be handled as query to API
+                      _additionalCustomizationController.text = newValue!;
                     },
                   ),
 
                   const SizedBox(height: 16),
                   
                   // Generate Button
-                  Button('essay')
+                   Button(
+                    'essay',
+                    onPressed: () {
+                      final result = getSelectedResponses();
+
+                      apiTest(result).then((dynamic results) 
+                      {
+                        print("Inside .then block");  // Check if we reach here
+                        setState(() 
+                        {
+                          globalRubric = results;  // Store the rubric
+                          print("Rubric set: $globalRubric");  // Verify if the rubric is stored
+                        });
+                      });
+                    },
+                   ),
                 ],
               ),
             ),
@@ -210,30 +217,95 @@ class _MyHomePageState extends State<EssayGeneration>
 
             // Right Side
             Expanded(
-              flex: 3, // side has more room for rubric display
+              flex: 3,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-
-                  // Placeholder for rubric to be generated by button
                   Container(
-                    height: 365,
-                    color: Colors.grey[200], // Just to show where the rubric will go
-                    child: Center(
-                      child: Text("Generated Rubric", 
-                        style: TextStyle(fontSize: 18, color: Colors.black54)),
-                    ),
+                    height: 600,
+                    color: Colors.grey[200],
+                    child: globalRubric == null
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center, // Center vertically
+                            children: [
+                              CircularProgressIndicator(), // Loading spinner
+                              SizedBox(height: 16), // Maintain spacing
+                              Text(
+                                "Generating Rubric...",
+                                style: TextStyle(fontSize: 18, color: Colors.black54),
+                              ),
+                            ],
+                          ),
+                        )
+                      : SingleChildScrollView(
+                          child: Table(
+                            border: TableBorder.all(), // Adds border to the table cells
+                            columnWidths: const {
+                              0: FlexColumnWidth(2), // Description column
+                              // Additional columns for scores will be dynamically added
+                            },
+                            children: [
+                              TableRow(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'Criteria',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                    ),
+                                  ),
+
+                                  // Dynamically create score level headers
+                                  for (var level in globalRubric['criteria'][0]['levels']) // Assuming all criteria have the same number of levels
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        '${level['score']}',
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                ],
+                              ),
+
+                              // Create rows as necessary
+                              for (var criteria in globalRubric['criteria']) ...[
+                                TableRow(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        criteria['description'],
+                                        style: TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+
+                                    // Add score levels for each column
+                                    for (var level in criteria['levels'])
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          '${level['definition']}',
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
                   ),
-
-
                   const SizedBox(height: 16),
-
-
                   // Send to Moodle Button
-                  Button("assessment")
+                  Button("assessment"),
                 ],
               ),
-            ),
+            )
+
+
+
           ],
         ),
       ),
@@ -243,44 +315,38 @@ class _MyHomePageState extends State<EssayGeneration>
 
 
 // Create Class for Buttons
-class Button extends StatelessWidget
-{
+class Button extends StatelessWidget {
   // Fields in this widget subclass are marked final
   final String type;
   final String text;
   final String filters = "";
-  Button._(this.type, this.text);
+  final VoidCallback? onPressed;
+  Button._(this.type, this.text, {this.onPressed});
 
-  factory Button(String type)
+  factory Button(String type, {VoidCallback? onPressed}) 
   {
-    if (type == "assessment")
-    {
-      return Button._(type,"Send to Moodle");
-    }
-    else if (type == "essay")
-    {
-      return Button._(type,"Generate Essay");
-    }
-    else
-    {
-      return Button._(type,"");
+    if (type == "assessment") {
+      return Button._(type, "Send to Moodle");
+    } else if (type == "essay") {
+      return Button._(
+        type,
+        "Generate Essay",
+        onPressed: onPressed,
+      );
+    } else {
+      return Button._(type, "");
     }
   }
-
-  @override 
-  Widget build(BuildContext context)
+  @override
+  Widget build(BuildContext context) 
   {
     return OutlinedButton(
-      onPressed: () {}, 
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.create), 
-          Text(text)],
-      )
-    );
+        onPressed: onPressed,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [Icon(Icons.create), Text(text)],
+        ));
   }
-  
 }
 
 class TextBox extends StatelessWidget {
@@ -291,6 +357,7 @@ class TextBox extends StatelessWidget {
   final String initialValue;
   // We need to store the value of the string the user inputs
   final ValueChanged<String?> onChanged;
+  final TextEditingController controller;
 
   // Constructor for textbok requires user input
   const TextBox({
@@ -300,6 +367,7 @@ class TextBox extends StatelessWidget {
     required this.secondaryIcon,
     required this.initialValue,
     required this.onChanged,
+    required this.controller,
   }) : super(key: key);
 
   void _handleTextChanged(String? newValue) 
@@ -312,15 +380,15 @@ class TextBox extends StatelessWidget {
   Widget build(BuildContext context) 
   {
     return TextField(
-      controller: TextEditingController(text: initialValue),  // To handle the initial value
+      controller: TextEditingController(text: initialValue), 
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Column(
           mainAxisAlignment: MainAxisAlignment.center, 
           children: [
-            Icon(icon),          // Primary icon
-            SizedBox(height: 4), // Space between the icons
-            Icon(secondaryIcon), // Secondary icon
+            Icon(icon),          
+            SizedBox(height: 4), 
+            Icon(secondaryIcon), 
           ],
         ),
       ),
@@ -388,7 +456,7 @@ class GradeLevelDropdown extends StatelessWidget
   {
     return DropdownButtonFormField<String>(
       decoration: const InputDecoration(labelText: "Grade Level"),
-      value: selectedGradeLevel,
+      value:  selectedGradeLevel.isNotEmpty ? selectedGradeLevel : null,
       items: <String>['9th grade', '10th grade', '11th grade', '12th grade']
           .map((String value) {
         return DropdownMenuItem<String>(
@@ -401,3 +469,10 @@ class GradeLevelDropdown extends StatelessWidget
   }
 }
 
+Future<void> apiTest() async {
+  String apiKey = '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';
+  LlmApi myLLM = LlmApi(apiKey);
+  String queryPrompt = 'How many stars are there in our galaxy?';
+  String ans1 = await myLLM.postToLlm(queryPrompt);
+  print(ans1);
+}

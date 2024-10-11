@@ -65,7 +65,7 @@ class MoodleApiSingleton {
     if (userinforesponse.statusCode != 200) {
       throw HttpException(userinforesponse.body);
     }
-    moodleCourses = await getUserCourses();
+    moodleCourses = await getCourses();
     Map<String, dynamic> userData = jsonDecode(userinforesponse.body);
     moodleUserName = userData['username'];
     moodleFirstName = userData['firstname'];
@@ -181,7 +181,7 @@ class MoodleApiSingleton {
   Future<List> getAllContents() async{
     // Collect all the course ids.
     // List<Course> courses = await getCourses();
-    List<Course> courses = await getUserCourses();
+    List<Course> courses = await getCourses();
     List results = [];
     for (Course c in courses){
       results = results + await getCourseContents(c.id);
