@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../Controller/beans.dart';
 import 'edit_questions.dart';
 import '../Api/llm/prompt_engine.dart';
+import 'package:llm_api_modules/openai_api.dart';
 
 
 class CreateAssessment extends StatefulWidget {
@@ -87,13 +88,16 @@ class _AssessmentState extends State<CreateAssessment> {
                           onChanged: (newValue) {},
                         ),
                         SizedBox(height: paddingHeight),
-                        SubmitButton._('Submit', {"name" : CreateAssessment.nameController, 
-                                                  "description" : CreateAssessment.descriptionController,
-                                                  "topic" : CreateAssessment.topicController,
-                                                  "multipleChoice" : CreateAssessment.multipleChoiceController,
-                                                  "trueFalse" :  CreateAssessment.trueFalseController,
-                                                  "shortAns" : CreateAssessment.shortAnswerController,}, _formKey,
-                                                  context)
+                        SubmitButton._('Submit', 
+                                        { "name" : CreateAssessment.nameController, 
+                                          "description" : CreateAssessment.descriptionController,
+                                          "topic" : CreateAssessment.topicController,
+                                          "multipleChoice" : CreateAssessment.multipleChoiceController,
+                                          "trueFalse" :  CreateAssessment.trueFalseController,
+                                          "shortAns" : CreateAssessment.shortAnswerController
+                                        },
+                                        _formKey,
+                                        context)
                       ],
                     ),
                   )
@@ -115,26 +119,33 @@ class SubmitButton extends StatelessWidget {
 
   Future<void> _submitToLLM() async {
     if(formKey.currentState!.validate()) {
-      AssignmentForm af = AssignmentForm(
-      questionType: QuestionType.shortanswer, //Potentially not necessary? Need to see about essay generator
-      subject: 'Algebra', // Get these programatically?
-      topic: fields['topic']!.text, 
-      gradeLevel: 'Sophomore', // Get these programatically?
-      title: fields['name']!.text,
-      trueFalseCount: int.parse(fields['trueFalse']!.text),
-      shortAnswerCount: int.parse(fields['shortAns']!.text),
-      multipleChoiceCount: int.parse(fields['multipleChoice']!.text),
-      maximumGrade: 100);
-      print(PromptEngine.generatePrompt(af));
 
-      if (await File("J:\\Users\\Conor Moore\\Downloads\\UMGC\\fall2024\\teamA\\lib\\TestFiles\\allThree.xml").exists()) {
-        File('J:\\Users\\Conor Moore\\Downloads\\UMGC\\fall2024\\teamA\\lib\\TestFiles\\allThree.xml').readAsString().then((String fileContents) {
+
+      AssignmentForm af = AssignmentForm(
+        questionType: QuestionType.shortanswer, //Potentially not necessary? Need to see about essay generator
+        subject: 'Algebra', // Get these programatically?
+        topic: fields['topic']!.text, 
+        gradeLevel: 'Sophomore', // Get these programatically?
+        title: fields['name']!.text,
+        trueFalseCount: int.parse(fields['trueFalse']!.text),
+        shortAnswerCount: int.parse(fields['shortAns']!.text),
+        multipleChoiceCount: int.parse(fields['multipleChoice']!.text),
+        maximumGrade: 100
+      );
+
+      if (await File('..\\lib\\TestFiles\\allThree.xml').exists()) {
+        File('..\lib\\TestFiles\\allThree.xml').readAsString().then((String fileContents) {
           Navigator.push(context, MaterialPageRoute(builder: (context) => EditQuestions(fileContents)));
         });
       } else {
-        print("No file boss");
+        print("Getting open ai response");
+        const apikey = String.fromEnvironment('openai_apikey');
+        final openai = OpenAiLLM(apikey);
+        var result = await openai.postToLlm(PromptEngine.generatePrompt(af));
+        if (result.isNotEmpty) {
+          print(result);
+        }
       }
-      Navigator.push(context, MaterialPageRoute(builder: (context) => EditQuestions(tempXML)));
     }
   }
 
