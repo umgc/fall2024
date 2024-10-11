@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../src/utils/contact_display.dart';
 import 'calendar_screen.dart';
 import 'assistant_screen.dart';
 import 'gallery_screen.dart';
@@ -99,6 +100,13 @@ class HomeScreenContentBody extends StatelessWidget {
                       size: iconSize, color: Colors.white),
                   text: 'Calendar',
                   screen: CalendarPage(),
+                ),
+                _buildElevatedButton(
+                  homeScreenState: homeScreenState,
+                  icon: Icon(Icons.contact_emergency,
+                      size: iconSize, color: Colors.white),
+                  text: 'Emergency Contacts',
+                  screen: ContactDisplay(),
                 ),
               ],
             ),

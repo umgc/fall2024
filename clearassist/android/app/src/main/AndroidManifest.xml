@@ -5,6 +5,9 @@
     <!-- Permission to read and write to external storage -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- Permission to access contacts -->
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <!-- <uses-permission android:name="android.permission.WRITE_CONTACTS"/> -->
     <!-- Permission to use camera -->
     <uses-permission android:name="android.permission.CAMERA" />
     <!-- Permission to use biometric -->
