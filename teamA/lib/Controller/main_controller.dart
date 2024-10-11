@@ -15,10 +15,7 @@ class MainController
   MainController._internal();
   static bool isLoggedIn = false;
   final ValueNotifier<bool> isUserLoggedInNotifier = ValueNotifier(false);
-  List<Course> courses = [];
   Course? selectedCourse;
-  List<Quiz>? quizzes;
-  List<Essay>? essays;
 
 
   Future<bool> loginToMoodle(String username, String password, String moodleURL) async 
@@ -47,49 +44,21 @@ class MainController
     isLoggedIn = false;
   }
 
-  Future<bool> updateCourses() async 
-  {
-    var moodleApi = MoodleApiSingleton();
-    try {
-      // courses = await moodleApi.getCourses();
-      courses = await moodleApi.getUserCourses();
-      if (courses.isNotEmpty) {
-        courses.removeAt(
-            0); // first course is always "Moodle" - no need to show it
-      }
-      return true;
-    } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-      courses = [];
-      return false;
-    }
-  }
-
   Future<bool> isUserLoggedIn() async 
   {
     return isLoggedIn;
   }
 
   Future<bool> selectCourse(int index) async{
-    if (index < courses.length){
-      selectedCourse = courses[index];
+    var api = MoodleApiSingleton();
+    if (index < (api.moodleCourses?.length ?? 0)){
+      selectedCourse = api.moodleCourses?[index];
+      return true;
     }
-    setQuizzes();
-    setEssays();
-    return true;
+    return false;
   }
 
   Course? getSelectedCourse(){
     return selectedCourse;
-  }
-
-  void setQuizzes() async{
-    quizzes = await MoodleApiSingleton().getQuizzes(selectedCourse?.id);
-  }
-
-  void setEssays() async{
-    essays = await MoodleApiSingleton().getEssays(selectedCourse?.id);
   }
 }

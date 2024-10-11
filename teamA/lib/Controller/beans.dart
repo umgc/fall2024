@@ -1,3 +1,4 @@
+import 'package:learninglens_app/Api/moodle_api_singleton.dart';
 import 'package:xml/xml.dart';
 import 'dart:typed_data';
 
@@ -219,6 +220,9 @@ class Course {
   String shortName;
   String fullName;
 
+  List<Quiz>? quizzes;
+  List<Essay>? essays;
+
   // Barebones constructor.
   Course(this.id, this.shortName, this.fullName);
 
@@ -233,6 +237,12 @@ class Course {
         Course(id, shortName, fullName),
       _ => throw const FormatException('Failed to load course from json.'),
     };
+  }
+
+  void updateContents() async{
+    MoodleApiSingleton api = MoodleApiSingleton();
+    api.getQuizzes(id).then((output) {quizzes = output;});
+    api.getEssays(id).then((output) {essays = output;});
   }
 }
 

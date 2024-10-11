@@ -94,6 +94,10 @@ class MoodleApiSingleton {
       throw HttpException(response.body);
     }
     List<Course> courses = (jsonDecode(response.body) as List).map((i) => Course.fromJson(i)).toList();
+    //obtain the contents of each course
+    for (Course course in courses){
+      course.updateContents();
+    }
     return courses;
   }
 
@@ -116,7 +120,7 @@ class MoodleApiSingleton {
   Future<List> getCourseContents(int courseID) async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
     // Make the request.
-    final http.Response response = await http.get(Uri.parse('$serverUrl$_userToken$jsonFormat&wsfunction=core_course_get_contents&courseid=$courseID'));
+    final http.Response response = await http.get(Uri.parse('$moodleURL$serverUrl$_userToken$jsonFormat&wsfunction=core_course_get_contents&courseid=$courseID'));
     if (response.statusCode != 200) {
       throw HttpException(response.body);
     }
@@ -236,6 +240,10 @@ class MoodleApiSingleton {
       courses = courseList.map((i) => Course.fromJson(i)).toList();
     } else {
       throw StateError('Unexpected response format');
+    }
+    //obtain the contents of each course
+    for (Course course in courses){
+      course.updateContents();
     }
     return courses;
   }
