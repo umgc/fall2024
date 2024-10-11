@@ -7,6 +7,8 @@ import 'Views/course_content.dart';
 import 'Views/send_essay_to_moodle.dart';
 import 'Views/essay_generation.dart';
 import 'Views/quiz_generator.dart';
+import 'Views/send_quiz_to_moodle.dart';
+import 'views/course_list.dart';
 
 void main() {
   runApp(MyApp());
@@ -45,6 +47,8 @@ class MyApp extends StatelessWidget {
         // '/create': (context) => const CreatePage(),
         '/dashboard': (context) => TeacherDashboard(),
         '/send_essay_to_moodle': (context) => EssayAssignmentSettings(),
+        '/send_quiz_to_moodle': (context) => QuizMoodle(),
+        '/course_list': (context) => CourseList(),
         // '/viewExams': (context) => const ViewExamPage(),
         // '/settings': (context) => Setting(themeModeNotifier: _themeModeNotifier)
       },
@@ -118,6 +122,14 @@ class _DevLaunch extends State {
                 );
               }),
           ElevatedButton(
+              child: const Text('Send Quiz to Moodle'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => QuizMoodle()),
+                );
+              }),
+          ElevatedButton(
             child: const Text('Quiz Generator'),
             onPressed: () {
               Navigator.push(
@@ -125,7 +137,15 @@ class _DevLaunch extends State {
                   MaterialPageRoute(
                       builder: (context) => CreateAssessment('Tester')));
             },
-          )
+          ),
+          ElevatedButton(
+              child: const Text('Course List'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CourseList()),
+                );
+              }),
         ]));
   }
 }
