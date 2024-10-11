@@ -32,3 +32,4 @@ macos/
 web/
 windows/
 Flutter/
+.DS_Store
