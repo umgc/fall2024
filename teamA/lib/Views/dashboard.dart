@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/Api/moodle_api_singleton.dart';
 import 'package:learninglens_app/Views/edit_questions.dart';
+import 'view_submissions.dart';
 import 'essay_generation.dart';
 import 'quiz_generator.dart';
 //import 'course.dart'; // Import the Courses page when available
@@ -44,6 +46,8 @@ class TeacherDashboard extends StatelessWidget {
             ),
             onPressed: () {
               // Handle profile/account actions here
+                String? myUserName = MoodleApiSingleton().moodleUserName;
+  print(myUserName);
             },
           ),
 
@@ -52,16 +56,26 @@ IconButton(
               Icons.edit, // Icon for Edit Questions button
               color: Theme.of(context).colorScheme.onPrimaryContainer,
             ),
-            onPressed: () {
-              // Navigate to the EditQuestions page
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EditQuestions(''),
-                ),
-              );
-            }
-)
+                          
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => SubmissionList(
+                          // moodleService: MoodleApiSingleton(),
+                          assignmentId: 207,
+                          courseId: '2')));
+                },
+                
+              ),
+            // onPressed: () {
+            //   // Navigate to the EditQuestions page
+            //   Navigator.push(
+            //     context,
+            //     MaterialPageRoute(
+            //       builder: (context) => EditQuestions(''),
+            //     ),
+            //   );
+            // }
+// )
         ],
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,

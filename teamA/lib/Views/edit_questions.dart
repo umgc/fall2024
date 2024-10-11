@@ -3,6 +3,7 @@ import 'package:image_network/image_network.dart';
 import '../controller/beans.dart';
 import 'package:flutter/material.dart';
 import 'package:llm_api_modules/openai_api.dart';
+import 'quiz_generator.dart';
 
 class EditQuestions extends StatefulWidget {
   final String questionXML;
@@ -19,21 +20,25 @@ class EditQuestionsState extends State<EditQuestions> {
   static const apikey = String.fromEnvironment('openai_apikey');
   final openai = OpenAiLLM(apikey);
 
-  //Need to insert subject and related to values from the promptbuilder page
-  String promptstart = 'Remake this question that is compatible with Moodle XML import. Do not include the original question in your response. Make sure the xml specification is included and the question is wrapped in the quiz xml element required by Moodle. The quiz is to be on the subject of Music Theory and should be related to Key Signatures. The quiz should be the same level of difficulty for high school students of the English-speaking language.  ';
+  String subject = CreateAssessment.descriptionController.text;
+  String topic = CreateAssessment.topicController.text;
+  late String promptstart;
+
   @override
   void initState() {
     super.initState();
-    // temporary code to load the quiz from the sample XML
     myQuiz = Quiz.fromXmlString(widget.questionXML);
-    myQuiz.name = "My Quiz";
-    myQuiz.description = "This is a quiz about the Pythagorean Theorem.";
+    myQuiz.name = CreateAssessment.nameController.text;
+    myQuiz.description = CreateAssessment.descriptionController.text;
+
+    promptstart =
+        'Remake this question that is compatible with Moodle XML import. Do not include the original question in your response. Make sure the xml specification is included and the question is wrapped in the quiz xml element required by Moodle. The quiz is to be on the subject of $subject and should be related to $topic. The quiz should be the same level of difficulty for high school students of the English-speaking language. ';
   }
 
   @override
   Widget build(BuildContext context) {
     var userprofileurl = MoodleApiSingleton().moodleProfileImage!;
-    
+
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 100,
@@ -106,15 +111,16 @@ class EditQuestionsState extends State<EditQuestions> {
                   confirmDismiss: (direction) async {
                     if (direction == DismissDirection.startToEnd) {
                       //********************************************************************************************
-                      var result = await openai.postToLlm(promptstart + question.toString());
-                      if (result.isNotEmpty){
-                      setState(() {
-                        //replace the old question with the new one from the api call
-                        question = Quiz.fromXmlString(result).questionList[0];
-                        question.setName = 'Question ${index + 1}';
-                        myQuiz.questionList[index] =
-                            question.copyWith(isFavorite: !question.isFavorite);
-                      });
+                      var result = await openai
+                          .postToLlm(promptstart + question.toString());
+                      if (result.isNotEmpty) {
+                        setState(() {
+                          //replace the old question with the new one from the api call
+                          question = Quiz.fromXmlString(result).questionList[0];
+                          question.setName = 'Question ${index + 1}';
+                          myQuiz.questionList[index] = question.copyWith(
+                              isFavorite: !question.isFavorite);
+                        });
                       }
                       return false;
                     } else {
@@ -160,32 +166,43 @@ class EditQuestionsState extends State<EditQuestions> {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  var result = await MoodleApiSingleton().addRandomQuestions('50', '22', '2');
+                  var result = await MoodleApiSingleton()
+                      .addRandomQuestions('50', '22', '2');
                   print(result);
                 },
                 child: const Text('Add Random Questions'),
               ),
               ElevatedButton(
                 onPressed: () async {
-                  var result = await MoodleApiSingleton().importQuizQuestions('2', myXML);
+                  var result = await MoodleApiSingleton()
+                      .importQuizQuestions('2', myXML);
                   print(result);
                 },
                 child: const Text('Import Questions'),
               ),
               ElevatedButton(
                 onPressed: () async {
-                  var result = await MoodleApiSingleton().createQuiz('2', 'Sunday Quiz', 'Sunday Quiz Intro');
+                  var result = await MoodleApiSingleton()
+                      .createQuiz('2', 'Sunday Quiz', 'Sunday Quiz Intro');
                   print(result);
                 },
                 child: const Text('Create Quiz'),
               ),
               ElevatedButton(
                 onPressed: () async {
-                  var result = await MoodleApiSingleton().createAssignnment('2', '2', 'Sunday Assignment', '2024-10-6', '2024-10-14', rubricDefinition, 'This is the description');
+                  var result = await MoodleApiSingleton().createAssignnment(
+                      '2',
+                      '2',
+                      'Sunday Assignment',
+                      '2024-10-6',
+                      '2024-10-14',
+                      rubricDefinition,
+                      'This is the description');
                   print(result);
                 },
                 child: const Text('Create Assignment'),
               ),
+
             ],
           )
         ],
@@ -194,7 +211,7 @@ class EditQuestionsState extends State<EditQuestions> {
   }
 }
 
- //debugging code for bottom row buttons and temp quiz information
+//debugging code for bottom row buttons and temp quiz information
 String myXML = '''
 <?xml version="1.0" encoding="UTF-8"?>
 <quiz>

@@ -293,3 +293,152 @@ class FileNameAndBytes {
     return "$filename: ${bytes.lengthInBytes} bytes";
   }
 }
+
+class Submission {
+  final int id;
+  final int userid;
+  final String status;
+  final DateTime submissionTime;
+  final DateTime? modificationTime;
+  final int attemptNumber;
+  final int groupId;
+  final String gradingStatus;
+  final String onlineText;
+  final String comments;
+  final int assignmentId; // Added field
+
+  Submission({
+    required this.id,
+    required this.userid,
+    required this.status,
+    required this.submissionTime,
+    this.modificationTime,
+    required this.attemptNumber,
+    required this.groupId,
+    required this.gradingStatus,
+    required this.onlineText,
+    required this.comments,
+    required this.assignmentId,
+  });
+
+  factory Submission.fromJson(Map<String, dynamic> json) {
+    String onlineText = '';
+    String comments = '';
+
+    // Debug: Print entire submission JSON
+    // ignore: avoid_print
+    print('Processing submission: ${json.toString()}');
+
+    if (json['plugins'] != null && json['plugins'] is List) {
+      for (var plugin in json['plugins']) {
+        // Extract 'onlineText'
+        if (plugin['type'] != null &&
+            plugin['type'].toString().toLowerCase() == 'onlinetext') {
+          var editorFields = plugin['editorfields'];
+          if (editorFields != null &&
+              editorFields is List &&
+              editorFields.isNotEmpty) {
+            for (var field in editorFields) {
+              if (field['name'] != null &&
+                  field['name'].toString().toLowerCase() == 'onlinetext') {
+                onlineText = field['text'] ?? '';
+                print('Extracted onlineText: $onlineText');
+                break; // Exit loop once the correct field is found
+              }
+            }
+          }
+        }
+
+        // Extract 'comments'
+        if (plugin['type'] != null &&
+            plugin['type'].toString().toLowerCase() == 'comments') {
+          var editorFields = plugin['editorfields'];
+          if (editorFields != null &&
+              editorFields is List &&
+              editorFields.isNotEmpty) {
+            for (var field in editorFields) {
+              if (field['name'] != null &&
+                  field['name'].toString().toLowerCase() == 'comments') {
+                comments = field['text'] ?? '';
+                print('Extracted comments: $comments');
+                break; // Exit loop once the correct field is found
+              }
+            }
+          }
+        }
+      }
+    } else {
+      print('No plugins found in submission.');
+    }
+
+    return Submission(
+      id: json['id'] ?? 0,
+      userid: json['userid'] ?? 0,
+      status: json['status'] ?? '',
+      submissionTime: json['timecreated'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['timecreated'] * 1000)
+          : DateTime.fromMillisecondsSinceEpoch(0),
+      modificationTime: json['timemodified'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['timemodified'] * 1000)
+          : null,
+      attemptNumber: json['attemptnumber'] ?? 0,
+      groupId: json['groupid'] ?? 0,
+      gradingStatus: json['gradingstatus'] ?? '',
+      onlineText: onlineText,
+      comments: comments,
+      assignmentId: json['assignmentid'] ?? 0, // Extract assignment ID
+    );
+  }
+}
+
+class Rubric {
+  final String title;
+  final List<Criterion> criteria;
+
+  Rubric({required this.title, required this.criteria});
+
+  factory Rubric.fromJson(Map<String, dynamic> json) {
+    var criteriaList = (json['rubric_criteria'] as List)
+        .map((c) => Criterion.fromJson(c))
+        .toList();
+
+    return Rubric(
+      title: json['criteria_title'] ?? 'Rubric',
+      criteria: criteriaList,
+    );
+  }
+}
+
+class Criterion {
+  final String description;
+  final List<Level> levels;
+
+  Criterion({required this.description, required this.levels});
+
+  factory Criterion.fromJson(Map<String, dynamic> json) {
+    var levelsList = (json['levels'] as List)
+        .map((l) => Level.fromJson(l))
+        .toList();
+
+    return Criterion(
+      description: json['description'] ?? '',
+      levels: levelsList,
+    );
+  }
+}
+
+class Level {
+  final String description;
+  final int score;
+
+  Level({required this.description, required this.score});
+
+  factory Level.fromJson(Map<String, dynamic> json) {
+    return Level(
+      description: json['definition'] ?? '',
+      score: json['score'] ?? 0,
+    );
+  }
+}
+
+
