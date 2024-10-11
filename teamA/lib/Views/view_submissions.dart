@@ -48,7 +48,7 @@ class SubmissionListState extends State<SubmissionList> {
         } else {
           // If the data is available, display it in a list.
           List<Submission> submissions = snapshot.data!;
-          return ListView.builder(
+          return GridView.builder(
             itemCount: submissions.length,
             itemBuilder: (context, index) {
               Submission submission = submissions[index];
@@ -97,6 +97,12 @@ class SubmissionListState extends State<SubmissionList> {
                 ),
               );
             },
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2, // Adjust the number of columns as needed
+              mainAxisSpacing: 10.0,
+              crossAxisSpacing: 10.0,
+              childAspectRatio: 2.0,
+            ),
           );
         }
       },

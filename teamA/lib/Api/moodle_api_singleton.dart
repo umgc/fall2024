@@ -268,14 +268,29 @@ class MoodleApiSingleton {
 
         // **Access the 'assignments' list**
         if (data['assignments'] != null && data['assignments'] is List) {
-          List assignments = data['assignments'];
-          for (var assignment in assignments) {
-            if (assignment['submissions'] != null &&
-                assignment['submissions'] is List) {
-              submissionsData.addAll(assignment['submissions']);
-            }
-          }
-        }
+  List assignments = data['assignments'];
+  for (var assignment in assignments) {
+    if (assignment['submissions'] != null && assignment['submissions'] is List) {
+      for (var submission in assignment['submissions']) {
+        // Create a map that includes the assignmentid along with the submission data
+        submissionsData.add({
+          'assignmentid': assignment['assignmentid'],  // Store assignmentid
+          'submission': submission  // Store the actual submission
+        });
+      }
+    }
+  }
+}
+
+        // if (data['assignments'] != null && data['assignments'] is List) {
+        //   List assignments = data['assignments'];
+        //   for (var assignment in assignments) {
+        //     if (assignment['submissions'] != null &&
+        //         assignment['submissions'] is List) {
+        //       submissionsData.addAll(assignment['submissions']);
+        //     }
+        //   }
+        // }
 
         // **Debugging: Print the number of submissions found**
         print('Number of submissions found: ${submissionsData.length}');
