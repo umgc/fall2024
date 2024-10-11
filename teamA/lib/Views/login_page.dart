@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:learninglens_app/main.dart';
 import '/controller/main_controller.dart';
-import '../Views/dashboard.dart';
+import 'dashboard.dart';
 
 class LoginApp extends StatelessWidget 
 {

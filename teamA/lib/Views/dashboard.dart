@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:learninglens_app/Api/moodle_api_singleton.dart';
-import 'package:learninglens_app/Views/edit_questions.dart';
+import '../Api/moodle_api_singleton.dart';
+import 'edit_questions.dart';
 import 'view_submissions.dart';
 import 'essay_generation.dart';
 import 'quiz_generator.dart';

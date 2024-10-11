@@ -1,9 +1,9 @@
 // import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:learninglens_app/Controller/beans.dart';
-import 'package:learninglens_app/Views/edit_questions.dart';
-import 'package:learninglens_app/api/llm/prompt_engine.dart';
+import '../Controller/beans.dart';
+import 'edit_questions.dart';
+import '../Api/llm/prompt_engine.dart';
 
 
 class CreateAssessment extends StatefulWidget {
