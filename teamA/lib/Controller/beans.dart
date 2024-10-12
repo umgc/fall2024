@@ -328,9 +328,11 @@ class Submission {
     // Debug: Print entire submission JSON
     // ignore: avoid_print
     print('Processing submission: ${json.toString()}');
+    int assignmentId = json['assignmentid'] ?? 0;
+     Map<String, dynamic> submission = json['submission'] ?? {};
 
-    if (json['plugins'] != null && json['plugins'] is List) {
-      for (var plugin in json['plugins']) {
+    if (submission['plugins'] != null && submission['plugins'] is List) {
+      for (var plugin in submission['plugins']) {
         // Extract 'onlineText'
         if (plugin['type'] != null &&
             plugin['type'].toString().toLowerCase() == 'onlinetext') {
@@ -372,21 +374,53 @@ class Submission {
     }
 
     return Submission(
-      id: json['id'] ?? 0,
-      userid: json['userid'] ?? 0,
-      status: json['status'] ?? '',
-      submissionTime: json['timecreated'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(json['timecreated'] * 1000)
+      id: submission['id'] ?? 0,
+      userid: submission['userid'] ?? 0,
+      status: submission['status'] ?? '',
+      submissionTime: submission['timecreated'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(submission['timecreated'] * 1000)
           : DateTime.fromMillisecondsSinceEpoch(0),
-      modificationTime: json['timemodified'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(json['timemodified'] * 1000)
+      modificationTime: submission['timemodified'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(submission['timemodified'] * 1000)
           : null,
-      attemptNumber: json['attemptnumber'] ?? 0,
-      groupId: json['groupid'] ?? 0,
-      gradingStatus: json['gradingstatus'] ?? '',
+      attemptNumber: submission['attemptnumber'] ?? 0,
+      groupId: submission['groupid'] ?? 0,
+      gradingStatus: submission['gradingstatus'] ?? '',
       onlineText: onlineText,
       comments: comments,
-      assignmentId: json['assignmentid'] ?? 0, // Extract assignment ID
+      assignmentId: assignmentId
+    );
+  }
+}
+
+class Participant {
+  final int id;
+  final String username;
+  final String fullname;
+  final List<String> roles;
+
+  Participant({
+    required this.id,
+    required this.username,
+    required this.fullname,
+    required this.roles,
+  });
+
+  // Factory constructor for creating a new Participant instance from a JSON map
+  factory Participant.fromJson(Map<String, dynamic> json) {
+    // Convert roles if they exist, and map them from the 'roles' field in the JSON
+    List<String> rolesList = [];
+    if (json['roles'] != null) {
+      rolesList = (json['roles'] as List<dynamic>)
+          .map((role) => role['shortname'] as String)
+          .toList();
+    }
+
+    return Participant(
+      id: json['id'] as int,
+      username: json['username'] as String,
+      fullname: json['fullname'] as String,
+      roles: rolesList,
     );
   }
 }
@@ -441,4 +475,43 @@ class Level {
   }
 }
 
+class Grade {
+  final int id;
+  final int userid;
+  final double grade;  // Convert from string in the JSON
+  final int grader;
+  final DateTime timecreated;
+  final DateTime timemodified;
 
+  Grade({
+    required this.id,
+    required this.userid,
+    required this.grade,
+    required this.grader,
+    required this.timecreated,
+    required this.timemodified,
+  });
+
+  // Parse grade JSON
+  factory Grade.fromJson(Map<String, dynamic> json) {
+    return Grade(
+      id: json['id'] ?? 0,
+      userid: json['userid'] ?? 0,
+      // Parsing the grade as a double from a string
+      grade: json['grade'] != null ? double.parse(json['grade']) : 0.0,
+      grader: json['grader'] ?? 0,
+      timecreated: DateTime.fromMillisecondsSinceEpoch(json['timecreated'] * 1000),
+      timemodified: DateTime.fromMillisecondsSinceEpoch(json['timemodified'] * 1000),
+    );
+  }
+}
+
+class SubmissionWithGrade {
+  final Submission submission;
+  final Grade? grade;
+
+  SubmissionWithGrade({
+    required this.submission,
+    this.grade,
+  });
+}
