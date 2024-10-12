@@ -49,16 +49,12 @@ class MainController
     return isLoggedIn;
   }
 
-  Future<bool> selectCourse(int index) async{
+  bool selectCourse(int index) {
     var api = MoodleApiSingleton();
     if (index < (api.moodleCourses?.length ?? 0)){
       selectedCourse = api.moodleCourses?[index];
       return true;
     }
     return false;
-  }
-
-  Course? getSelectedCourse(){
-    return selectedCourse;
   }
 }

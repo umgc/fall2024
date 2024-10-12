@@ -21,7 +21,7 @@ class ViewCourseContents extends StatefulWidget {
 }
 
 class _CourseState extends State{
-  final String courseName = MainController().getSelectedCourse()?.fullName ?? "Test Course";
+  final String courseName = MainController().selectedCourse?.fullName ?? "Test Course";
 
   @override
   Widget build(BuildContext context){

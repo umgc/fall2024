@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/Api/moodle_api_singleton.dart';
 import 'package:learninglens_app/main.dart';
 import '/controller/main_controller.dart';
 import '../Views/dashboard.dart';
@@ -19,6 +20,7 @@ class LoginApp extends StatelessWidget
         ),
       ),
       debugShowCheckedModeBanner: false,
+      scrollBehavior: CustomScrollBehavior(),
       home: const LoginScreen(),
     );
   }
@@ -163,7 +165,6 @@ class _LoginScreenState extends State<LoginScreen>
                 var wasSuccessful = await LoginScreen.controller.loginToMoodle(_usernameController.text, _passwordController.text, _moodleURLController.text);
                 if (wasSuccessful) 
                 {
-                  MainController().updateCourses();
                   Navigator.push(
                     context,
                     // MaterialPageRoute(builder: (context) => TeacherDashboard())

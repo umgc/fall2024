@@ -96,7 +96,8 @@ class MoodleApiSingleton {
     List<Course> courses = (jsonDecode(response.body) as List).map((i) => Course.fromJson(i)).toList();
     //obtain the contents of each course
     for (Course course in courses){
-      course.updateContents();
+      course.quizzes = await getQuizzes(course.id);
+      course.essays = await getEssays(course.id);
     }
     return courses;
   }
@@ -120,7 +121,15 @@ class MoodleApiSingleton {
   Future<List> getCourseContents(int courseID) async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
     // Make the request.
-    final http.Response response = await http.get(Uri.parse('$moodleURL$serverUrl$_userToken$jsonFormat&wsfunction=core_course_get_contents&courseid=$courseID'));
+    final http.Response response = await http.post(
+      Uri.parse('$moodleURL$serverUrl'),
+      body: {
+        'wstoken': _userToken,
+        'wsfunction': 'core_course_get_contents',
+        'moodlewsrestformat': 'json',
+        'courseid': courseID.toString()
+      }
+    );
     if (response.statusCode != 200) {
       throw HttpException(response.body);
     }
@@ -243,7 +252,8 @@ class MoodleApiSingleton {
     }
     //obtain the contents of each course
     for (Course course in courses){
-      course.updateContents();
+      course.quizzes = await getQuizzes(course.id);
+      course.essays = await getEssays(course.id);
     }
     return courses;
   }

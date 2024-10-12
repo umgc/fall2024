@@ -87,11 +87,7 @@ class _DevLaunch extends State {
           ElevatedButton(
               child: const Text('Open Contents Carousel'),
               onPressed: () async {
-                MoodleApiSingleton api = MoodleApiSingleton();
-                MainController main = MainController();
-                //await api.login('insert test username', 'insert test pw', 'insert test url');
-                await main.selectCourse(0);
-                // Current issue: Haven't tested yet, need to make a dummy course for myself.
+                MainController().selectCourse(0);
                 Navigator.push(
                   context,
                   MaterialPageRoute(

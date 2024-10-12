@@ -1,4 +1,3 @@
-import 'package:learninglens_app/Api/moodle_api_singleton.dart';
 import 'package:xml/xml.dart';
 import 'dart:typed_data';
 
@@ -39,6 +38,11 @@ class Essay {
   String? description;
 
   Essay({this.name,this.description});
+
+  @override
+  String toString(){
+    return '$name: $description';
+  }
 }
 
 // A Moodle quiz containing a list of questions.
@@ -224,7 +228,7 @@ class Course {
   List<Essay>? essays;
 
   // Barebones constructor.
-  Course(this.id, this.shortName, this.fullName);
+  Course(this.id, this.shortName, this.fullName, [this.quizzes, this.essays]);
 
   // Json factory constructor.
   factory Course.fromJson(Map<String, dynamic> json) {
@@ -239,10 +243,9 @@ class Course {
     };
   }
 
-  void updateContents() async{
-    MoodleApiSingleton api = MoodleApiSingleton();
-    api.getQuizzes(id).then((output) {quizzes = output;});
-    api.getEssays(id).then((output) {essays = output;});
+  @override
+  String toString(){
+    return "$shortName ($fullName) $id";
   }
 }
 
