@@ -161,12 +161,11 @@ class _MyHomePageState extends State<EssayGeneration>
 
                   const SizedBox(height: 16),
 
-                  // Standard/Objective TextBox
+                  // Standard/objective
                   TextBox(
                     label: "Standard / Objective",
                     icon: Icons.mic,
                     secondaryIcon: Icons.attachment,
-                    controller: _standardObjectiveController,
                     initialValue: '',
                     onChanged: (newValue) 
                     {
@@ -175,12 +174,11 @@ class _MyHomePageState extends State<EssayGeneration>
                   ),
                   const SizedBox(height: 16),
 
-                  // Assignment Description TextBox
+                  // Assignment description
                   TextBox(
                     label: "Assignment Description",
                     icon: Icons.mic,
                     secondaryIcon: Icons.attachment,
-                    controller: _assignmentDescriptionController,
                     initialValue: '',
                     onChanged: (newValue) 
                     {
@@ -189,12 +187,11 @@ class _MyHomePageState extends State<EssayGeneration>
                   ),
                   const SizedBox(height: 16),
 
-                  // Additional Customization TextBox
+                  // Additional customization
                   TextBox(
                     label: "Additional Customization for Rubric (Optional)",
                     icon: Icons.mic,
                     secondaryIcon: Icons.attachment,
-                    controller: _additionalCustomizationController,
                     initialValue: '',
                     onChanged: (newValue) 
                     {
@@ -311,7 +308,7 @@ class _MyHomePageState extends State<EssayGeneration>
                           )
                         : Center(
                             child: Text(
-                              "No Rubric Data Available", // Show this message when rubric data is not present
+                              "No Rubric Data Available",
                               style: TextStyle(fontSize: 18, color: Colors.black54),
                             ),
                           ),
@@ -365,17 +362,13 @@ class Button extends StatelessWidget {
   }
 }
 
-class TextBox extends StatelessWidget {
-  // Each text box will have icons for attachments and playback, and event handlers
+class TextBox extends StatefulWidget { // Create stateful widget to maintain persistence in textboxes from events
   final String label;
   final IconData icon;
   final IconData secondaryIcon;
   final String initialValue;
-  // We need to store the value of the string the user inputs
   final ValueChanged<String?> onChanged;
-  final TextEditingController controller;
 
-  // Constructor for textbok requires user input
   const TextBox({
     Key? key,
     required this.label,
@@ -383,32 +376,47 @@ class TextBox extends StatelessWidget {
     required this.secondaryIcon,
     required this.initialValue,
     required this.onChanged,
-    required this.controller,
   }) : super(key: key);
 
-  void _handleTextChanged(String? newValue) 
-  {
-    // Additional Logic
-    onChanged(newValue); // Call the passed onChanged function
+  @override
+  _TextBoxState createState() => _TextBoxState();
+}
+
+class _TextBoxState extends State<TextBox> { // State within
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controller with initial value
+    _controller = TextEditingController(text: widget.initialValue);
+    // Listen for changes
+    _controller.addListener(() {
+      widget.onChanged(_controller.text); // Call the passed onChanged function
+    });
   }
 
   @override
-  Widget build(BuildContext context) 
-  {
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return TextField(
-      controller: TextEditingController(text: initialValue), 
+      controller: _controller, // Use the controller initialized in initState
       decoration: InputDecoration(
-        labelText: label,
+        labelText: widget.label,
         prefixIcon: Column(
-          mainAxisAlignment: MainAxisAlignment.center, 
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon),          
-            SizedBox(height: 4), 
-            Icon(secondaryIcon), 
+            Icon(widget.icon),
+            SizedBox(height: 4),
+            Icon(widget.secondaryIcon),
           ],
         ),
       ),
-      onChanged: _handleTextChanged,
     );
   }
 }
