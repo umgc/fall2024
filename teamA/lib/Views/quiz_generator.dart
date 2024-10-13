@@ -30,7 +30,9 @@ class CreateAssessment extends StatefulWidget {
 
 class _AssessmentState extends State<CreateAssessment> {
   double paddingHeight = 16.0, paddingWidth=32;
+  bool isAdvancedModeOnGetFromGlobalVarsLater = false;
   final _formKey = GlobalKey<FormState>();
+  String? selectedLLM, selectedSubject;
   _AssessmentState();
 
   @override
@@ -61,7 +63,20 @@ class _AssessmentState extends State<CreateAssessment> {
                         SizedBox(height: paddingHeight),
                         TextEntry._('Description', false, CreateAssessment.descriptionController, isTextArea: true,),
                         SizedBox(height: paddingHeight),
-                        TextEntry._('Question Topic', true, CreateAssessment.topicController),
+                        isAdvancedModeOnGetFromGlobalVarsLater ? 
+                          TextEntry._('Question Topic', true, CreateAssessment.topicController) :
+                          DropdownButtonFormField<String>(
+                          value: selectedSubject,
+                          decoration: const InputDecoration(labelText: "Select Subject"),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedSubject = newValue;
+                            });
+                          },
+                          items: ['Math', 'Science', 'Language Arts', 'Social Studies', 'History', 'Health'].map((String value) {
+                                  return DropdownMenuItem(value: value, child: Text(value),);
+                                }).toList(),
+                        ),
                         SizedBox(height: paddingHeight),
                         TextEntry._('Question Source', false, CreateAssessment.sourceController),
                         SizedBox(height: paddingHeight),
@@ -83,12 +98,23 @@ class _AssessmentState extends State<CreateAssessment> {
                         SizedBox(height: paddingHeight),
                         Text("Choose a total number of questions equal to four or five times the number of students in the course to guarantee unique quizzes per student"),
                         SizedBox(height: paddingHeight),
-                        LLMSelectorDropdown(
-                          selectedLLM: 'ChatGPT',
-                          onChanged: (newValue) {},
+                        DropdownButtonFormField<String>(
+                          value: selectedLLM,
+                          decoration: const InputDecoration(labelText: "Select Model"),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedLLM = newValue;
+                            });
+                          },
+                          items: ['ChatGPT', 'LLAMA', 'Perplexity'].map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList()
                         ),
                         SizedBox(height: paddingHeight),
-                        SubmitButton._('Submit', 
+                        SubmitButton._(selectedSubject, selectedLLM,
                                         { "name" : CreateAssessment.nameController, 
                                           "description" : CreateAssessment.descriptionController,
                                           "topic" : CreateAssessment.topicController,
@@ -110,20 +136,22 @@ class _AssessmentState extends State<CreateAssessment> {
 }
 
 class SubmitButton extends StatelessWidget {
-  final String buttonText;
+  final String? selectedSubject, selectedLLM;
   final Map<String, TextEditingController> fields;
   final GlobalKey<FormState> formKey;
   final BuildContext context;
 
-  SubmitButton._(this.buttonText, this.fields, this.formKey, this.context);
+  SubmitButton._(this.selectedSubject,
+                 this.selectedLLM,
+                 this.fields,
+                 this.formKey,
+                 this.context);
 
   Future<void> _submitToLLM() async {
     if(formKey.currentState!.validate()) {
-
-
       AssignmentForm af = AssignmentForm(
         questionType: QuestionType.shortanswer, //Potentially not necessary? Need to see about essay generator
-        subject: 'Algebra', // Get these programatically?
+        subject: selectedSubject.toString(), 
         topic: fields['topic']!.text, 
         gradeLevel: 'Sophomore', // Get these programatically?
         title: fields['name']!.text,
@@ -133,31 +161,28 @@ class SubmitButton extends StatelessWidget {
         maximumGrade: 100
       );
 
-      if (await File('..\\lib\\TestFiles\\allThree.xml').exists()) {
-        File('..\lib\\TestFiles\\allThree.xml').readAsString().then((String fileContents) {
+      if (await File('J:\\Users\\Conor Moore\\Downloads\\UMGC\\fall2024\\teamA\\lib\\TestFiles\\allThree.xml').exists()) {
+        File('J:\\Users\\Conor Moore\\Downloads\\UMGC\\fall2024\\teamA\\lib\\TestFiles\\allThree.xml').readAsString().then((String fileContents) {
           Navigator.push(context, MaterialPageRoute(builder: (context) => EditQuestions(fileContents)));
         });
       } else {
         print("Getting open ai response");
-        const apikey = String.fromEnvironment('openai_apikey');
-        final openai = OpenAiLLM(apikey);
-        var result = await openai.postToLlm(PromptEngine.generatePrompt(af));
-        if (result.isNotEmpty) {
-          print(result);
-        }
+        const apiKey = String.fromEnvironment('openai_apikey');
+        print('api key: $apiKey');
+        //final openai = OpenAiLLM(apiKey);
+        //print("OpenAi");
+        //var result = await openai.postToLlm(PromptEngine.generatePrompt(af));
+        //if (result.isNotEmpty) {
+        //  print("Result: $result");
+        //}
       }
     }
-  }
-
-  bool _evaluateInputs() {
-    formKey.currentState!.validate();
-    return true;
   }
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: _submitToLLM, child: Text(buttonText));
+      onPressed: _submitToLLM, child: Text("Submit"));
   }
 }
 
@@ -212,36 +237,4 @@ class TextEntry extends StatelessWidget {
       maxLines: isTextArea ? 6 : 1,
     );
   }
-}
-
-class LLMSelectorDropdown extends StatelessWidget {
-
-  final String selectedLLM;
-  final ValueChanged<String?> onChanged;
-
-  LLMSelectorDropdown({
-    Key? key,
-    required this.selectedLLM,
-    required this.onChanged
-  }) : super(key : key);
-
-  void _handleValueChanged(String? newValue) {
-    onChanged(newValue);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButtonFormField<String>(
-      decoration: const InputDecoration(labelText: "Select Model"),
-      value: selectedLLM,
-      items: ['ChatGPT', 'LLAMA', 'Perplexity'].map((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-      onChanged: _handleValueChanged,
-    );
-  }
-
 }
