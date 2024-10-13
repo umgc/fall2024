@@ -24,6 +24,7 @@ class _MyHomePageState extends State<EssayGeneration>
     //Holds values for user input fields
   int _selectedPointScale = 3; // Default value
   String _selectedGradeLevel = '12th grade'; // Default value for GradeLevelDropdown
+  bool _isLoading = false;
 
   // Variables to store the text inputs
   final TextEditingController _standardObjectiveController = TextEditingController();
@@ -54,6 +55,10 @@ class _MyHomePageState extends State<EssayGeneration>
   Future<dynamic> apiTest(String inputs) async {
     try
     {
+      setState(() 
+      {
+        _isLoading = true; // Set loading state to true
+      });
       String apiKey = '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';
       LlmApi myLLM = LlmApi(apiKey);
       String queryPrompt = '''
@@ -88,6 +93,13 @@ class _MyHomePageState extends State<EssayGeneration>
     {
       print("Error in API request: $e");
       return null;
+    }
+    finally 
+    {
+      setState(() 
+      {
+        _isLoading = false; // Reset loading state to false
+      });
     }
   }
   
@@ -195,16 +207,15 @@ class _MyHomePageState extends State<EssayGeneration>
                   // Generate Button
                    Button(
                     'essay',
-                    onPressed: () {
+                    onPressed: () 
+                    {
                       final result = getSelectedResponses();
 
                       apiTest(result).then((dynamic results) 
                       {
-                        print("Inside .then block");  // Check if we reach here
                         setState(() 
                         {
                           globalRubric = results;  // Store the rubric
-                          print("Rubric set: $globalRubric");  // Verify if the rubric is stored
                         });
                       });
                     },
@@ -217,95 +228,100 @@ class _MyHomePageState extends State<EssayGeneration>
 
             // Right Side
             Expanded(
-              flex: 3,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    height: 600,
-                    color: Colors.grey[200],
-                    child: globalRubric == null
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center, // Center vertically
-                            children: [
-                              CircularProgressIndicator(), // Loading spinner
-                              SizedBox(height: 16), // Maintain spacing
-                              Text(
-                                "Generating Rubric...",
-                                style: TextStyle(fontSize: 18, color: Colors.black54),
-                              ),
-                            ],
-                          ),
-                        )
-                      : SingleChildScrollView(
-                          child: Table(
-                            border: TableBorder.all(), // Adds border to the table cells
-                            columnWidths: const {
-                              0: FlexColumnWidth(2), // Description column
-                              // Additional columns for scores will be dynamically added
-                            },
-                            children: [
-                              TableRow(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      'Criteria',
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                    ),
-                                  ),
-
-                                  // Dynamically create score level headers
-                                  for (var level in globalRubric['criteria'][0]['levels']) // Assuming all criteria have the same number of levels
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        '${level['score']}',
-                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                ],
-                              ),
-
-                              // Create rows as necessary
-                              for (var criteria in globalRubric['criteria']) ...[
+            flex: 3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  height: 600,
+                  color: Colors.grey[200],
+                  child: _isLoading // Make the container dependent on the isLoading var
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(), // Loading spinner
+                            SizedBox(height: 16),
+                            Text(
+                              "Generating Rubric...", // Display this text when we start loading
+                              style: TextStyle(fontSize: 18, color: Colors.black54),
+                            ),
+                          ],
+                        ),
+                      )
+                    : globalRubric != null && globalRubric['criteria'] != null
+                        ? SingleChildScrollView(
+                            child: Table(
+                              border: TableBorder.all(), // Adds border to the table cells
+                              columnWidths: const 
+                              {
+                                0: FlexColumnWidth(2), // Description column
+                                // Dynamically add scores per column
+                              },
+                              children: [
                                 TableRow(
                                   children: [
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(
-                                        criteria['description'],
-                                        style: TextStyle(fontWeight: FontWeight.bold),
+                                        'Criteria',
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                                       ),
                                     ),
 
-                                    // Add score levels for each column
-                                    for (var level in criteria['levels'])
+                                    // Dynamically create score level headers
+                                    for (var level in globalRubric['criteria'][0]['levels']) // Assuming all criteria have the same number of levels
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Text(
-                                          '${level['definition']}',
+                                          '${level['score']}',
+                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                                           textAlign: TextAlign.center,
                                         ),
                                       ),
                                   ],
                                 ),
+
+                                // Create rows
+                                for (var criteria in globalRubric['criteria']) ...[
+                                  TableRow(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          criteria['description'],
+                                          style: TextStyle(fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+
+                                      // Add score levels for each column
+                                      for (var level in criteria['levels'])
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            '${level['definition']}',
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ],
                               ],
-                            ],
+                            ),
+                          )
+                        : Center(
+                            child: Text(
+                              "No Rubric Data Available", // Show this message when rubric data is not present
+                              style: TextStyle(fontSize: 18, color: Colors.black54),
+                            ),
                           ),
-                        ),
-                  ),
-                  const SizedBox(height: 16),
-                  // Send to Moodle Button
-                  Button("assessment"),
-                ],
-              ),
-            )
-
-
-
+                ),
+                const SizedBox(height: 16),
+                // Send to Moodle Button
+                Button("assessment"),
+              ],
+            ),
+          ),
           ],
         ),
       ),
@@ -467,12 +483,4 @@ class GradeLevelDropdown extends StatelessWidget
       onChanged: _handleTextChanged,
     );
   }
-}
-
-Future<void> apiTest() async {
-  String apiKey = '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';
-  LlmApi myLLM = LlmApi(apiKey);
-  String queryPrompt = 'How many stars are there in our galaxy?';
-  String ans1 = await myLLM.postToLlm(queryPrompt);
-  print(ans1);
 }
