@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-//import '../api/moodle_api_singleton.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:http/http.dart' as http;
 import 'package:learninglens_app/Views/essay_edit_page.dart';
@@ -7,7 +6,6 @@ import '../controller/main_controller.dart';
 import '/Controller/beans.dart'; // Import the file that contains the Course class
 import 'dart:convert';
 import 'dart:io';
-import 'package:editable/editable.dart';
 import '../Api/moodle_api_singleton.dart'; // Import the Moodle API Singleton
 
 class EssayAssignmentSettings extends StatefulWidget {
@@ -35,17 +33,9 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   String selectedHourDue = '00';
   String selectedMinuteDue = '00';
 
-  // Date selection variables for "Remind me to grade by"
-  String selectedDayRemind = '01';
-  String selectedMonthRemind = 'January';
-  String selectedYearRemind = '2024';
-  String selectedHourRemind = '00';
-  String selectedMinuteRemind = '00';
-
   // Checkbox states
   bool isSubmissionEnabled = true;
   bool isDueDateEnabled = true;
-  bool isRemindEnabled = true;
 
   List<String> days =
       List.generate(31, (index) => (index + 1).toString().padLeft(2, '0'));
@@ -98,8 +88,6 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
           selectedCourse = 'No courses available'; // Handle the empty case
         }
       });
-      // Debugging courses fetched
-      //  debugPrint('Courses fetched: ${courses.map((c) => c.fullName).toList()}'); i dnt need it for now
     } catch (e) {
       debugPrint('Error fetching courses: $e');
     }
@@ -113,10 +101,7 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   void populateHeadersAndRows() {
     try {
       Map<String, dynamic> jsonData = jsonDecode(widget.updatedJson);
-      // Debugging JSON passed from edit essay page
-      // debugPrint('Rubric JSON from edit page: ${widget.updatedJson}');
 
-      // Build headers dynamically based on the number of levels in the first criterion
       List<dynamic> levels =
           List<dynamic>.from(jsonData['criteria'][0]['levels'] as List);
       headers = [
@@ -131,7 +116,6 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
         });
       }
 
-      // Build rows by mapping each criterion and its levels dynamically
       rows = (jsonData['criteria'] ?? []).map((criterion) {
         Map<String, dynamic> row = {
           "name": criterion['description'],
@@ -158,11 +142,9 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
       String description,
       String dueDate,
       String startDate) async {
-    // API Endpoint URL
     const String url = 'webservice/rest/server.php';
-    final fullUrl = 'https://www.swen670moodle.site/$url'; // Full URL
+    final fullUrl = 'https://www.swen670moodle.site/$url';
 
-    // Rubric data as a JSON string
     String rubrickinjsonformat = '''
 {
     "criteria": [
@@ -187,20 +169,19 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
 ''';
 
     try {
-      // Prepare POST request body with the parameters
       final response = await http.post(
         Uri.parse(fullUrl),
         body: {
-          'wstoken': token, // Use the token parameter here
+          'wstoken': token,
           'wsfunction': 'local_learninglens_create_assignment',
           'moodlewsrestformat': 'json',
           'courseid': courseId,
-          'sectionid': '1', // Ensure the section ID is valid
-          'enddate': dueDate, // Due date string
-          'startdate': startDate, // Start date string
-          'description': description, // Assignment description
-          'rubricJson': rubrickinjsonformat, // Rubric as a JSON string
-          'assignmentName': assignmentName, // Assignment name
+          'sectionid': '1',
+          'enddate': dueDate,
+          'startdate': startDate,
+          'description': description,
+          'rubricJson': rubrickinjsonformat,
+          'assignmentName': assignmentName,
         },
       );
 
@@ -259,12 +240,10 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
     return Table(
       border: TableBorder.all(),
       children: [
-        // Header Row
         TableRow(children: [
           _buildTableCell('Criteria'),
           for (var header in headers.skip(1)) _buildTableCell(header['title']),
         ]),
-        // Data Rows
         for (var row in rows)
           TableRow(children: [
             _buildTableCell(row['name']),
@@ -311,8 +290,6 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
               ),
             ),
             SizedBox(height: 20),
-
-            // Course Dropdown with dynamic course fetching
             SectionTitle(title: 'General'),
             _buildCourseDropdown(),
             SizedBox(height: 12),
@@ -324,16 +301,12 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
               ),
             ),
             SizedBox(height: 12),
-
-            // Rubric Section
             SectionTitle(title: 'Rubric'),
-            buildRubricTable(), // Manually create rubric table
+            buildRubricTable(),
             SizedBox(height: 20),
-
-            // Description with Quill Rich Text Editor
             SectionTitle(title: 'Description'),
             Container(
-              height: 250, // Increased height for better usability
+              height: 250,
               padding: EdgeInsets.all(8.0),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
@@ -353,12 +326,8 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
               ),
             ),
             SizedBox(height: 20),
-
-            // Availability Section
             SectionTitle(title: 'Availability'),
             SizedBox(height: 14),
-
-            // Allow submissions from
             Row(
               children: [
                 Checkbox(
@@ -371,39 +340,45 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                 ),
                 Text('Enable'),
                 SizedBox(width: 10),
-                _buildDropdown(
+                Expanded(
+                  child: _buildDropdown(
                     'Allow submissions from',
                     selectedDaySubmission,
                     selectedMonthSubmission,
                     selectedYearSubmission,
                     selectedHourSubmission,
                     selectedMinuteSubmission,
-                    isSubmissionEnabled, (String? newValue) {
-                  setState(() {
-                    selectedDaySubmission = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedMonthSubmission = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedYearSubmission = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedHourSubmission = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedMinuteSubmission = newValue!;
-                  });
-                }),
+                    isSubmissionEnabled,
+                    (String? newValue) {
+                      setState(() {
+                        selectedDaySubmission = newValue!;
+                      });
+                    },
+                    (String? newValue) {
+                      setState(() {
+                        selectedMonthSubmission = newValue!;
+                      });
+                    },
+                    (String? newValue) {
+                      setState(() {
+                        selectedYearSubmission = newValue!;
+                      });
+                    },
+                    (String? newValue) {
+                      setState(() {
+                        selectedHourSubmission = newValue!;
+                      });
+                    },
+                    (String? newValue) {
+                      setState(() {
+                        selectedMinuteSubmission = newValue!;
+                      });
+                    },
+                  ),
+                ),
               ],
             ),
             SizedBox(height: 14),
-
-            // Due date
             Row(
               children: [
                 Checkbox(
@@ -416,96 +391,54 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                 ),
                 Text('Enable'),
                 SizedBox(width: 10),
-                _buildDropdown(
+                Expanded(
+                  child: _buildDropdown(
                     'Due date',
                     selectedDayDue,
                     selectedMonthDue,
                     selectedYearDue,
                     selectedHourDue,
                     selectedMinuteDue,
-                    isDueDateEnabled, (String? newValue) {
-                  setState(() {
-                    selectedDayDue = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedMonthDue = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedYearDue = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedHourDue = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedMinuteDue = newValue!;
-                  });
-                }),
+                    isDueDateEnabled,
+                    (String? newValue) {
+                      setState(() {
+                        selectedDayDue = newValue!;
+                      });
+                    },
+                    (String? newValue) {
+                      setState(() {
+                        selectedMonthDue = newValue!;
+                      });
+                    },
+                    (String? newValue) {
+                      setState(() {
+                        selectedYearDue = newValue!;
+                      });
+                    },
+                    (String? newValue) {
+                      setState(() {
+                        selectedHourDue = newValue!;
+                      });
+                    },
+                    (String? newValue) {
+                      setState(() {
+                        selectedMinuteDue = newValue!;
+                      });
+                    },
+                  ),
+                ),
               ],
             ),
             SizedBox(height: 14),
-
-            // Remind me to grade by
-            Row(
-              children: [
-                Checkbox(
-                  value: isRemindEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      isRemindEnabled = value!;
-                    });
-                  },
-                ),
-                Text('Enable'),
-                SizedBox(width: 10),
-                _buildDropdown(
-                    'Remind me to grade by',
-                    selectedDayRemind,
-                    selectedMonthRemind,
-                    selectedYearRemind,
-                    selectedHourRemind,
-                    selectedMinuteRemind,
-                    isRemindEnabled, (String? newValue) {
-                  setState(() {
-                    selectedDayRemind = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedMonthRemind = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedYearRemind = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedHourRemind = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedMinuteRemind = newValue!;
-                  });
-                }),
-              ],
-            ),
-            SizedBox(height: 20),
-
-            // Two Buttons at the Bottom
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
                   onPressed: () async {
-                    // Fetch the user token dynamically from the MoodleApiSingleton instance
-                    var userInfo =
-                        MoodleApiSingleton(); // Get Singleton instance
-                    String? token = userInfo.userToken; // Fetch the user token
+                    var userInfo = MoodleApiSingleton();
+                    String? token = userInfo.userToken;
 
                     if (token != null && token.isNotEmpty) {
-                      // Continue with assignment creation
                       String courseId = courses
                           .firstWhere(
                               (course) => course.fullName == selectedCourse)
@@ -520,7 +453,7 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                           '$selectedDaySubmission $selectedMonthSubmission $selectedYearSubmission $selectedHourSubmission:$selectedMinuteSubmission';
 
                       await createAssignment(
-                        token, // Use the dynamically fetched token
+                        token,
                         courseId,
                         assignmentName,
                         description,
@@ -528,7 +461,6 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                         allowSubmissionFrom,
                       );
                     } else {
-                      // Handle the case where the token is not available
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text('Failed to retrieve user token.')));
                     }
@@ -554,6 +486,7 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   }
 
   // Dropdown Builder for each section
+  // Dropdown Builder for each section
   Widget _buildDropdown(
       String label,
       String selectedDay,
@@ -571,17 +504,15 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label),
-        Row(
+        Wrap(
+          spacing: 8.0, // Space between dropdowns
+          runSpacing: 8.0, // Space between rows when wrapping
           children: [
             _buildDropdownButton(days, selectedDay, onDayChanged, isEnabled),
-            SizedBox(width: 8),
             _buildDropdownButton(
                 months, selectedMonth, onMonthChanged, isEnabled),
-            SizedBox(width: 8),
             _buildDropdownButton(years, selectedYear, onYearChanged, isEnabled),
-            SizedBox(width: 8),
             _buildDropdownButton(hours, selectedHour, onHourChanged, isEnabled),
-            SizedBox(width: 8),
             _buildDropdownButton(
                 minutes, selectedMinute, onMinuteChanged, isEnabled),
           ],
@@ -590,19 +521,20 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
     );
   }
 
-  // Dropdown Button Builder
+// Dropdown Button Builder
   Widget _buildDropdownButton(List<String> items, String selectedValue,
       ValueChanged<String?> onChanged, bool isEnabled) {
-    return DropdownButton<String>(
-      value: selectedValue,
-      onChanged:
-          isEnabled ? onChanged : null, // Disable dropdown if not enabled
-      items: items.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
+    return Flexible(
+      child: DropdownButton<String>(
+        value: selectedValue,
+        onChanged: isEnabled ? onChanged : null,
+        items: items.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+      ),
     );
   }
 
