@@ -19,6 +19,9 @@ class EssayAssignmentSettings extends StatefulWidget {
 }
 
 class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
+  // Global key for the form
+  final _formKey = GlobalKey<FormState>();
+
   // Date selection variables for "Allow submissions from"
   String selectedDaySubmission = '01';
   String selectedMonthSubmission = 'January';
@@ -76,20 +79,20 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
     populateHeadersAndRows();
   }
 
-  // Fetch courses from the controller
+// Fetch courses from the controller
   Future<void> fetchCourses() async {
     try {
       List<Course> courseList = await MainController().getCourses();
       setState(() {
         courses = courseList;
-        if (courses.isNotEmpty) {
-          selectedCourse = courses.first.fullName;
-        } else {
-          selectedCourse = 'No courses available'; // Handle the empty case
-        }
+        // Don't auto-select any course here, leave it to the user to select.
+        selectedCourse = 'Select a course';
       });
     } catch (e) {
       debugPrint('Error fetching courses: $e');
+      setState(() {
+        selectedCourse = 'No courses available'; // Handle the empty case
+      });
     }
   }
 
@@ -134,7 +137,7 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
     setState(() {});
   }
 
-// Create and send assignment to Moodle
+  // Create and send assignment to Moodle
   Future<void> createAssignment(
       String token,
       String courseId,
@@ -202,35 +205,40 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
     }
   }
 
-  // Dropdown to display courses
+// Dropdown to display courses with "Select a course" as the default option
   DropdownButtonFormField<String> _buildCourseDropdown() {
     return DropdownButtonFormField<String>(
-      value: courses.isNotEmpty && selectedCourse != 'No courses available'
-          ? selectedCourse
-          : null,
+      value: selectedCourse == 'Select a course'
+          ? null
+          : selectedCourse, // Set initial value to null if 'Select a course'
       decoration: InputDecoration(
         labelText: 'Course name',
         border: OutlineInputBorder(),
       ),
+      validator: (value) {
+        if (value == null || value == 'Select a course') {
+          return 'Please select a course';
+        }
+        return null;
+      },
       onChanged: (String? newValue) {
         setState(() {
           selectedCourse = newValue!;
         });
         debugPrint('Selected course: $selectedCourse');
       },
-      items: courses.isNotEmpty
-          ? courses.map<DropdownMenuItem<String>>((Course course) {
-              return DropdownMenuItem<String>(
-                value: course.fullName,
-                child: Text(course.fullName),
-              );
-            }).toList()
-          : [
-              DropdownMenuItem<String>(
-                value: 'No courses available',
-                child: Text('No courses available'),
-              ),
-            ],
+      items: [
+        DropdownMenuItem<String>(
+          value: 'Select a course',
+          child: Text('Select a course'),
+        ),
+        ...courses.map<DropdownMenuItem<String>>((Course course) {
+          return DropdownMenuItem<String>(
+            value: course.fullName,
+            child: Text(course.fullName),
+          );
+        }).toList(),
+      ],
       isExpanded: true,
     );
   }
@@ -265,6 +273,27 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
     );
   }
 
+  // Function to validate if the availability date selections are not default values
+  bool _validateAvailabilityDates() {
+    if (selectedDaySubmission == '01' &&
+        selectedMonthSubmission == 'January' &&
+        selectedYearSubmission == '2024' &&
+        selectedHourSubmission == '00' &&
+        selectedMinuteSubmission == '00') {
+      return false; // If the default date for submission is selected, return false
+    }
+
+    if (selectedDayDue == '01' &&
+        selectedMonthDue == 'January' &&
+        selectedYearDue == '2024' &&
+        selectedHourDue == '00' &&
+        selectedMinuteDue == '00') {
+      return false; // If the default due date is selected, return false
+    }
+
+    return true; // If both dates have been customized, validation passes
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -276,216 +305,238 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(14.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 14.0),
-                child: Text(
-                  'Send Essay to Moodle',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
+        child: Form(
+          key: _formKey, // Assigning the global form key
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 14.0),
+                  child: Text(
+                    'Send Essay to Moodle',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            SectionTitle(title: 'General'),
-            _buildCourseDropdown(),
-            SizedBox(height: 12),
-            TextField(
-              controller: _assignmentNameController,
-              decoration: InputDecoration(
-                labelText: 'Assignment name',
-                border: OutlineInputBorder(),
+              SizedBox(height: 20),
+              SectionTitle(title: 'General'),
+              _buildCourseDropdown(),
+              SizedBox(height: 12),
+              TextFormField(
+                controller: _assignmentNameController,
+                decoration: InputDecoration(
+                  labelText: 'Assignment name',
+                  border: OutlineInputBorder(),
+                ),
+                // Adding validator to ensure assignment name is not empty
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter an assignment name';
+                  }
+                  return null;
+                },
               ),
-            ),
-            SizedBox(height: 12),
-            SectionTitle(title: 'Rubric'),
-            buildRubricTable(),
-            SizedBox(height: 20),
-            SectionTitle(title: 'Description'),
-            Container(
-              height: 250,
-              padding: EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(8.0),
+              SizedBox(height: 12),
+              SectionTitle(title: 'Rubric'),
+              buildRubricTable(),
+              SizedBox(height: 20),
+              SectionTitle(title: 'Description'),
+              Container(
+                height: 250,
+                padding: EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Column(
+                  children: [
+                    quill.QuillToolbar.simple(controller: _quillController),
+                    Expanded(
+                      child: quill.QuillEditor(
+                        controller: _quillController,
+                        scrollController: ScrollController(),
+                        focusNode: FocusNode(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              child: Column(
+              SizedBox(height: 20),
+              SectionTitle(title: 'Availability'),
+              SizedBox(height: 14),
+              Row(
                 children: [
-                  quill.QuillToolbar.simple(controller: _quillController),
+                  Checkbox(
+                    value: isSubmissionEnabled,
+                    onChanged: (value) {
+                      setState(() {
+                        isSubmissionEnabled = value!;
+                      });
+                    },
+                  ),
+                  Text('Enable'),
+                  SizedBox(width: 10),
                   Expanded(
-                    child: quill.QuillEditor(
-                      controller: _quillController,
-                      scrollController: ScrollController(),
-                      focusNode: FocusNode(),
+                    child: _buildDropdown(
+                      'Allow submissions from',
+                      selectedDaySubmission,
+                      selectedMonthSubmission,
+                      selectedYearSubmission,
+                      selectedHourSubmission,
+                      selectedMinuteSubmission,
+                      isSubmissionEnabled,
+                      (String? newValue) {
+                        setState(() {
+                          selectedDaySubmission = newValue!;
+                        });
+                      },
+                      (String? newValue) {
+                        setState(() {
+                          selectedMonthSubmission = newValue!;
+                        });
+                      },
+                      (String? newValue) {
+                        setState(() {
+                          selectedYearSubmission = newValue!;
+                        });
+                      },
+                      (String? newValue) {
+                        setState(() {
+                          selectedHourSubmission = newValue!;
+                        });
+                      },
+                      (String? newValue) {
+                        setState(() {
+                          selectedMinuteSubmission = newValue!;
+                        });
+                      },
                     ),
                   ),
                 ],
               ),
-            ),
-            SizedBox(height: 20),
-            SectionTitle(title: 'Availability'),
-            SizedBox(height: 14),
-            Row(
-              children: [
-                Checkbox(
-                  value: isSubmissionEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      isSubmissionEnabled = value!;
-                    });
-                  },
-                ),
-                Text('Enable'),
-                SizedBox(width: 10),
-                Expanded(
-                  child: _buildDropdown(
-                    'Allow submissions from',
-                    selectedDaySubmission,
-                    selectedMonthSubmission,
-                    selectedYearSubmission,
-                    selectedHourSubmission,
-                    selectedMinuteSubmission,
-                    isSubmissionEnabled,
-                    (String? newValue) {
+              SizedBox(height: 14),
+              Row(
+                children: [
+                  Checkbox(
+                    value: isDueDateEnabled,
+                    onChanged: (value) {
                       setState(() {
-                        selectedDaySubmission = newValue!;
-                      });
-                    },
-                    (String? newValue) {
-                      setState(() {
-                        selectedMonthSubmission = newValue!;
-                      });
-                    },
-                    (String? newValue) {
-                      setState(() {
-                        selectedYearSubmission = newValue!;
-                      });
-                    },
-                    (String? newValue) {
-                      setState(() {
-                        selectedHourSubmission = newValue!;
-                      });
-                    },
-                    (String? newValue) {
-                      setState(() {
-                        selectedMinuteSubmission = newValue!;
+                        isDueDateEnabled = value!;
                       });
                     },
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 14),
-            Row(
-              children: [
-                Checkbox(
-                  value: isDueDateEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      isDueDateEnabled = value!;
-                    });
-                  },
-                ),
-                Text('Enable'),
-                SizedBox(width: 10),
-                Expanded(
-                  child: _buildDropdown(
-                    'Due date',
-                    selectedDayDue,
-                    selectedMonthDue,
-                    selectedYearDue,
-                    selectedHourDue,
-                    selectedMinuteDue,
-                    isDueDateEnabled,
-                    (String? newValue) {
-                      setState(() {
-                        selectedDayDue = newValue!;
-                      });
-                    },
-                    (String? newValue) {
-                      setState(() {
-                        selectedMonthDue = newValue!;
-                      });
-                    },
-                    (String? newValue) {
-                      setState(() {
-                        selectedYearDue = newValue!;
-                      });
-                    },
-                    (String? newValue) {
-                      setState(() {
-                        selectedHourDue = newValue!;
-                      });
-                    },
-                    (String? newValue) {
-                      setState(() {
-                        selectedMinuteDue = newValue!;
-                      });
-                    },
+                  Text('Enable'),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: _buildDropdown(
+                      'Due date',
+                      selectedDayDue,
+                      selectedMonthDue,
+                      selectedYearDue,
+                      selectedHourDue,
+                      selectedMinuteDue,
+                      isDueDateEnabled,
+                      (String? newValue) {
+                        setState(() {
+                          selectedDayDue = newValue!;
+                        });
+                      },
+                      (String? newValue) {
+                        setState(() {
+                          selectedMonthDue = newValue!;
+                        });
+                      },
+                      (String? newValue) {
+                        setState(() {
+                          selectedYearDue = newValue!;
+                        });
+                      },
+                      (String? newValue) {
+                        setState(() {
+                          selectedHourDue = newValue!;
+                        });
+                      },
+                      (String? newValue) {
+                        setState(() {
+                          selectedMinuteDue = newValue!;
+                        });
+                      },
+                    ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 14),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    var userInfo = MoodleApiSingleton();
-                    String? token = userInfo.userToken;
+                ],
+              ),
+              SizedBox(height: 14),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      // Validate the form before submitting
+                      if (_formKey.currentState!.validate() &&
+                          _quillController.document
+                              .toPlainText()
+                              .trim()
+                              .isNotEmpty &&
+                          _validateAvailabilityDates()) {
+                        var userInfo = MoodleApiSingleton();
+                        String? token = userInfo.userToken;
 
-                    if (token != null && token.isNotEmpty) {
-                      String courseId = courses
-                          .firstWhere(
-                              (course) => course.fullName == selectedCourse)
-                          .id
-                          .toString();
-                      String assignmentName = _assignmentNameController.text;
-                      String description =
-                          _quillController.document.toPlainText();
-                      String dueDate =
-                          '$selectedDayDue $selectedMonthDue $selectedYearDue $selectedHourDue:$selectedMinuteDue';
-                      String allowSubmissionFrom =
-                          '$selectedDaySubmission $selectedMonthSubmission $selectedYearSubmission $selectedHourSubmission:$selectedMinuteSubmission';
+                        if (token != null && token.isNotEmpty) {
+                          String courseId = courses
+                              .firstWhere(
+                                  (course) => course.fullName == selectedCourse)
+                              .id
+                              .toString();
+                          String assignmentName =
+                              _assignmentNameController.text;
+                          String description =
+                              _quillController.document.toPlainText();
+                          String dueDate =
+                              '$selectedDayDue $selectedMonthDue $selectedYearDue $selectedHourDue:$selectedMinuteDue';
+                          String allowSubmissionFrom =
+                              '$selectedDaySubmission $selectedMonthSubmission $selectedYearSubmission $selectedHourSubmission:$selectedMinuteSubmission';
 
-                      await createAssignment(
-                        token,
-                        courseId,
-                        assignmentName,
-                        description,
-                        dueDate,
-                        allowSubmissionFrom,
+                          await createAssignment(
+                            token,
+                            courseId,
+                            assignmentName,
+                            description,
+                            dueDate,
+                            allowSubmissionFrom,
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text('Failed to retrieve user token.')));
+                        }
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(
+                                'Please fill out all fields and ensure a course, description, and valid availability dates are selected.')));
+                      }
+                    },
+                    child: Text('Send to Moodle'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => EssayEditPage(),
+                        ),
                       );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('Failed to retrieve user token.')));
-                    }
-                  },
-                  child: Text('Send to Moodle'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => EssayEditPage(),
-                      ),
-                    );
-                  },
-                  child: Text('Go Back to Edit Essay'),
-                ),
-              ],
-            ),
-          ],
+                    },
+                    child: Text('Go Back to Edit Essay'),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // Dropdown Builder for each section
   // Dropdown Builder for each section
   Widget _buildDropdown(
       String label,
@@ -521,7 +572,7 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
     );
   }
 
-// Dropdown Button Builder
+  // Dropdown Button Builder
   Widget _buildDropdownButton(List<String> items, String selectedValue,
       ValueChanged<String?> onChanged, bool isEnabled) {
     return Flexible(
