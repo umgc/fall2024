@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../Controller/beans.dart';
 import '../Api/moodle_api_singleton.dart';
+import 'dart:math';
 
 class SubmissionDetail extends StatefulWidget {
   final Participant participant;
@@ -175,7 +176,7 @@ class SubmissionDetailState extends State<SubmissionDetail> {
     );
   }
 
-// Interactive rubric table with both horizontal and vertical scrolling
+// Interactive rubric table with dynamic width expansion
 Widget buildInteractiveRubricTable() {
   if (rubric == null) return Container(); // No rubric, return an empty container
 
@@ -292,20 +293,28 @@ Widget buildInteractiveRubricTable() {
     );
   }
 
-  return SingleChildScrollView(
-    scrollDirection: Axis.vertical, // Enable vertical scrolling
-    child: ConstrainedBox(
-      constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal, // Enable horizontal scrolling
-        child: Table(
-          border: TableBorder.all(
-              color: Colors.black, width: 1.0), // Outer border for the table
-          defaultColumnWidth: IntrinsicColumnWidth(),
-          children: tableRows,
+  return LayoutBuilder(
+    builder: (BuildContext context, BoxConstraints constraints) {
+      // Set a minWidth (e.g., 600px), but make sure it's less than or equal to the available maxWidth
+      double minWidth = 800;
+      double tableWidth = max(minWidth, constraints.maxWidth);
+
+      return SingleChildScrollView(
+        scrollDirection: Axis.vertical, // Enable vertical scrolling
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal, // Enable horizontal scrolling
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: tableWidth), // Safely set minWidth
+            child: Table(
+              border: TableBorder.all(
+                  color: Colors.black, width: 1.0), // Outer border for the table
+              defaultColumnWidth: IntrinsicColumnWidth(),
+              children: tableRows,
+            ),
+          ),
         ),
-      ),
-    ),
+      );
+    },
   );
 }
 

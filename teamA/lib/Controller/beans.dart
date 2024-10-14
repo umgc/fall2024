@@ -502,13 +502,13 @@ class Participant {
 
 class MoodleRubric {
   final String title;
-  final List<Criterion> criteria;
+  final List<MoodleRubricCriteria> criteria;
 
   MoodleRubric({required this.title, required this.criteria});
 
   factory MoodleRubric.fromJson(Map<String, dynamic> json) {
     var criteriaList = (json['rubric_criteria'] as List)
-        .map((c) => Criterion.fromJson(c))
+        .map((c) => MoodleRubricCriteria.fromJson(c))
         .toList();
 
     return MoodleRubric(
@@ -518,19 +518,19 @@ class MoodleRubric {
   }
 }
 
-class Criterion {
+class MoodleRubricCriteria {
   final int id;
   final String description;
   final List<Level> levels;
 
-  Criterion({required this.id, required this.description, required this.levels});
+  MoodleRubricCriteria({required this.id, required this.description, required this.levels});
 
-  factory Criterion.fromJson(Map<String, dynamic> json) {
+  factory MoodleRubricCriteria.fromJson(Map<String, dynamic> json) {
     var levelsList = (json['levels'] as List)
         .map((l) => Level.fromJson(l))
         .toList();
 
-    return Criterion(
+    return MoodleRubricCriteria(
       id: json['id'] ?? 0,
       description: json['description'] ?? '',
       levels: levelsList,
