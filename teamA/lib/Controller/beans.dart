@@ -270,12 +270,9 @@ class Question {
     return question;
   }
 
-
-// Question copyWith({
-//    String? name
-//   }){
-//      return Question(name: name ?? this.name, type: type, questionText: questionText, isFavorite: isFavorite ?? isFavorite,);
-//  }
+  set setName(String newname) {
+    name = newname;
+  }
 
   @override
   String toString() {
@@ -369,7 +366,9 @@ class AssignmentForm {
   String gradeLevel;
   int maximumGrade;
   int? assignmentCount;
-  int questionCount;
+  int trueFalseCount;
+  int shortAnswerCount;
+  int multipleChoiceCount;
   String? codingLanguage;
   String title;
 
@@ -379,7 +378,9 @@ class AssignmentForm {
       required this.topic,
       required this.gradeLevel,
       required this.title,
-      required this.questionCount,
+      required this.trueFalseCount,
+      required this.shortAnswerCount,
+      required this.multipleChoiceCount,
       required this.maximumGrade,
       this.assignmentCount,
       this.gradingCriteria,
@@ -396,5 +397,352 @@ class FileNameAndBytes {
   @override
   String toString() {
     return "$filename: ${bytes.lengthInBytes} bytes";
+  }
+}
+
+class Assignment {
+  final int id;
+  final String name;
+  final String description;
+  final DateTime? dueDate;
+  final DateTime? allowsubmissionsfromdate;
+  final DateTime? cutoffDate;
+  final bool isDraft;
+  final int maxAttempts;
+  final int gradingStatus; // Can use an enum to represent status like "graded", "notgraded"
+  final int courseId;
+
+  final List<SubmissionWithGrade>? submissionsWithGrades;
+
+  Assignment({
+    required this.id,
+    required this.name,
+    required this.description,
+    this.dueDate,
+    this.allowsubmissionsfromdate,
+    this.cutoffDate,
+    required this.isDraft,
+    required this.maxAttempts,
+    required this.gradingStatus,
+    required this.courseId,
+    this.submissionsWithGrades,
+  });
+
+  // Factory method to create an Assignment object from a JSON response
+  factory Assignment.fromJson(Map<String, dynamic> json) {
+    return Assignment(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? 'Untitled',
+      description: json['description'] ?? '',
+      dueDate: json['duedate'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['duedate'] * 1000)
+          : null,
+      allowsubmissionsfromdate: json['allowsubmissionsfromdate'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['allowsubmissionsfromdate'] * 1000)
+          : null,
+      cutoffDate: json['cutoffdate'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['cutoffdate'] * 1000)
+          : null,
+      isDraft: json['submissiondrafts'] == 1, // boolean conversion
+      maxAttempts: json['maxattempts'] ?? 0,
+      gradingStatus: json['gradingstatus'] ?? 0,
+      courseId: json['course'] ?? 0,
+
+    );
+  }
+
+  // Convert the Assignment object back to JSON (useful for POST requests or local storage)
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'duedate': dueDate?.millisecondsSinceEpoch,
+      'allowsubmissionsfromdate': allowsubmissionsfromdate?.millisecondsSinceEpoch,
+      'cutoffdate': cutoffDate?.millisecondsSinceEpoch,
+      'submissiondrafts': isDraft ? 1 : 0,
+      'maxattempts': maxAttempts,
+      'gradingstatus': gradingStatus,
+      'course': courseId,
+
+    };
+  }
+}
+
+class Submission {
+  final int id;
+  final int userid;
+  final String status;
+  final DateTime submissionTime;
+  final DateTime? modificationTime;
+  final int attemptNumber;
+  final int groupId;
+  final String gradingStatus;
+  final String onlineText;
+  final String comments;
+  final int assignmentId; // Added field
+
+  Submission({
+    required this.id,
+    required this.userid,
+    required this.status,
+    required this.submissionTime,
+    this.modificationTime,
+    required this.attemptNumber,
+    required this.groupId,
+    required this.gradingStatus,
+    required this.onlineText,
+    required this.comments,
+    required this.assignmentId,
+  });
+
+  factory Submission.fromJson(Map<String, dynamic> json) {
+    String onlineText = '';
+    String comments = '';
+
+    // Debug: Print entire submission JSON
+    // ignore: avoid_print
+    print('Processing submission: ${json.toString()}');
+    int assignmentId = json['assignmentid'] ?? 0;
+     Map<String, dynamic> submission = json['submission'] ?? {};
+
+    if (submission['plugins'] != null && submission['plugins'] is List) {
+      for (var plugin in submission['plugins']) {
+        // Extract 'onlineText'
+        if (plugin['type'] != null &&
+            plugin['type'].toString().toLowerCase() == 'onlinetext') {
+          var editorFields = plugin['editorfields'];
+          if (editorFields != null &&
+              editorFields is List &&
+              editorFields.isNotEmpty) {
+            for (var field in editorFields) {
+              if (field['name'] != null &&
+                  field['name'].toString().toLowerCase() == 'onlinetext') {
+                onlineText = field['text'] ?? '';
+                print('Extracted onlineText: $onlineText');
+                break; // Exit loop once the correct field is found
+              }
+            }
+          }
+        }
+
+        // Extract 'comments'
+        if (plugin['type'] != null &&
+            plugin['type'].toString().toLowerCase() == 'comments') {
+          var editorFields = plugin['editorfields'];
+          if (editorFields != null &&
+              editorFields is List &&
+              editorFields.isNotEmpty) {
+            for (var field in editorFields) {
+              if (field['name'] != null &&
+                  field['name'].toString().toLowerCase() == 'comments') {
+                comments = field['text'] ?? '';
+                print('Extracted comments: $comments');
+                break; // Exit loop once the correct field is found
+              }
+            }
+          }
+        }
+      }
+    } else {
+      print('No plugins found in submission.');
+    }
+
+    return Submission(
+      id: submission['id'] ?? 0,
+      userid: submission['userid'] ?? 0,
+      status: submission['status'] ?? '',
+      submissionTime: submission['timecreated'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(submission['timecreated'] * 1000)
+          : DateTime.fromMillisecondsSinceEpoch(0),
+      modificationTime: submission['timemodified'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(submission['timemodified'] * 1000)
+          : null,
+      attemptNumber: submission['attemptnumber'] ?? 0,
+      groupId: submission['groupid'] ?? 0,
+      gradingStatus: submission['gradingstatus'] ?? '',
+      onlineText: onlineText,
+      comments: comments,
+      assignmentId: assignmentId
+    );
+  }
+}
+
+class Participant {
+  final int id;
+  final String username;
+  final String fullname;
+  final List<String> roles;
+
+  Participant({
+    required this.id,
+    required this.username,
+    required this.fullname,
+    required this.roles,
+  });
+
+  // Factory constructor for creating a new Participant instance from a JSON map
+  factory Participant.fromJson(Map<String, dynamic> json) {
+    // Convert roles if they exist, and map them from the 'roles' field in the JSON
+    List<String> rolesList = [];
+    if (json['roles'] != null) {
+      rolesList = (json['roles'] as List<dynamic>)
+          .map((role) => role['shortname'] as String)
+          .toList();
+    }
+
+    return Participant(
+      id: json['id'] as int,
+      username: json['username'] as String,
+      fullname: json['fullname'] as String,
+      roles: rolesList,
+    );
+  }
+}
+
+class Rubric {
+  final String title;
+  final List<Criterion> criteria;
+
+  Rubric({required this.title, required this.criteria});
+
+  factory Rubric.fromJson(Map<String, dynamic> json) {
+    var criteriaList = (json['rubric_criteria'] as List)
+        .map((c) => Criterion.fromJson(c))
+        .toList();
+
+    return Rubric(
+      title: json['criteria_title'] ?? 'Rubric',
+      criteria: criteriaList,
+    );
+  }
+}
+
+class Criterion {
+  final String description;
+  final List<Level> levels;
+
+  Criterion({required this.description, required this.levels});
+
+  factory Criterion.fromJson(Map<String, dynamic> json) {
+    var levelsList = (json['levels'] as List)
+        .map((l) => Level.fromJson(l))
+        .toList();
+
+    return Criterion(
+      description: json['description'] ?? '',
+      levels: levelsList,
+    );
+  }
+}
+
+class Level {
+  final String description;
+  final int score;
+
+  Level({required this.description, required this.score});
+
+  factory Level.fromJson(Map<String, dynamic> json) {
+    return Level(
+      description: json['definition'] ?? '',
+      score: json['score'] ?? 0,
+    );
+  }
+}
+
+class Grade {
+  final int id;
+  final int userid;
+  final double grade;  // Convert from string in the JSON
+  final int grader;
+  final DateTime timecreated;
+  final DateTime timemodified;
+
+  Grade({
+    required this.id,
+    required this.userid,
+    required this.grade,
+    required this.grader,
+    required this.timecreated,
+    required this.timemodified,
+  });
+
+  // Parse grade JSON
+  factory Grade.fromJson(Map<String, dynamic> json) {
+    return Grade(
+      id: json['id'] ?? 0,
+      userid: json['userid'] ?? 0,
+      // Parsing the grade as a double from a string
+      grade: json['grade'] != null ? double.parse(json['grade']) : 0.0,
+      grader: json['grader'] ?? 0,
+      timecreated: DateTime.fromMillisecondsSinceEpoch(json['timecreated'] * 1000),
+      timemodified: DateTime.fromMillisecondsSinceEpoch(json['timemodified'] * 1000),
+    );
+  }
+}
+
+class SubmissionWithGrade {
+  final Submission submission;
+  final Grade? grade;
+
+  SubmissionWithGrade({
+    required this.submission,
+    this.grade,
+  });
+}
+
+class SubmissionStatus {
+  final int assignmentId;
+  final int userId;
+  final String status;
+  final DateTime? timeSubmitted;
+  final DateTime? timeGraded;
+  final double? grade;
+  final bool needsGrading;
+
+  SubmissionStatus({
+    required this.assignmentId,
+    required this.userId,
+    required this.status,
+    this.timeSubmitted,
+    this.timeGraded,
+    this.grade,
+    required this.needsGrading,
+  });
+
+  // Factory method to create a SubmissionStatus object from a JSON response
+  factory SubmissionStatus.fromJson(Map<String, dynamic> json) {
+    return SubmissionStatus(
+      assignmentId: json['assignid'] ?? 0,
+      userId: json['userid'] ?? 0,
+      status: json['lastattempt']['submission']['status'] ?? 'unknown',
+      timeSubmitted: json['lastattempt']['submission']['timemodified'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              json['lastattempt']['submission']['timemodified'] * 1000)
+          : null,
+      timeGraded: json['lastattempt']['grades'] != null &&
+              json['lastattempt']['grades']['grade'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              json['lastattempt']['grades']['timemodified'] * 1000)
+          : null,
+      grade: json['lastattempt']['grades'] != null &&
+              json['lastattempt']['grades']['grade'] != null
+          ? double.tryParse(json['lastattempt']['grades']['grade'].toString())
+          : null,
+      needsGrading: json['lastattempt']['gradingstatus'] == 'notgraded',
+    );
+  }
+
+  // Convert the SubmissionStatus object back to JSON if necessary
+  Map<String, dynamic> toJson() {
+    return {
+      'assignid': assignmentId,
+      'userid': userId,
+      'status': status,
+      'timemodified': timeSubmitted?.millisecondsSinceEpoch,
+      'timegraded': timeGraded?.millisecondsSinceEpoch,
+      'grade': grade,
+      'needsgrading': needsGrading,
+    };
   }
 }
