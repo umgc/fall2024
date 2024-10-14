@@ -87,7 +87,9 @@ class _DevLaunch extends State {
           ElevatedButton(
               child: const Text('Open Contents Carousel'),
               onPressed: () async {
-                MainController().selectCourse(0);
+                if (MoodleApiSingleton().isLoggedIn()){
+                  MainController().selectCourse(0);
+                }
                 Navigator.push(
                   context,
                   MaterialPageRoute(
