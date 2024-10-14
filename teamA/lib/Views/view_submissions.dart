@@ -19,7 +19,6 @@ class SubmissionList extends StatefulWidget {
 class SubmissionListState extends State<SubmissionList> {
   MoodleApiSingleton api = MoodleApiSingleton();
 
-  // Updated to fetch submissions with grades
   late Future<List<SubmissionWithGrade>> futureSubmissionsWithGrades =
       api.getSubmissionsWithGrades(widget.assignmentId);
   late Future<List<Participant>> futureParticipants =
@@ -36,11 +35,6 @@ class SubmissionListState extends State<SubmissionList> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text("View Submissions"),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-          ),
-        ],
       ),
       body: FutureBuilder<List<SubmissionWithGrade>>(
         future: futureSubmissionsWithGrades,
@@ -72,149 +66,138 @@ class SubmissionListState extends State<SubmissionList> {
                       submissionSnapshot.data!;
                   List<Participant> participants = participantSnapshot.data!;
 
-                  // Calculate childAspectRatio based on screen width and height
-                  double screenWidth = MediaQuery.of(context).size.width;
-                  double cardWidth = (screenWidth / 2) -
-                      16; // 2 columns, with horizontal padding
-                  double cardHeight =
-                      250; // Adjust this based on how tall you want each card to be
-                  double childAspectRatio = cardWidth / cardHeight;
+                  return SingleChildScrollView(
+                    child: Wrap(
+                      spacing: 8.0,
+                      runSpacing: 8.0,
+                      alignment: WrapAlignment.center,
+                      children: submissionsWithGrades.map((submissionWithGrade) {
+                        Submission submission = submissionWithGrade.submission;
+                        Grade? grade = submissionWithGrade.grade;
 
-                  return GridView.builder(
-                    itemCount: submissionsWithGrades.length,
-                    itemBuilder: (context, index) {
-                      Submission submission =
-                          submissionsWithGrades[index].submission;
-                      Grade? grade = submissionsWithGrades[index].grade;
+                        // Find the corresponding participant for this submission
+                        Participant? participant = participants.firstWhere(
+                          (p) => p.id == submission.userid,
+                          orElse: () => Participant(
+                              id: submission.userid,
+                              username: 'Unknown',
+                              fullname: 'Unknown',
+                              roles: []),
+                        );
 
-                      // Find the corresponding participant for this submission
-                      Participant? participant = participants.firstWhere(
-                        (p) => p.id == submission.userid,
-                        orElse: () => Participant(
-                            id: submission.userid,
-                            username: 'Unknown',
-                            fullname: 'Unknown',
-                            roles: []),
-                      );
-
-                      return Card(
-                        margin:
-                            EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primaryContainer,
-                            child: Text(
-                              participant.fullname
-                                  .substring(0, 1)
-                                  .toUpperCase(),
-                              style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer,
-                              ),
-                            ),
-                          ),
-                          title: Text(
-                              'Name: ${participant.fullname}'), // Display the full name
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Grade Status: ${submission.gradingStatus}'),
-                              Text('Status: ${submission.status}'),
-                              Text(
-                                  'Submitted on: ${submission.submissionTime.toLocal()}'),
-                              Text(
-                                'Grade: ${grade != null ? grade.grade.toString() : "Not graded yet"}', // Display the grade
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                'Content: ${submission.onlineText.isNotEmpty ? "Available" : "No content provided."}',
-                                style: TextStyle(
-                                  fontStyle: submission.onlineText.isNotEmpty
-                                      ? FontStyle.normal
-                                      : FontStyle.italic,
+                        return SizedBox(
+                          width: MediaQuery.of(context).size.width < 450 ? double.infinity : 450,
+                          child: Card(
+                            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primaryContainer,
+                                child: Text(
+                                  participant.fullname
+                                      .substring(0, 1)
+                                      .toUpperCase(),
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer,
+                                  ),
                                 ),
                               ),
-                              SizedBox(height: 4),
-                              Text(
-                                'Comments: ${submission.comments.isNotEmpty ? "Available" : "No comments."}',
-                                style: TextStyle(
-                                  fontStyle: submission.comments.isNotEmpty
-                                      ? FontStyle.normal
-                                      : FontStyle.italic,
-                                ),
-                              ),
-                              SizedBox(
-                                  height: 8), // Add spacing before the button
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
+                              title: Text(
+                                  participant.fullname), // Display the full name
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  if (submission.gradingStatus == 'notgraded')
-                                    ElevatedButton(
-                                      onPressed: () async {
-                                        // Logic to open grading page or perform grading action
-                                        // will need to send onlinetext and rubric to the prompt engine.
-
-                                        var submissionText =
-                                            submission.onlineText;
-                                        // Fetch context ID
-                                        int? contextId =
-                                            await MoodleApiSingleton()
-                                                .getContextId(
-                                                    widget.assignmentId,
-                                                    widget.courseId);
-                                        if (contextId != null) {
-                                          var fetchedRubric =
-                                              await MoodleApiSingleton()
-                                                  .getRubric(widget.assignmentId
-                                                      .toString());
-                                        }
-                                        // Call the grader function and return the grade.
-                                      },
-                                      child: Text('Grade'), // Button label
+                                  Text('Grade Status: ${submission.gradingStatus}'),
+                                  Text('Status: ${submission.status}'),
+                                  Text(
+                                      'Submitted on: ${submission.submissionTime.toLocal()}'),
+                                  Text(
+                                    'Grade: ${grade != null ? grade.grade.toString() : "Not graded yet"}',
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Content: ${submission.onlineText.isNotEmpty ? "Available" : "No content provided."}',
+                                    style: TextStyle(
+                                      fontStyle: submission.onlineText.isNotEmpty
+                                          ? FontStyle.normal
+                                          : FontStyle.italic,
                                     ),
-                                  SizedBox(width: 8), // Space between buttons
-                                  if (submission.gradingStatus == 'graded')
-                                    ElevatedButton(
-                                      onPressed: () async {
-                                        var tempvar = await api.getSubmissionStatus(widget.assignmentId, participant.id);
-                                      },
-                                      child: Text(
-                                          'Send Grade to Moodle'), // Button label
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Comments: ${submission.comments.isNotEmpty ? "Available" : "No comments."}',
+                                    style: TextStyle(
+                                      fontStyle: submission.comments.isNotEmpty
+                                          ? FontStyle.normal
+                                          : FontStyle.italic,
                                     ),
-                                  SizedBox(width: 8), //
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      // Navigate to the SubmissionDetail screen with rubric data
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              SubmissionDetail(
-                                            submission: submission,
-                                            assignmentId: widget.assignmentId,
-                                            courseId: widget.courseId,
-                                          ),
+                                  ),
+                                  // SizedBox(height: 8), // Add spacing before the button
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      if (submission.gradingStatus ==
+                                          'notgraded')
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            var submissionText =
+                                                submission.onlineText;
+                                            int? contextId =
+                                                await MoodleApiSingleton()
+                                                    .getContextId(
+                                                        widget.assignmentId,
+                                                        widget.courseId);
+                                            if (contextId != null) {
+                                              var fetchedRubric =
+                                                  await MoodleApiSingleton()
+                                                      .getRubric(widget
+                                                          .assignmentId
+                                                          .toString());
+                                            }
+                                          },
+                                          child: Text('Grade'),
                                         ),
-                                      );
-                                    },
-                                    child: Text('View Details'), // Button label
+                                      // SizedBox(width: 8),
+                                      // if (submission.gradingStatus == 'graded')
+                                      //   ElevatedButton(
+                                      //     onPressed: () async {
+                                      //       var tempvar = await api
+                                      //           .getSubmissionStatus(
+                                      //               widget.assignmentId,
+                                      //               participant.id);
+                                      //     },
+                                      //     child: Text(
+                                      //         'Grade'),
+                                      //   ),
+                                      SizedBox(width: 8),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  SubmissionDetail(
+                                                submission: submission,
+                                                assignmentId:
+                                                    widget.assignmentId,
+                                                courseId: widget.courseId,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Text('View Details'),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
+                              isThreeLine: true,
+                            ),
                           ),
-                          isThreeLine: true,
-                        ),
-                      );
-                    },
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount:
-                          2, // Adjust the number of columns as needed
-                      mainAxisSpacing: 10.0,
-                      crossAxisSpacing: 10.0,
-                      childAspectRatio: childAspectRatio,
+                        );
+                      }).toList(),
                     ),
                   );
                 }
