@@ -272,6 +272,7 @@ class MoodleApiSingleton {
   // Add random questions to the specified quiz using learninglens plugin.
   // ********************************************************************************************************************
 
+
   Future<String> addRandomQuestions(String categoryid, String quizid, String numquestions) async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
     final response = await http.post(
@@ -376,7 +377,8 @@ class MoodleApiSingleton {
   // Create a new assignment with optional rubric JSON in the specified course using learninglens plugin.
   // ********************************************************************************************************************
 
-  Future<Map<String, dynamic>?> createAssignnment(
+
+  Future<Map<String, dynamic>?> createAssignment(
       String courseid,
       String sectionid,
       String assignmentName,
