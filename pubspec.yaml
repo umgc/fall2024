@@ -7,10 +7,6 @@ version: 0.0.1+1
 
 environment:
   sdk: ^3.1.1
-
-dependencies:
-  flutter:
-    sdk: flutter
     
   editable: 2.0.0
   flutter_dotenv: ^5.1.0
@@ -28,6 +24,4 @@ dev_dependencies:
   flutter_lints: ^2.0.0
 
 flutter:
-  uses-material-design: true
-
-  
+  uses-material-design: true 

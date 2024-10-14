@@ -82,7 +82,6 @@ class MoodleApiSingleton {
   // ********************************************************************************************************************
   // Get list of courses the user is enrolled in.
   // ********************************************************************************************************************
-// original code by scott
 
   Future<List<Course>> getCourses() async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
@@ -118,44 +117,6 @@ class MoodleApiSingleton {
     return courses;
   }
 
-/*
-// code modified by safia
-  Future<List<Course>> getCourses() async {
-    if (_userToken == null) throw StateError('User not logged in to Moodle');
-
-    final response = await http.post(
-      Uri.parse(moodleURL + serverUrl),
-      body: {
-        'wstoken': _userToken,
-        'wsfunction':
-            'core_course_get_enrolled_courses_by_timeline_classification',
-        'classification': 'all', // Fetch all courses
-        'moodlewsrestformat': 'json',
-      },
-    );
-
-    if (response.statusCode != 200) {
-      throw HttpException(response.body);
-    }
-
-    var decodedJson = jsonDecode(response.body);
-
-    // Check if the response is a list or a map containing a list
-    List<Course> courses;
-    if (decodedJson is List) {
-      // If the response is directly a list
-      courses = decodedJson.map((i) => Course.fromJson(i)).toList();
-    } else if (decodedJson is Map<String, dynamic>) {
-      // If the response is a map containing a list of courses
-      var courseList = decodedJson['courses'] as List<dynamic>;
-      courses = courseList.map((i) => Course.fromJson(i)).toList();
-    } else {
-      throw StateError('Unexpected response format');
-    }
-
-    return courses;
-  }
-*/
   // ********************************************************************************************************************
   // Get list of assignments for a course. Throws HttpException if request fails.
   // ********************************************************************************************************************
