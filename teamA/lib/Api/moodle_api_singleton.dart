@@ -475,7 +475,7 @@ Future<SubmissionStatus?> getSubmissionStatus(int assignmentId, int userId) asyn
   // Get rubric for an assignment.
   // ********************************************************************************************************************
 
-  Future<Rubric?> getRubric(String assignmentid) async {
+  Future<MoodleRubric?> getRubric(String assignmentid) async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
     final response = await http.post(
       Uri.parse(moodleURL + serverUrl),
@@ -493,7 +493,7 @@ Future<SubmissionStatus?> getSubmissionStatus(int assignmentId, int userId) asyn
           responseData.first is Map<String, dynamic>) {
         Map<String, dynamic> rubricData = responseData.first;
         print('Response: $responseData');
-        return Rubric.fromJson(rubricData);
+        return MoodleRubric.fromJson(rubricData);
       }
     } else {
       print('Request failed with status: ${response.statusCode}.');
