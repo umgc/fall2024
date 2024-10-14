@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import '/Controller/main_controller.dart';
 import '../content_carousel.dart';
+
 
 //What we need:
 //Two carousels, one for essays and the other for assessments.
@@ -10,21 +12,16 @@ import '../content_carousel.dart';
 
 //Main Page
 class ViewCourseContents extends StatefulWidget {
-  //todo: figure out how to do the super.key and define a internal var
-  final String courseName;
-  //also: vertical scroll
-  ViewCourseContents(this.courseName);
+  ViewCourseContents();
 
   @override
   State createState(){
-    return _CourseState(courseName);
+    return _CourseState();
   }
 }
 
 class _CourseState extends State{
-  final String courseName;
-
-  _CourseState(this.courseName);
+  final String courseName = MainController().getSelectedCourse()?.fullName ?? "Test Course";
 
   @override
   Widget build(BuildContext context){
@@ -36,15 +33,15 @@ class _CourseState extends State{
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Text(courseName, style: TextStyle(fontSize: 64),),
-              ContentCarousel('assessment'),
-              ContentCarousel('essay'),
+              ContentCarousel('assessment', MainController().quizzes),
+              ContentCarousel('essay', MainController().essays),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [CreateButton('assessment'), CreateButton('essay')]
               )
             ],
+          )
         )
-      )
     );
   }
 }

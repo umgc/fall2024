@@ -25,5 +25,11 @@ doc/api/
 
 .flutter-plugins
 .flutter-plugins-dependencies
-.vs/*
 .vscode/
+.vs*
+*/ios/
+linux/
+macos/
+web/
+windows/
+Flutter/

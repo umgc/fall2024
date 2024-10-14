@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import "Controller/beans.dart";
 
 //Provides a carousel of either assessments, essays, or submission
 class ContentCarousel extends StatefulWidget{
   final String type;
+  final List? children;
 
-  ContentCarousel(this.type);
+  ContentCarousel(this.type, this.children);
 
   @override
   State<ContentCarousel> createState() {
-    return _ContentState(type);
+    return _ContentState(type, children);
   }
 }
 
@@ -24,14 +26,13 @@ class _ContentState extends State<ContentCarousel>{
     children = _children;
   }
   
-  factory _ContentState(String type) {
+  factory _ContentState(String type, List? input) {
     //generate the full list of cards
-    //todo: do this via the Moodle API
     if (type == "assessment"){
-      return _ContentState._(type, [CarouselCard('Real Test','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test 2','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test3','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test4','Test Information\nWould Go\nHere','assessment'), CarouselCard('Real Test5','Test Information\nWould Go\nHere','assessment')]);
+      return _ContentState._(type, CarouselCard.fromQuizzes(input) ?? [Text('This course has no generated quizzes.')]);
     }
     else if (type == 'essay'){
-      return _ContentState._(type, [CarouselCard('Real Essay','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test 2','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test3','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test4','Test Information\nWould Go\nHere','essay'), CarouselCard('Real Test5','Test Information\nWould Go\nHere','essay')]);
+      return _ContentState._(type, CarouselCard.fromEssays(input) ?? [Text('This course has no generated essays.')]);
     }
     //todo: add submission type
     else {
@@ -43,7 +44,6 @@ class _ContentState extends State<ContentCarousel>{
 
   @override
   Widget build(BuildContext context){
-    
     return ConstrainedBox(
       constraints: BoxConstraints(maxHeight: 400), //testing width
       child: CarouselView(
@@ -66,6 +66,40 @@ class CarouselCard extends StatelessWidget{
   final String type;
 
   CarouselCard(this.title, this.information, this.type);
+
+  static CarouselCard fromQuiz(Quiz input){
+    return CarouselCard(input.name ?? "Unnamed Quiz", input.description ?? '', 'assessment');
+  }
+
+  static List<CarouselCard>? fromQuizzes(List? input){
+    if (input == null){
+      return null;
+    }
+    List<CarouselCard> output = [];
+    for (Object c in input){
+      if (c is Quiz){
+        output.insert(output.length, fromQuiz(c));
+      }
+    }
+    return output;
+  }
+
+  static CarouselCard fromEssay(Essay input){
+    return CarouselCard(input.name ?? "Unnamed Essay", input.description ?? '', 'essay');
+  }
+
+  static List<CarouselCard>? fromEssays(List? input){
+    if (input == null){
+      return null;
+    }
+    List<CarouselCard> output = [];
+    for (Object c in input){
+      if (c is Essay){
+        output.insert(output.length, fromEssay(c));
+      }
+    }
+    return output;
+  }
 
   @override
   StatelessWidget build(BuildContext context){

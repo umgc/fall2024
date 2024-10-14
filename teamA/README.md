@@ -1,4 +1,4 @@
-# namer_app
+#learninglens_app
 
 A new Flutter project.
 

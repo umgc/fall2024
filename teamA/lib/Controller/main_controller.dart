@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import '../Api/moodle_api_singleton.dart';
-import 'package:namer_app/Controller/beans.dart';
 import '../Api/llm_api.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../Controller/beans.dart';
 
 class MainController 
 {
@@ -18,13 +18,17 @@ class MainController
   static bool isLoggedIn = false;
   final llm = LlmApi(dotenv.env['PERPLEXITY_API_KEY']!);
   final ValueNotifier<bool> isUserLoggedInNotifier = ValueNotifier(false);
+  List<Course> courses = [];
+  Course? selectedCourse;
+  List<Quiz>? quizzes;
+  List<Essay>? essays;
 
-  Future<bool> loginToMoodle(String username, String password) async 
+  Future<bool> loginToMoodle(String username, String password, String moodleURL) async
   {
     var moodleApi = MoodleApiSingleton();
     try 
     {
-      await moodleApi.login(username, password);
+      await moodleApi.login(username, password, moodleURL);
       isLoggedIn = true;
       return true;
     } catch (e) 
@@ -45,26 +49,49 @@ class MainController
     isLoggedIn = false;
   }
 
-  Future<List<Course>> getCourses() async 
+  Future<bool> updateCourses() async 
   {
     var moodleApi = MoodleApiSingleton();
     try {
-      List<Course> courses = await moodleApi.getCourses();
+      // courses = await moodleApi.getCourses();
+      courses = await moodleApi.getUserCourses();
       if (courses.isNotEmpty) {
         courses.removeAt(
             0); // first course is always "Moodle" - no need to show it
       }
-      return courses;
+      return true;
     } catch (e) {
       if (kDebugMode) {
         print(e);
       }
-      return [];
+      courses = [];
+      return false;
     }
   }
 
   Future<bool> isUserLoggedIn() async 
   {
     return isLoggedIn;
+  }
+
+  Future<bool> selectCourse(int index) async{
+    if (index < courses.length){
+      selectedCourse = courses[index];
+    }
+    setQuizzes();
+    setEssays();
+    return true;
+  }
+
+  Course? getSelectedCourse(){
+    return selectedCourse;
+  }
+
+  void setQuizzes() async{
+    quizzes = await MoodleApiSingleton().getQuizzes(selectedCourse?.id);
+  }
+
+  void setEssays() async{
+    essays = await MoodleApiSingleton().getEssays(selectedCourse?.id);
   }
 }

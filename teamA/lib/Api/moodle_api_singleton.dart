@@ -10,14 +10,12 @@ class MoodleApiSingleton {
   static const serverUrl = '/webservice/rest/server.php';
   static const jsonFormat = '&moodlewsrestformat=json';
   static const errorKey = 'error';
-  static const baseUrl = 'https://www.swen670moodle.site';
 
   // The singleton instance.
   static final MoodleApiSingleton _instance = MoodleApiSingleton._internal();
 
   // User token is stored here.
   String? _userToken;
-
   // User info
   String moodleURL = '';
   String? moodleUserName;
@@ -42,9 +40,9 @@ class MoodleApiSingleton {
   }
 
   // Log in to Moodle and retrieve the user token. Throws HttpException if login failed.
-  Future<void> login(String username, String password) async {
+  Future<void> login(String username, String password, String baseURL) async {
     final response = await http.get(Uri.parse(
-        '$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app'));
+        '$baseURL/login/token.php?username=$username&password=$password&service=moodle_mobile_app'));
     Map<String, dynamic> data = jsonDecode(response.body);
     if (response.statusCode != 200) {
       throw HttpException(response.body);
@@ -52,11 +50,11 @@ class MoodleApiSingleton {
       throw HttpException(data[errorKey]);
     }
     _userToken = data['token'];
-    moodleURL = baseUrl;
+    moodleURL = baseURL;
 
     //get user info
     final userinforesponse =
-        await http.post(Uri.parse(baseUrl + serverUrl), 
+        await http.post(Uri.parse(baseURL + serverUrl), 
         body: {
       'wstoken': _userToken,
       'wsfunction': 'core_webservice_get_site_info',
@@ -65,7 +63,7 @@ class MoodleApiSingleton {
     if (userinforesponse.statusCode != 200) {
       throw HttpException(userinforesponse.body);
     }
-    moodleCourses = await getCourses();
+    moodleCourses = await getUserCourses();
     Map<String, dynamic> userData = jsonDecode(userinforesponse.body);
     moodleUserName = userData['username'];
     moodleFirstName = userData['firstname'];
@@ -81,41 +79,24 @@ class MoodleApiSingleton {
     _userToken = null;
   }
 
-  // ********************************************************************************************************************
-  // Get list of courses the user is enrolled in.
-  // ********************************************************************************************************************
-
+  // Get list of courses.
   Future<List<Course>> getCourses() async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
-    // var moodleURL = MoodleApiSingleton().moodleURL;
-    final response = await http.post(
-        Uri.parse(moodleURL + serverUrl
-            // '$moodleURL$serverUrl$_userToken$jsonFormat&wsfunction=core_course_get_enrolled_courses_by_timeline_classification&classification=inprogress'
+
+    final response = await http.post(Uri.parse(moodleURL + serverUrl
             ),
         body: {
           'wstoken': _userToken,
-          'wsfunction':
-              'core_course_get_enrolled_courses_by_timeline_classification',
-          'classification': 'inprogress',
+          'wsfunction':'core_course_get_courses',
           'moodlewsrestformat': 'json',
         });
+
+        // '$moodleURL$serverUrl&wstoken=$_userToken$jsonFormat&wsfunction=core_course_get_courses'
+    // ));
     if (response.statusCode != 200) {
       throw HttpException(response.body);
     }
-
-    var decodedJson = jsonDecode(response.body);
-    // Check if the response is a list or a map containing a list
-    List<Course> courses;
-    if (decodedJson is List) {
-      // If the response is directly a list
-      courses = decodedJson.map((i) => Course.fromJson(i)).toList();
-    } else if (decodedJson is Map<String, dynamic>) {
-      // If the response is a map containing a list of courses
-      var courseList = decodedJson['courses'] as List<dynamic>;
-      courses = courseList.map((i) => Course.fromJson(i)).toList();
-    } else {
-      throw StateError('Unexpected response format');
-    }
+    List<Course> courses = (jsonDecode(response.body) as List).map((i) => Course.fromJson(i)).toList();
     return courses;
   }
 
@@ -181,7 +162,7 @@ class MoodleApiSingleton {
   Future<List> getAllContents() async{
     // Collect all the course ids.
     // List<Course> courses = await getCourses();
-    List<Course> courses = await getCourses();
+    List<Course> courses = await getUserCourses();
     List results = [];
     for (Course c in courses){
       results = results + await getCourseContents(c.id);
@@ -226,6 +207,43 @@ class MoodleApiSingleton {
   }
 
   // ********************************************************************************************************************
+  // Get list of courses the user is enrolled in.
+  // ********************************************************************************************************************
+
+  Future<List<Course>> getUserCourses() async {
+    if (_userToken == null) throw StateError('User not logged in to Moodle');
+    // var moodleURL = MoodleApiSingleton().moodleURL;
+    final response = await http.post(
+        Uri.parse(moodleURL + serverUrl
+            ),
+        body: {
+          'wstoken': _userToken,
+          'wsfunction':
+              'core_course_get_enrolled_courses_by_timeline_classification',
+          'classification': 'inprogress',
+          'moodlewsrestformat': 'json',
+        });
+    if (response.statusCode != 200) {
+      throw HttpException(response.body);
+    }
+
+    var decodedJson = jsonDecode(response.body);
+    // Check if the response is a list or a map containing a list
+    List<Course> courses;
+    if (decodedJson is List) {
+      // If the response is directly a list
+      courses = decodedJson.map((i) => Course.fromJson(i)).toList();
+    } else if (decodedJson is Map<String, dynamic>) {
+      // If the response is a map containing a list of courses
+      var courseList = decodedJson['courses'] as List<dynamic>;
+      courses = courseList.map((i) => Course.fromJson(i)).toList();
+    } else {
+      throw StateError('Unexpected response format');
+    }
+    return courses;
+  }
+
+  // ********************************************************************************************************************
   // Get list of assignments for a course. Throws HttpException if request fails.
   // ********************************************************************************************************************
 
@@ -255,8 +273,8 @@ class MoodleApiSingleton {
   // Add random questions to the specified quiz using learninglens plugin.
   // ********************************************************************************************************************
 
-  Future<String> addRandomQuestions(
-      String categoryid, String quizid, String numquestions) async {
+
+  Future<String> addRandomQuestions(String categoryid, String quizid, String numquestions) async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
     final response = await http.post(
       Uri.parse(moodleURL + serverUrl),
@@ -293,10 +311,9 @@ class MoodleApiSingleton {
 
   // ********************************************************************************************************************
   // Import XML quiz questions into the specified course using learninglens plugin.
-  // ********************************************************************************************************************
+  // ******************************************************************************************************************** 
 
-  Future<Map<String, dynamic>?> importQuizQuestions(
-      String courseid, String quizXml) async {
+  Future<Map<String, dynamic>?> importQuizQuestions(String courseid, String quizXml) async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
     try {
       final response = await http.post(
@@ -360,6 +377,7 @@ class MoodleApiSingleton {
   // ********************************************************************************************************************
   // Create a new assignment with optional rubric JSON in the specified course using learninglens plugin.
   // ********************************************************************************************************************
+
 
   Future<Map<String, dynamic>?> createAssignment(
       String courseid,

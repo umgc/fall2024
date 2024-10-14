@@ -1,12 +1,15 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:namer_app/Views/login_page.dart';
+import 'Api/moodle_api_singleton.dart';
+import 'Controller/main_controller.dart';
+import 'Views/login_page.dart';
 import 'Views/dashboard.dart';
 import 'Views/essay_edit_page.dart';
 import 'Views/course_content.dart';
 import 'Views/send_essay_to_moodle.dart';
 import 'Views/essay_generation.dart';
 import 'Views/quiz_generator.dart';
+import 'Views/edit_questions.dart';
 
 void main() {
   runApp(MyApp());
@@ -28,7 +31,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Test App",
+      title: "Learning Lens",
       home: DevLaunch(),
       theme: ThemeData(
         useMaterial3: true,
@@ -38,13 +41,13 @@ class MyApp extends StatelessWidget {
       routes: {
         'LoginPage': (context) => LoginApp(),
         '/EssayEditPage': (context) => EssayEditPage(),
-        '/Content': (context) => ViewCourseContents('Test Course'),
-        '/EssayGenerationPage': (context) =>
-            EssayGeneration(title: 'Essay Generation'),
+        '/Content': (context) => ViewCourseContents(),
+        '/EssayGenerationPage': (context) => EssayGeneration(title: 'Essay Generation'),
         '/QuizGenerationPage': (context) => CreateAssessment('Tester'),
+        '/EditQuestions': (context) => EditQuestions(),
         // '/create': (context) => const CreatePage(),
         '/dashboard': (context) => TeacherDashboard(),
-        '/send_essay_to_moodle': (context) => EssayAssignmentSettings(),
+        '/send_essay_to_moodle': (context) => EssayAssignmentSettings(''),
         // '/viewExams': (context) => const ViewExamPage(),
         // '/settings': (context) => Setting(themeModeNotifier: _themeModeNotifier)
       },
@@ -83,11 +86,19 @@ class _DevLaunch extends State {
               }),
           ElevatedButton(
               child: const Text('Open Contents Carousel'),
-              onPressed: () {
+              onPressed: () async {
+                MoodleApiSingleton api = MoodleApiSingleton();
+                MainController main = MainController();
+                //await api.login('insert test username', 'insert test pw', 'insert test url');
+                await main.updateCourses();
+                await main.selectCourse(1);
+                // current issue: while the courses do come in, the quiz and essay list do not seem to come in quickly enough.
+                // Solution for this is to go back using the navigator and open the page again, then it'll work.
+                // I'm not fixing this because it's just for test purposes.
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => ViewCourseContents("Test Course")),
+                      builder: (context) => ViewCourseContents()),
                 );
               }),
           ElevatedButton(
@@ -114,7 +125,7 @@ class _DevLaunch extends State {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => EssayAssignmentSettings()),
+                      builder: (context) => EssayAssignmentSettings('')),
                 );
               }),
           ElevatedButton(
@@ -124,6 +135,13 @@ class _DevLaunch extends State {
                   context,
                   MaterialPageRoute(
                       builder: (context) => CreateAssessment('Tester')));
+            },
+          ),
+          ElevatedButton(
+            child: const Text('Edit Questions'),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => EditQuestions()));
             },
           )
         ]));
