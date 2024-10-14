@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
-import '../Api/moodle_api_singleton.dart';
+import 'package:learninglens_app/Api/moodle_api_singleton.dart';
 
 class EssayAssignmentSettings extends StatefulWidget {
   final String updatedJson;
@@ -288,9 +288,17 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
               children: [
                 ElevatedButton(
                   onPressed: () async {
-                  var result = await MoodleApiSingleton().createAssignment('2', '2', 'Sunday Assignment', '2024-10-6', '2024-10-14', widget.updatedJson, 'This is the description');
-                  print(result);
-                },
+                    var api = MoodleApiSingleton();
+                    var result = await api.createAssignment(
+                        '2',
+                        '2',
+                        'Sunday Assignment',
+                        '2024-10-06',
+                        '2024-10-14',
+                        widget.updatedJson,
+                        'This is the description');
+                    print(result);
+                  },
                   child: Text('Send to Moodle'),
                 ),
                 ElevatedButton(
