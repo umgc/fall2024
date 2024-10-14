@@ -5,7 +5,6 @@
 import FlutterMacOS
 import Foundation
 
-
 import path_provider_foundation
 import sqflite_darwin
 import url_launcher_macos

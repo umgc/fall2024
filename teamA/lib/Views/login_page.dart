@@ -68,6 +68,7 @@ class _LoginScreenState extends State<LoginScreen>
 
     return Scaffold(
       // Use background color from colorScheme
+
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: colorScheme

@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../Api/moodle_api_singleton.dart';
+import '../Api/llm_api.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../Controller/beans.dart';
 
 class MainController 
@@ -14,6 +16,7 @@ class MainController
   // Internal constructor
   MainController._internal();
   static bool isLoggedIn = false;
+  final llm = LlmApi(dotenv.env['PERPLEXITY_API_KEY']!);
   final ValueNotifier<bool> isUserLoggedInNotifier = ValueNotifier(false);
   Course? selectedCourse;
 
