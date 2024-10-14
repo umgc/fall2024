@@ -267,6 +267,44 @@ class MoodleApiSingleton {
     return courses;
   }
 
+
+Future<SubmissionStatus?> getSubmissionStatus(int assignmentId, int userId) async {
+    try {
+      final response = await http.post(
+        Uri.parse(moodleURL + serverUrl),
+        body: {
+          'wstoken': _userToken,
+          'wsfunction': 'mod_assign_get_submission_status',
+          'moodlewsrestformat': 'json',
+          'assignid': assignmentId.toString(),
+          'userid': userId.toString(),
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+
+        if (data.containsKey('exception')) {
+          throw Exception('Moodle API Error: ${data['message']}');
+        }
+
+        // Parse the response and return a SubmissionStatus object
+        return SubmissionStatus.fromJson(data);
+      } else {
+        print('Failed to load submission status. Status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e, stackTrace) {
+      print('Error fetching submission status: $e');
+      print('StackTrace: $stackTrace');
+      return null;
+    }
+  }
+
+
+
+
+
   // ********************************************************************************************************************
   // Get grades for an assignment.
   // ********************************************************************************************************************

@@ -177,7 +177,9 @@ class SubmissionListState extends State<SubmissionList> {
                                   SizedBox(width: 8), // Space between buttons
                                   if (submission.gradingStatus == 'graded')
                                     ElevatedButton(
-                                      onPressed: () async {},
+                                      onPressed: () async {
+                                        var tempvar = await api.getSubmissionStatus(widget.assignmentId, participant.id);
+                                      },
                                       child: Text(
                                           'Send Grade to Moodle'), // Button label
                                     ),
