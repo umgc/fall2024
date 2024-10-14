@@ -144,16 +144,18 @@ class create_assignment extends external_api {
             $rubric_definition = self::create_rubric_definition_from_json($rubricJson);
 
             $rubric_controller->update_definition($rubric_definition);
+            $rubricid = $rubric_controller->get_definition()->id;
         }
 
-        return array('id' => $cmid, 'name' => $assignmentName);
+        return array('assignmentid' => $assignment_instance, 'assignmentname' => $assignmentName, 'rubricid' => $rubricid);
     }
 
     public static function execute_returns() {
         return new external_single_structure(
             array(
-                'id'   => new external_value(PARAM_INT, 'Course module ID (CMID)'),
-                'name' => new external_value(PARAM_TEXT, 'Assignment name')
+                'assignmentid'   => new external_value(PARAM_INT, 'Assignment ID'),
+                'assignmentname' => new external_value(PARAM_TEXT, 'Assignment name'),
+                'rubricid' => new external_value(PARAM_TEXT, 'Rubric ID')
             )
         );
     }
