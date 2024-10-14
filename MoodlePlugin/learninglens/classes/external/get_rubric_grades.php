@@ -38,7 +38,9 @@ class get_rubric_grades extends external_api {
         return new external_multiple_structure(
          new external_single_structure(
             array(
+                'criterionid' => new external_value(PARAM_INT, 'The ID of the criterion'),
                 'criterion_description' => new external_value(PARAM_TEXT, 'The description of the criterion'),
+                'levelid' => new external_value(PARAM_INT, 'The ID of the level'),
                 'level_description' => new external_value(PARAM_TEXT, 'The description of the level in the criterion'),
                 'score' => new external_value(PARAM_FLOAT, 'The score for the criterion'),
                 'remark' => new external_value(PARAM_RAW, 'Remarks by the grader')
@@ -63,22 +65,26 @@ class get_rubric_grades extends external_api {
     // Add conditions to ensure you get only one grading instance.
     $gradinginstances = $DB->get_records('grading_instances', ['itemid' => $itemid]);
 
-    // Loop through grading instances to find the one with a valid rubric definition.
-    $gradinginstance = null;
+
+    $valid_gradinginstance = null;
+    // Loop through grading instances to find the one with status = 1 and method = 'rubric'.
     foreach ($gradinginstances as $instance) {
-        $definition = $DB->get_record('grading_definitions', ['id' => $instance->definitionid]);
-        if ($definition->method === 'rubric') {
-            $gradinginstance = $instance;
-            break;  // Found the correct rubric instance, stop further checks.
+        if ($instance->status == 1) {
+            // Get the definition for the grading instance.
+            $definition = $DB->get_record('grading_definitions', ['id' => $instance->definitionid], '*', IGNORE_MISSING);
+            if ($definition && $definition->method === 'rubric') {
+                $valid_gradinginstance = $instance;
+                break; // Stop once we find the valid instance.
+            }
         }
     }
 
-    if (!$gradinginstance) {
+    if (!$valid_gradinginstance) {
         throw new moodle_exception('norubricinstance', 'error', '', $assignmentid);
     }
 
     // Query the rubric fillings for this submission.
-    $rubricgrades = $DB->get_records('gradingform_rubric_fillings', ['instanceid' => $gradinginstance->id]);
+    $rubricgrades = $DB->get_records('gradingform_rubric_fillings', ['instanceid' => $valid_gradinginstance->id]);
 
     $rubricdata = [];
 
@@ -89,7 +95,9 @@ class get_rubric_grades extends external_api {
         'criterion_description' => $criterion->description,
         'level_description' => $level->definition,
         'score' => $level->score,
-        'remark' => $grade->remark
+        'remark' => $grade->remark,
+        'criterionid' => $criterion->id,
+        'levelid' => $level->id
             ];
         }
 
