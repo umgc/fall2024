@@ -500,18 +500,18 @@ class Participant {
   }
 }
 
-class Rubric {
+class MoodleRubric {
   final String title;
   final List<Criterion> criteria;
 
-  Rubric({required this.title, required this.criteria});
+  MoodleRubric({required this.title, required this.criteria});
 
-  factory Rubric.fromJson(Map<String, dynamic> json) {
+  factory MoodleRubric.fromJson(Map<String, dynamic> json) {
     var criteriaList = (json['rubric_criteria'] as List)
         .map((c) => Criterion.fromJson(c))
         .toList();
 
-    return Rubric(
+    return MoodleRubric(
       title: json['criteria_title'] ?? 'Rubric',
       criteria: criteriaList,
     );
