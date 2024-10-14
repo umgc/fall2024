@@ -466,12 +466,16 @@ class Participant {
   final int id;
   final String username;
   final String fullname;
+  final String firstname;
+  final String lastname;
   final List<String> roles;
 
   Participant({
     required this.id,
     required this.username,
     required this.fullname,
+    required this.firstname,
+    required this.lastname,
     required this.roles,
   });
 
@@ -489,6 +493,8 @@ class Participant {
       id: json['id'] as int,
       username: json['username'] as String,
       fullname: json['fullname'] as String,
+      firstname: json['firstname'] as String,
+      lastname: json['lastname'] as String,
       roles: rolesList,
     );
   }
@@ -513,10 +519,11 @@ class Rubric {
 }
 
 class Criterion {
+  final int id;
   final String description;
   final List<Level> levels;
 
-  Criterion({required this.description, required this.levels});
+  Criterion({required this.id, required this.description, required this.levels});
 
   factory Criterion.fromJson(Map<String, dynamic> json) {
     var levelsList = (json['levels'] as List)
@@ -524,6 +531,7 @@ class Criterion {
         .toList();
 
     return Criterion(
+      id: json['id'] ?? 0,
       description: json['description'] ?? '',
       levels: levelsList,
     );
@@ -531,13 +539,15 @@ class Criterion {
 }
 
 class Level {
+  final int id;
   final String description;
   final int score;
 
-  Level({required this.description, required this.score});
+  Level({required this.id, required this.description, required this.score});
 
   factory Level.fromJson(Map<String, dynamic> json) {
     return Level(
+      id: json['id'] ?? 0,
       description: json['definition'] ?? '',
       score: json['score'] ?? 0,
     );
