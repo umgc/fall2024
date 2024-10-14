@@ -661,7 +661,8 @@ Future<SubmissionStatus?> getSubmissionStatus(int assignmentId, int userId) asyn
   // Create a new assignment with optional rubric JSON in the specified course using learninglens plugin.
   // ********************************************************************************************************************
 
-  Future<Map<String, dynamic>?> createAssignnment(
+
+  Future<Map<String, dynamic>?> createAssignment(
       String courseid,
       String sectionid,
       String assignmentName,
