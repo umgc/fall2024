@@ -1,33 +1,40 @@
 import 'package:flutter/foundation.dart';
 import '../Api/moodle_api_singleton.dart';
-// import 'package:flutter_dotenv/flutter_dotenv.dart';
-import '/Controller/beans.dart';
+import '../Api/llm_api.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../Controller/beans.dart';
 
-class MainController {
+class MainController 
+{
   // Singleton instance
   static final MainController _instance = MainController._internal();
   // Singleton accessor
-  factory MainController() {
+  factory MainController() 
+  {
     return _instance;
   }
   // Internal constructor
   MainController._internal();
   static bool isLoggedIn = false;
+  final llm = LlmApi(dotenv.env['PERPLEXITY_API_KEY']!);
   final ValueNotifier<bool> isUserLoggedInNotifier = ValueNotifier(false);
   List<Course> courses = [];
   Course? selectedCourse;
   List<Quiz>? quizzes;
   List<Essay>? essays;
 
-  Future<bool> loginToMoodle(
-      String username, String password, String moodleURL) async {
+  Future<bool> loginToMoodle(String username, String password, String moodleURL) async
+  {
     var moodleApi = MoodleApiSingleton();
-    try {
+    try 
+    {
       await moodleApi.login(username, password, moodleURL);
       isLoggedIn = true;
       return true;
-    } catch (e) {
-      if (kDebugMode) {
+    } catch (e) 
+    {
+      if (kDebugMode) 
+      {
         print(e);
       }
       isLoggedIn = false;
@@ -35,47 +42,56 @@ class MainController {
     }
   }
 
-  void logoutFromMoodle() {
+  void logoutFromMoodle() 
+  {
     var moodleApi = MoodleApiSingleton();
     moodleApi.logout();
     isLoggedIn = false;
   }
 
-  Future<List<Course>> getCourses() async {
-    if (courses.isNotEmpty) {
-      return courses;
-    }
+  Future<bool> updateCourses() async 
+  {
     var moodleApi = MoodleApiSingleton();
     try {
-      courses = await moodleApi.getCourses();
-      return courses;
+      // courses = await moodleApi.getCourses();
+      courses = await moodleApi.getUserCourses();
+      if (courses.isNotEmpty) {
+        courses.removeAt(
+            0); // first course is always "Moodle" - no need to show it
+      }
+      return true;
     } catch (e) {
       if (kDebugMode) {
         print(e);
       }
-      return [];
+      courses = [];
+      return false;
     }
   }
 
-  Future<bool> isUserLoggedIn() async {
+  Future<bool> isUserLoggedIn() async 
+  {
     return isLoggedIn;
   }
 
-  void selectCourse(int index) {
-    if (index < courses.length) {
+  Future<bool> selectCourse(int index) async{
+    if (index < courses.length){
       selectedCourse = courses[index];
     }
+    setQuizzes();
+    setEssays();
+    return true;
   }
 
-  Course? getSelectedCourse() {
+  Course? getSelectedCourse(){
     return selectedCourse;
   }
 
-  List<Quiz>? getQuizzes() {
-    return quizzes;
+  void setQuizzes() async{
+    quizzes = await MoodleApiSingleton().getQuizzes(selectedCourse?.id);
   }
 
-  List<Essay>? getEssays() {
-    return essays;
+  void setEssays() async{
+    essays = await MoodleApiSingleton().getEssays(selectedCourse?.id);
   }
 }

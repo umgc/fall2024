@@ -1,47 +1,42 @@
 import 'package:flutter/material.dart';
-import 'package:learninglens_app/Views/essay_edit_page.dart';
-import 'edit_questions.dart';
+import 'package:learninglens_app/Views/edit_questions.dart';
 import 'essay_generation.dart';
 import 'quiz_generator.dart';
-import '../Api/moodle_api_singleton.dart'; // Import the Moodle API Singleton
 //import 'course.dart'; // Import the Courses page when available
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: true, // Keeps the debug banner for now
+      home: const TeacherDashboard(),
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF6A5A99), // Custom primary color
+        ),
+      ),
+      title: 'Learning Lens',
+    );
+  }
+}
 
 class TeacherDashboard extends StatelessWidget {
   const TeacherDashboard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Accessing the user information from the MoodleApiSingleton
-    var userinfo = MoodleApiSingleton(); // Retrieve the Singleton instance
     return Scaffold(
       appBar: AppBar(
         title: const Text('Learning Lens'),
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         actions: [
-          // Display user first name and token in the AppBar
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  'Welcome, ${userinfo.moodleFirstName ?? 'User'}',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    fontSize: 16,
-                  ),
-                ),
-                /*  Text(
-                  'Token: ${userinfo.userToken ?? ''}', // Optionally, display token or username
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    fontSize: 12,
-                  ),
-                ),*/
-              ],
-            ),
-          ),
           IconButton(
             icon: Icon(
               Icons.account_circle,
@@ -51,21 +46,22 @@ class TeacherDashboard extends StatelessWidget {
               // Handle profile/account actions here
             },
           ),
-          IconButton(
-              icon: Icon(
-                Icons.edit, // Icon for Edit Questions button
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
-              ),
-              onPressed: () {
-                // Navigate to the EditQuestions page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EssayEditPage(),
-                    // builder: (context) => EditQuestions(),
-                  ),
-                );
-              })
+
+IconButton(
+            icon: Icon(
+              Icons.edit, // Icon for Edit Questions button
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
+            ),
+            onPressed: () {
+              // Navigate to the EditQuestions page
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditQuestions(),
+                ),
+              );
+            }
+          )
         ],
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,

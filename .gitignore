@@ -25,6 +25,7 @@ doc/api/
 
 .flutter-plugins
 .flutter-plugins-dependencies
+.vscode/
 .vs*
 */ios/
 linux/
@@ -32,3 +33,4 @@ macos/
 web/
 windows/
 Flutter/
+teama/assets/api-keys.json

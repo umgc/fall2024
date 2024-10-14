@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/main.dart';
 import '/controller/main_controller.dart';
-import '/Views/dashboard.dart';
+import '../Views/dashboard.dart';
 
-class LoginApp extends StatelessWidget {
+class LoginApp extends StatelessWidget 
+{
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -296,9 +299,79 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 16),
                 ],
               ),
-            );
-          }
-        },
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+
+            // Username Input
+            TextField(
+              controller: _usernameController,
+              decoration: InputDecoration(
+                labelText: 'Username',
+                hintText: 'Enter your username',
+                border: const OutlineInputBorder(),
+
+                // Input field background
+                fillColor: colorScheme.surface,
+                filled: true,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Password Input
+            TextField(
+              controller: _passwordController,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                hintText: 'Enter your password',
+                border: const OutlineInputBorder(),
+
+                // Input field background
+                fillColor: colorScheme.surface,
+                filled: true,
+              ),
+              obscureText: true,
+            ),
+            const SizedBox(height: 16),
+
+            // Moodle URL (optional if needed)
+            TextField(
+              controller: _moodleURLController,
+              decoration: InputDecoration(
+                labelText: 'Moodle URL',
+                hintText: 'https://moodle.example.com',
+                border: const OutlineInputBorder(),
+
+                // Input field background
+                fillColor: colorScheme.surface,
+                filled: true,
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            // Login Button
+            ElevatedButton(
+              onPressed: () async {
+                var wasSuccessful = await LoginScreen.controller.loginToMoodle(_usernameController.text, _passwordController.text, _moodleURLController.text);
+                if (wasSuccessful) 
+                {
+                  MainController().updateCourses();
+                  Navigator.push(
+                    context,
+                    // MaterialPageRoute(builder: (context) => TeacherDashboard())
+                    // For now, go to DEV view
+                    MaterialPageRoute(builder: (context) => DevLaunch())
+                  );
+                } else {
+                  _showLoginFailedDialog();
+                }
+              },
+              child: const Text('Login'),
+            ),
+
+            const SizedBox(height: 16),
+          ],
+        ),
       ),
     );
   }

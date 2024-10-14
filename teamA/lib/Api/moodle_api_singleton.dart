@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
-import '/Controller/beans.dart';
+import '../Controller/beans.dart';
 
 // Singleton class for Moodle API access.
 class MoodleApiSingleton {
@@ -33,8 +32,6 @@ class MoodleApiSingleton {
 
   // Internal constructor.
   MoodleApiSingleton._internal();
-  // **Add this getter for accessing the token**
-  String? get userToken => _userToken;
 
   // Check if user has logged in (if singleton has a token).
   bool isLoggedIn() {
@@ -64,7 +61,7 @@ class MoodleApiSingleton {
     if (userinforesponse.statusCode != 200) {
       throw HttpException(userinforesponse.body);
     }
-    moodleCourses = await getCourses();
+    moodleCourses = await getUserCourses();
     Map<String, dynamic> userData = jsonDecode(userinforesponse.body);
     moodleUserName = userData['username'];
     moodleFirstName = userData['firstname'];
@@ -79,24 +76,176 @@ class MoodleApiSingleton {
     _userToken = null;
   }
 
+  // Get list of courses.
+  Future<List<Course>> getCourses() async {
+    if (_userToken == null) throw StateError('User not logged in to Moodle');
+
+    final response = await http.post(Uri.parse(moodleURL + serverUrl), body: {
+      'wstoken': _userToken,
+      'wsfunction': 'core_course_get_courses',
+      'moodlewsrestformat': 'json',
+    });
+
+    // '$moodleURL$serverUrl&wstoken=$_userToken$jsonFormat&wsfunction=core_course_get_courses'
+    // ));
+    if (response.statusCode != 200) {
+      throw HttpException(response.body);
+    }
+    List<Course> courses = (jsonDecode(response.body) as List)
+        .map((i) => Course.fromJson(i))
+        .toList();
+    return courses;
+  }
+
+  // Import XML quiz into the specified course. Returns a list of IDs for newly imported questions.
+  Future<void> importQuiz(String courseid, String quizXml) async {
+    if (_userToken == null) throw StateError('User not logged in to Moodle');
+
+    final http.Response response = await http.post(Uri.parse(
+        '$serverUrl$_userToken$jsonFormat&wsfunction=local_quizgen_import_questions&courseid=$courseid&questionxml=$quizXml'));
+    if (response.statusCode != 200) {
+      throw HttpException(response.body);
+    }
+    if (response.body.contains('error')) {
+      throw HttpException(response.body);
+    }
+  }
+
+  // Gets the contents of the specified course.
+  Future<List> getCourseContents(int courseID) async {
+    if (_userToken == null) throw StateError('User not logged in to Moodle');
+    // Make the request.
+    final http.Response response = await http.get(Uri.parse(
+        '$serverUrl$_userToken$jsonFormat&wsfunction=core_course_get_contents&courseid=$courseID'));
+    if (response.statusCode != 200) {
+      throw HttpException(response.body);
+    }
+
+    // Decode the JSON to get the wanted information.
+    List<dynamic> temp = jsonDecode(response.body) as List<dynamic>;
+    List results = [];
+    for (int i = 0; i < temp.length; i++) {
+      var v = temp[i];
+      if (v['modules'] != []) {
+        //todo method for converting from json or xml
+        for (int i = 0; i < v['modules'].length; i++) {
+          // Collect important identifying information.
+          Map<String, dynamic> module = v['modules'][i];
+          // Skip modules that are not a quiz or assignment. //todo specific filter for app-created stuff
+          if (module['modname'] == "quiz" || module['modname'] == 'assign') {
+            //todo check neccessity of an id for modules (personally think that's a 'probably')
+            String name = module['name'];
+            String description = '';
+            //todo learn how to get the questions from quizzes
+            //all this is literally only enough to make the CarouselCards
+            if (module.containsKey('intro')) {
+              //while all the null-shorting is amazingly useful, I don't know if Dart has KeyErrors
+              description = module['intro'];
+            }
+            if (module['modname'] == 'quiz') {
+              results.insert(
+                  results.length, Quiz(name: name, description: description));
+            } else {
+              // results.insert(results.length, Essay(name: name, description: description));
+            }
+          }
+        }
+      }
+    }
+    return results;
+  }
+
+  // Gets the contents of all courses.
+  Future<List> getAllContents() async {
+    // Collect all the course ids.
+    // List<Course> courses = await getCourses();
+    List<Course> courses = await getUserCourses();
+    List results = [];
+    for (Course c in courses) {
+      results = results + await getCourseContents(c.id);
+    }
+    return results;
+  }
+
+  Future<List<Quiz>> getQuizzes(int? courseID) async {
+    List contents;
+    if (courseID != null) {
+      contents = await getCourseContents(courseID);
+    } else {
+      contents = await getAllContents();
+    }
+    List<Quiz> results = [];
+    for (Object c in contents) {
+      if (c is Quiz) {
+        results.insert(results.length, c);
+      }
+    }
+    print(results.toString());
+    return results;
+  }
+
+  Future<List<Essay>> getEssays(int? courseID) async {
+    List contents;
+    if (courseID != null) {
+      contents = await getCourseContents(courseID);
+    } else {
+      contents = await getAllContents();
+    }
+    List<Essay> results = [];
+    for (Object c in contents) {
+      if (c is Essay) {
+        results.insert(results.length, c);
+      }
+    }
+    print(results.toString());
+    return results;
+  }
+
+  // ********************************************************************************************************************
+  // Get participants in a course
+  // ********************************************************************************************************************
+
+  Future<List<Participant>> getCourseParticipants(String courseId) async {
+    if (_userToken == null) throw StateError('User not logged in to Moodle');
+
+    // URL of the Moodle server
+    final response = await http.post(Uri.parse(moodleURL + serverUrl), body: {
+      'wstoken': _userToken,
+      'wsfunction': 'core_enrol_get_enrolled_users',
+      'courseid': courseId,
+      'moodlewsrestformat': 'json',
+    });
+
+    if (response.statusCode != 200) {
+      throw HttpException(response.body);
+    }
+
+    var decodedJson = jsonDecode(response.body);
+
+    // Assuming the response is directly a list of participants
+    List<Participant> participants;
+    if (decodedJson is List) {
+      participants = decodedJson.map((i) => Participant.fromJson(i)).toList();
+    } else {
+      throw StateError('Unexpected response format');
+    }
+    return participants;
+  }
+
   // ********************************************************************************************************************
   // Get list of courses the user is enrolled in.
   // ********************************************************************************************************************
 
-  Future<List<Course>> getCourses() async {
+  Future<List<Course>> getUserCourses() async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
     // var moodleURL = MoodleApiSingleton().moodleURL;
-    final response = await http.post(
-        Uri.parse(moodleURL + serverUrl
-            // '$moodleURL$serverUrl$_userToken$jsonFormat&wsfunction=core_course_get_enrolled_courses_by_timeline_classification&classification=inprogress'
-            ),
-        body: {
-          'wstoken': _userToken,
-          'wsfunction':
-              'core_course_get_enrolled_courses_by_timeline_classification',
-          'classification': 'inprogress',
-          'moodlewsrestformat': 'json',
-        });
+    final response = await http.post(Uri.parse(moodleURL + serverUrl), body: {
+      'wstoken': _userToken,
+      'wsfunction':
+          'core_course_get_enrolled_courses_by_timeline_classification',
+      'classification': 'inprogress',
+      'moodlewsrestformat': 'json',
+    });
     if (response.statusCode != 200) {
       throw HttpException(response.body);
     }
@@ -117,11 +266,215 @@ class MoodleApiSingleton {
     return courses;
   }
 
+
+Future<SubmissionStatus?> getSubmissionStatus(int assignmentId, int userId) async {
+    try {
+      final response = await http.post(
+        Uri.parse(moodleURL + serverUrl),
+        body: {
+          'wstoken': _userToken,
+          'wsfunction': 'mod_assign_get_submission_status',
+          'moodlewsrestformat': 'json',
+          'assignid': assignmentId.toString(),
+          'userid': userId.toString(),
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+
+        if (data.containsKey('exception')) {
+          throw Exception('Moodle API Error: ${data['message']}');
+        }
+
+        // Parse the response and return a SubmissionStatus object
+        return SubmissionStatus.fromJson(data);
+      } else {
+        print('Failed to load submission status. Status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e, stackTrace) {
+      print('Error fetching submission status: $e');
+      print('StackTrace: $stackTrace');
+      return null;
+    }
+  }
+
+
+
+
+
   // ********************************************************************************************************************
-  // Get list of assignments for a course. Throws HttpException if request fails.
+  // Get grades for an assignment.
   // ********************************************************************************************************************
 
-  Future<List> getRubric(String assignmentid) async {
+  Future<List<Grade>> getAssignmentGrades(int assignmentId) async {
+    if (_userToken == null) throw StateError('User not logged in to Moodle');
+    try {
+      final response = await http.post(
+        Uri.parse(moodleURL + serverUrl),
+        body: {
+          'wstoken': _userToken,
+          'wsfunction': 'mod_assign_get_grades',
+          'moodlewsrestformat': 'json',
+          'assignmentids[0]': assignmentId.toString(), // The assignment ID
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+
+        if (data.containsKey('exception')) {
+          throw Exception('Moodle API Error: ${data['message']}');
+        }
+
+        // Debug: Print the entire grades JSON response
+        print('Grades Response Data: ${json.encode(data)}');
+
+        // Initialize an empty list for grades
+        List<Grade> grades = [];
+
+        // Access the 'grades' list within the assignments
+        if (data['assignments'] != null && data['assignments'] is List) {
+          List assignments = data['assignments'];
+          for (var assignment in assignments) {
+            if (assignment['grades'] != null && assignment['grades'] is List) {
+              for (var gradeData in assignment['grades']) {
+                // Parse each grade and add it to the list
+                grades.add(Grade.fromJson(gradeData));
+              }
+            }
+          }
+        }
+
+        return grades;
+      } else {
+        print('Failed to load grades. Status code: ${response.statusCode}');
+        return [];
+      }
+    } catch (e, stackTrace) {
+      print('Error fetching grades: $e');
+      print('StackTrace: $stackTrace');
+      return [];
+    }
+  }
+
+  // ********************************************************************************************************************
+  // Get submissions for an assignment.
+  // ********************************************************************************************************************
+
+  Future<List<Submission>> getAssignmentSubmissions(int assignmentId) async {
+    if (_userToken == null) throw StateError('User not logged in to Moodle');
+    try {
+      final response = await http.post(
+        Uri.parse(moodleURL + serverUrl),
+        body: {
+          'wstoken': _userToken,
+          'wsfunction': 'mod_assign_get_submissions',
+          'moodlewsrestformat': 'json',
+          'assignmentids[0]': assignmentId.toString(),
+          'status': 'submitted',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+
+        if (data.containsKey('exception')) {
+          throw Exception('Moodle API Error: ${data['message']}');
+        }
+
+        // **Debugging: Print the entire JSON response**
+        print('Full Response Data: ${json.encode(data)}');
+
+        // **Initialize an empty list for submissions**
+        List<dynamic> submissionsData = [];
+
+        // **Access the 'assignments' list**
+        if (data['assignments'] != null && data['assignments'] is List) {
+          List assignments = data['assignments'];
+          for (var assignment in assignments) {
+            if (assignment['submissions'] != null &&
+                assignment['submissions'] is List) {
+              for (var submission in assignment['submissions']) {
+                // Create a map that includes the assignmentid along with the submission data
+                submissionsData.add({
+                  'assignmentid':
+                      assignment['assignmentid'], // Store assignmentid
+                  'submission': submission // Store the actual submission
+                });
+              }
+            }
+          }
+        }
+
+        // **Debugging: Print the number of submissions found**
+        print('Number of submissions found: ${submissionsData.length}');
+
+        if (submissionsData.isEmpty) {
+          print('No submissions found.');
+          return []; // Return empty list if no submissions are found
+        }
+
+        // **Map the submissions to Submission objects**
+        List<Submission> submissions = submissionsData
+            .map((submissionJson) => Submission.fromJson(submissionJson))
+            .toList();
+
+        return submissions;
+      } else {
+        // Log the unexpected status code
+        print(
+            'Failed to load submissions. Status code: ${response.statusCode}');
+        return []; // Return empty list on non-200 status codes
+      }
+    } catch (e, stackTrace) {
+      // Log the error details
+      print('Error fetching submissions: $e');
+      print('StackTrace: $stackTrace');
+      return []; // Return empty list in case of any exceptions
+    }
+  }
+
+  // helper function to find grade for a user
+  Grade? findGradeForUser(List<Grade> grades, int userId) {
+    for (Grade grade in grades) {
+      if (grade.userid == userId) {
+        return grade;
+      }
+    }
+    return null; // Return null if no grade is found for this user
+  }
+
+  // ********************************************************************************************************************
+  // Get submissions with grades for an assignment.
+  // ********************************************************************************************************************
+  
+  Future<List<SubmissionWithGrade>> getSubmissionsWithGrades(
+      int assignmentId) async {
+    List<Submission> submissions = await getAssignmentSubmissions(assignmentId);
+    List<Grade> grades = await getAssignmentGrades(assignmentId);
+
+    // Combine submissions and grades
+    List<SubmissionWithGrade> submissionsWithGrades = [];
+
+    for (Submission submission in submissions) {
+      Grade? grade = findGradeForUser(grades, submission.userid);
+
+      submissionsWithGrades.add(SubmissionWithGrade(
+        submission: submission,
+        grade: grade, // May be null if no grade found
+      ));
+    }
+
+    return submissionsWithGrades;
+  }
+
+  // ********************************************************************************************************************
+  // Get rubric for an assignment.
+  // ********************************************************************************************************************
+
+  Future<Rubric?> getRubric(String assignmentid) async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
     final response = await http.post(
       Uri.parse(moodleURL + serverUrl),
@@ -135,20 +488,24 @@ class MoodleApiSingleton {
 
     if (response.statusCode == 200) {
       final List<dynamic> responseData = json.decode(response.body);
-      print('Response: $responseData');
-      return responseData;
+      if (responseData.isNotEmpty &&
+          responseData.first is Map<String, dynamic>) {
+        Map<String, dynamic> rubricData = responseData.first;
+        print('Response: $responseData');
+        return Rubric.fromJson(rubricData);
+      }
     } else {
       print('Request failed with status: ${response.statusCode}.');
-      return [];
+      return null;
     }
+    return null;
   }
 
   // ********************************************************************************************************************
   // Add random questions to the specified quiz using learninglens plugin.
   // ********************************************************************************************************************
 
-  Future<String> addRandomQuestions(
-      String categoryid, String quizid, String numquestions) async {
+  Future<String> addRandomQuestions(String categoryid, String quizid, String numquestions) async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
     final response = await http.post(
       Uri.parse(moodleURL + serverUrl),
@@ -253,7 +610,8 @@ class MoodleApiSingleton {
   // Create a new assignment with optional rubric JSON in the specified course using learninglens plugin.
   // ********************************************************************************************************************
 
-  Future<Map<String, dynamic>?> createAssignnment(
+
+  Future<Map<String, dynamic>?> createAssignment(
       String courseid,
       String sectionid,
       String assignmentName,
@@ -289,6 +647,47 @@ class MoodleApiSingleton {
       }
     } catch (e) {
       print('Error occurred');
+      return null;
+    }
+  }
+
+  // ********************************************************************************************************************
+  // Gets context ID for an assignment instance in a course.
+  // ********************************************************************************************************************
+
+  Future<int?> getContextId(int assignmentId, String courseId) async {
+    if (_userToken == null) throw StateError('User not logged in to Moodle');
+    try {
+      final response = await http.post(Uri.parse(moodleURL + serverUrl), body: {
+        'wstoken': _userToken,
+        'wsfunction': 'core_course_get_contents',
+        'moodlewsrestformat': 'json',
+        'courseid': courseId, // Replace with actual course ID
+      });
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+
+        for (var section in data) {
+          for (var module in section['modules']) {
+            if (module['instance'] == assignmentId &&
+                module['modname'] == 'assign') {
+              // Get the contextid of the assignment instance 13
+              int contextId = module['contextid'];
+              print('Context ID for assignment instance 13: $contextId');
+              return contextId; // Exit once found
+            }
+          }
+        }
+        return null; // Context ID not found
+      } else {
+        print(
+            'Failed to fetch course contents. Status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e, stackTrace) {
+      print('Error fetching context ID: $e');
+      print('StackTrace: $stackTrace');
       return null;
     }
   }

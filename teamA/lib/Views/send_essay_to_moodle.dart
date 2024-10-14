@@ -9,13 +9,12 @@ import 'dart:io';
 import '../Api/moodle_api_singleton.dart'; // Import the Moodle API Singleton
 
 class EssayAssignmentSettings extends StatefulWidget {
-  final String updatedJson; // Rubric data passed from the edit essay page
+  final String updatedJson;
 
-  EssayAssignmentSettings(this.updatedJson, {super.key});
+  EssayAssignmentSettings(this.updatedJson);
 
   @override
-  _EssayAssignmentSettingsState createState() =>
-      _EssayAssignmentSettingsState();
+  EssayAssignmentSettingsState createState() => EssayAssignmentSettingsState();
 }
 
 class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
@@ -62,8 +61,8 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   List<String> minutes =
       List.generate(60, (index) => index.toString().padLeft(2, '0'));
 
-  final TextEditingController _assignmentNameController =
-      TextEditingController();
+  TextEditingController _courseNameController = TextEditingController();
+  TextEditingController _assignmentNameController = TextEditingController();
 
   // Quill Editor controller
   final quill.QuillController _quillController = quill.QuillController.basic();
@@ -298,10 +297,12 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
+        centerTitle: true, // Center the title in the AppBar
         title: Text('Learning Lens',
             style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        backgroundColor: Theme.of(context)
+            .colorScheme
+            .primaryContainer, // Use primary container color
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(14.0),

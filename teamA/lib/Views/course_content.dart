@@ -33,15 +33,15 @@ class _CourseState extends State{
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Text(courseName, style: TextStyle(fontSize: 64),),
-              ContentCarousel('assessment'),
-              ContentCarousel('essay'),
+              ContentCarousel('assessment', MainController().quizzes),
+              ContentCarousel('essay', MainController().essays),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [CreateButton('assessment'), CreateButton('essay')]
               )
             ],
+          )
         )
-      )
     );
   }
 }
