@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:learninglens_app/main.dart';
+import '../main.dart';
 import '/controller/main_controller.dart';
 import '../Views/dashboard.dart';
 

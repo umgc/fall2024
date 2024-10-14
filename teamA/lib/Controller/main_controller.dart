@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
 import '../Api/moodle_api_singleton.dart';
-import '../Controller/beans.dart';
+import 'package:namer_app/Controller/beans.dart';
+import '../Api/llm_api.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../Controller/essay_generator.dart';
 
 class MainController 
 {
@@ -14,18 +17,19 @@ class MainController
   // Internal constructor
   MainController._internal();
   static bool isLoggedIn = false;
+  final llm = LlmApi(dotenv.env['PERPLEXITY_API_KEY']!);
   final ValueNotifier<bool> isUserLoggedInNotifier = ValueNotifier(false);
   List<Course> courses = [];
   Course? selectedCourse;
   List<Quiz>? quizzes;
   List<Essay>? essays;
 
-  Future<bool> loginToMoodle(String username, String password, String moodleURL) async 
+  Future<bool> loginToMoodle(String username, String password) async 
   {
     var moodleApi = MoodleApiSingleton();
     try 
     {
-      await moodleApi.login(username, password, moodleURL);
+      await moodleApi.login(username, password);
       isLoggedIn = true;
       return true;
     } catch (e) 
@@ -46,12 +50,12 @@ class MainController
     isLoggedIn = false;
   }
 
-  Future<bool> updateCourses() async 
+    Future<bool> updateCourses() async 
   {
     var moodleApi = MoodleApiSingleton();
     try {
       // courses = await moodleApi.getCourses();
-      courses = await moodleApi.getUserCourses();
+      courses = await moodleApi.getCourses();
       if (courses.isNotEmpty) {
         courses.removeAt(
             0); // first course is always "Moodle" - no need to show it
@@ -66,9 +70,22 @@ class MainController
     }
   }
 
-  Future<bool> isUserLoggedIn() async 
+  Future<List<Course>> getCourses() async 
   {
-    return isLoggedIn;
+    var moodleApi = MoodleApiSingleton();
+    try {
+      List<Course> courses = await moodleApi.getCourses();
+      if (courses.isNotEmpty) {
+        courses.removeAt(
+            0); // first course is always "Moodle" - no need to show it
+      }
+      return courses;
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      return [];
+    }
   }
 
   Future<bool> selectCourse(int index) async{
@@ -82,6 +99,11 @@ class MainController
 
   Course? getSelectedCourse(){
     return selectedCourse;
+  }
+
+  Future<bool> isUserLoggedIn() async 
+  {
+    return isLoggedIn;
   }
 
   void setQuizzes() async{
