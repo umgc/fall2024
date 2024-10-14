@@ -288,7 +288,7 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
               children: [
                 ElevatedButton(
                   onPressed: () async {
-                  var result = await MoodleApiSingleton().createAssignnment('2', '2', 'Sunday Assignment', '2024-10-6', '2024-10-14', widget.updatedJson, 'This is the description');
+                  var result = await MoodleApiSingleton().createAssignment('2', '2', 'Sunday Assignment', '2024-10-6', '2024-10-14', widget.updatedJson, 'This is the description');
                   print(result);
                 },
                   child: Text('Send to Moodle'),

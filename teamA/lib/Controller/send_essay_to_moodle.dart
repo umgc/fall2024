@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
-import 'package:namer_app/Api/moodle_api_singleton.dart';
+import 'package:learninglens_app/Api/moodle_api_singleton.dart';
 
 class EssayAssignmentSettings extends StatefulWidget {
   final String updatedJson;

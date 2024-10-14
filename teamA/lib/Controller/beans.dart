@@ -136,6 +136,8 @@ class RubricCriteria
     toXml(builder);
     return builder.buildFragment().toXmlString();
   }
+}
+
 class Essay {
   //todo more vars as needed (like the Rubric for starters)
   String? name;

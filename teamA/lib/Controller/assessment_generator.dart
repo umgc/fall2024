@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:namer_app/Controller/beans.dart';
+import 'package:learninglens_app/Controller/beans.dart';
 
 class AssessmentGenerator 
 {

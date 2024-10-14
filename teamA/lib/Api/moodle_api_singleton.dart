@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../Controller/beans.dart';
-import '../Controller/essay_generator.dart';
 
 // Singleton class for Moodle API access.
 class MoodleApiSingleton {
