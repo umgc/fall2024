@@ -1,4 +1,4 @@
-name: namer_app
+name: learninglens_app
 description: A new Flutter project.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -8,7 +8,10 @@ version: 0.0.1+1
 environment:
   sdk: ^3.1.1
     
-  editable: 2.0.0
+dependencies:
+  flutter:
+    sdk: flutter
+
   flutter_dotenv: ^5.1.0
   xml: ^6.2.2
   http: ^1.2.1 
