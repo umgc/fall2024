@@ -151,7 +151,7 @@ class SubmitButton extends StatelessWidget {
     if(formKey.currentState!.validate()) {
       AssignmentForm af = AssignmentForm(
         questionType: QuestionType.shortanswer, //Potentially not necessary? Need to see about essay generator
-        subject: selectedSubject.toString(), 
+        subject: selectedSubject != null ? selectedSubject.toString() :  fields['topic']!.text, 
         topic: fields['topic']!.text, 
         gradeLevel: 'Sophomore', // Get these programatically?
         title: fields['name']!.text,
