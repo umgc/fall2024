@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../Controller/beans.dart';
 import '../Api/moodle_api_singleton.dart';
 import 'dart:math';
+import '../Api/llm_api.dart';
 
 class SubmissionDetail extends StatefulWidget {
   final Participant participant;
