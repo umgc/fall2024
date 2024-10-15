@@ -148,7 +148,7 @@ class _DevLaunch extends State {
   final tempRubricXML = '''
 [
   {
-    "rubric_criteria": [
+    "criteria": [
       {
         "description": "Grammar and Mechanics",
         "levels": [
