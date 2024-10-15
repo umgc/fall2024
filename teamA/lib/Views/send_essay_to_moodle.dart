@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:http/http.dart' as http;
 import 'package:learninglens_app/Views/essay_edit_page.dart';
+import 'package:learninglens_app/Views/quiz_generator.dart';
 // import '../controller/main_controller.dart';
 import '/Controller/beans.dart'; // Import the file that contains the Course class
 import 'dart:convert';
@@ -135,74 +136,6 @@ Future<void> fetchCourses() async {
     }
 
     setState(() {});
-  }
-
-  // Create and send assignment to Moodle
-  Future<void> createAssignment(
-      String token,
-      String courseId,
-      String assignmentName,
-      String description,
-      String dueDate,
-      String startDate) async {
-    const String url = 'webservice/rest/server.php';
-    final fullUrl = 'https://www.swen670moodle.site/$url';
-
-    String rubrickinjsonformat = '''
-{
-    "criteria": [
-        {
-            "description": "Content",
-            "levels": [
-                { "definition": "Excellent", "score": 5 },
-                { "definition": "Good", "score": 3 },
-                { "definition": "Poor", "score": 1 }
-            ]
-        },
-        {
-            "description": "Clarity",
-            "levels": [
-                { "definition": "Very Clear", "score": 5 },
-                { "definition": "Somewhat Clear", "score": 3 },
-                { "definition": "Unclear", "score": 1 }
-            ]
-        }
-    ]
-}
-''';
-
-    try {
-      final response = await http.post(
-        Uri.parse(fullUrl),
-        body: {
-          'wstoken': token,
-          'wsfunction': 'local_learninglens_create_assignment',
-          'moodlewsrestformat': 'json',
-          'courseid': courseId,
-          'sectionid': '1',
-          'enddate': dueDate,
-          'startdate': startDate,
-          'description': description,
-          'rubricJson': rubrickinjsonformat,
-          'assignmentName': assignmentName,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        debugPrint('Assignment sent to Moodle successfully.');
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Assignment sent to Moodle successfully!')));
-      } else {
-        debugPrint(
-            'Failed to send assignment to Moodle. Status Code: ${response.statusCode}');
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to send assignment to Moodle.')));
-      }
-    } catch (error) {
-      debugPrint('Error occurred while sending assignment: $error');
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('An error occurred: $error')));
-    }
   }
 
 // Dropdown to display courses with "Select a course" as the default option
@@ -473,53 +406,54 @@ Future<void> fetchCourses() async {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  // ElevatedButton(
-                  //   onPressed: () async {
-                  //     // Validate the form before submitting
-                  //     if (_formKey.currentState!.validate() &&
-                  //         _quillController.document
-                  //             .toPlainText()
-                  //             .trim()
-                  //             .isNotEmpty &&
-                  //         _validateAvailabilityDates()) {
-                  //       var userInfo = MoodleApiSingleton();
-                  //       String? token = userInfo.userToken;
+                  ElevatedButton(
+                    onPressed: () async {
+                      // Validate the form before submitting
+                      if (_formKey.currentState!.validate() &&
+                          _quillController.document
+                              .toPlainText()
+                              .trim()
+                              .isNotEmpty &&
+                          _validateAvailabilityDates()) {
+                        var api = MoodleApiSingleton();
+                        bool? token = api.isLoggedIn();
 
-                  //       if (token != null && token.isNotEmpty) {
-                  //         String courseId = courses
-                  //             .firstWhere(
-                  //                 (course) => course.fullName == selectedCourse)
-                  //             .id
-                  //             .toString();
-                  //         String assignmentName =
-                  //             _assignmentNameController.text;
-                  //         String description =
-                  //             _quillController.document.toPlainText();
-                  //         String dueDate =
-                  //             '$selectedDayDue $selectedMonthDue $selectedYearDue $selectedHourDue:$selectedMinuteDue';
-                  //         String allowSubmissionFrom =
-                  //             '$selectedDaySubmission $selectedMonthSubmission $selectedYearSubmission $selectedHourSubmission:$selectedMinuteSubmission';
+                        if (token) {
+                          String courseId = courses
+                              .firstWhere(
+                                  (course) => course.fullName == selectedCourse)
+                              .id
+                              .toString();
+                          String assignmentName =
+                              _assignmentNameController.text;
+                          String description =
+                              _quillController.document.toPlainText();
+                          String dueDate =
+                              '$selectedDayDue $selectedMonthDue $selectedYearDue $selectedHourDue:$selectedMinuteDue';
+                          String allowSubmissionFrom =
+                              '$selectedDaySubmission $selectedMonthSubmission $selectedYearSubmission $selectedHourSubmission:$selectedMinuteSubmission';
 
-                  //         await createAssignment(
-                  //           token,
-                  //           courseId,
-                  //           assignmentName,
-                  //           description,
-                  //           dueDate,
-                  //           allowSubmissionFrom,
-                  //         );
-                  //       } else {
-                  //         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  //             content: Text('Failed to retrieve user token.')));
-                  //       }
-                  //     } else {
-                  //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  //           content: Text(
-                  //               'Please fill out all fields and ensure a course, description, and valid availability dates are selected.')));
-                  //     }
-                  //   },
-                  //   child: Text('Send to Moodle'),
-                  // ),
+                          await api.createAssignment(
+                            courseId,
+                            '1', // Section ID
+                            assignmentName,
+                            allowSubmissionFrom,
+                            dueDate,
+                            widget.updatedJson,
+                            description,
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text('Failed to retrieve user token.')));
+                        }
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(
+                                'Please fill out all fields and ensure a course, description, and valid availability dates are selected.')));
+                      }
+                    },
+                    child: Text('Send to Moodle'),
+                  ),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).push(
