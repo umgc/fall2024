@@ -97,12 +97,13 @@ dependencies:
   path_provider_foundation: ^2.3.1
   collection: ^1.17.2
   camera_platform_interface: ^2.6.0
-  logging: ^1.2.0
+  logger: ^2.4.0
 
 
   intl: any
   form_field_validator: ^1.1.0
   flutter_contacts: ^1.1.9+2
+  regexpattern: ^2.6.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
