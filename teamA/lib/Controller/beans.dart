@@ -600,36 +600,36 @@ class Participant {
   }
 }
 
-class Rubric {
+class MoodleRubric {
   final String title;
-  final List<Criterion> criteria;
+  final List<MoodleRubricCriteria> criteria;
 
-  Rubric({required this.title, required this.criteria});
+  MoodleRubric({required this.title, required this.criteria});
 
-  factory Rubric.fromJson(Map<String, dynamic> json) {
+  factory MoodleRubric.fromJson(Map<String, dynamic> json) {
     var criteriaList = (json['rubric_criteria'] as List)
-        .map((c) => Criterion.fromJson(c))
+        .map((c) => MoodleRubricCriteria.fromJson(c))
         .toList();
 
-    return Rubric(
+    return MoodleRubric(
       title: json['criteria_title'] ?? 'Rubric',
       criteria: criteriaList,
     );
   }
 }
 
-class Criterion {
+class MoodleRubricCriteria {
   final String description;
   final List<Level> levels;
 
-  Criterion({required this.description, required this.levels});
+  MoodleRubricCriteria({required this.description, required this.levels});
 
-  factory Criterion.fromJson(Map<String, dynamic> json) {
+  factory MoodleRubricCriteria.fromJson(Map<String, dynamic> json) {
     var levelsList = (json['levels'] as List)
         .map((l) => Level.fromJson(l))
         .toList();
 
-    return Criterion(
+    return MoodleRubricCriteria(
       description: json['description'] ?? '',
       levels: levelsList,
     );

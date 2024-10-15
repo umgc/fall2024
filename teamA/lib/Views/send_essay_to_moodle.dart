@@ -17,7 +17,7 @@ class EssayAssignmentSettings extends StatefulWidget {
   EssayAssignmentSettingsState createState() => EssayAssignmentSettingsState();
 }
 
-class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
+class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   // Global key for the form
   final _formKey = GlobalKey<FormState>();
 
@@ -74,26 +74,26 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   @override
   void initState() {
     super.initState();
-    fetchCourses(); // Fetch courses on page load
+    // fetchCourses(); // Fetch courses on page load
     populateHeadersAndRows();
   }
 
 // Fetch courses from the controller
-  Future<void> fetchCourses() async {
-    try {
-      List<Course> courseList = await MainController().getCourses();
-      setState(() {
-        courses = courseList;
-        // Don't auto-select any course here, leave it to the user to select.
-        selectedCourse = 'Select a course';
-      });
-    } catch (e) {
-      debugPrint('Error fetching courses: $e');
-      setState(() {
-        selectedCourse = 'No courses available'; // Handle the empty case
-      });
-    }
-  }
+  // Future<void> fetchCourses() async {
+  //   try {
+  //     List<Course> courseList = await MainController().getCourses();
+  //     setState(() {
+  //       courses = courseList;
+  //       // Don't auto-select any course here, leave it to the user to select.
+  //       selectedCourse = 'Select a course';
+  //     });
+  //   } catch (e) {
+  //     debugPrint('Error fetching courses: $e');
+  //     setState(() {
+  //       selectedCourse = 'No courses available'; // Handle the empty case
+  //     });
+  //   }
+  // }
 
   // Headers and Rows for Rubric Display
   List headers = [];
@@ -472,53 +472,53 @@ class _EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  ElevatedButton(
-                    onPressed: () async {
-                      // Validate the form before submitting
-                      if (_formKey.currentState!.validate() &&
-                          _quillController.document
-                              .toPlainText()
-                              .trim()
-                              .isNotEmpty &&
-                          _validateAvailabilityDates()) {
-                        var userInfo = MoodleApiSingleton();
-                        String? token = userInfo.userToken;
+                  // ElevatedButton(
+                  //   onPressed: () async {
+                  //     // Validate the form before submitting
+                  //     if (_formKey.currentState!.validate() &&
+                  //         _quillController.document
+                  //             .toPlainText()
+                  //             .trim()
+                  //             .isNotEmpty &&
+                  //         _validateAvailabilityDates()) {
+                  //       var userInfo = MoodleApiSingleton();
+                  //       String? token = userInfo.userToken;
 
-                        if (token != null && token.isNotEmpty) {
-                          String courseId = courses
-                              .firstWhere(
-                                  (course) => course.fullName == selectedCourse)
-                              .id
-                              .toString();
-                          String assignmentName =
-                              _assignmentNameController.text;
-                          String description =
-                              _quillController.document.toPlainText();
-                          String dueDate =
-                              '$selectedDayDue $selectedMonthDue $selectedYearDue $selectedHourDue:$selectedMinuteDue';
-                          String allowSubmissionFrom =
-                              '$selectedDaySubmission $selectedMonthSubmission $selectedYearSubmission $selectedHourSubmission:$selectedMinuteSubmission';
+                  //       if (token != null && token.isNotEmpty) {
+                  //         String courseId = courses
+                  //             .firstWhere(
+                  //                 (course) => course.fullName == selectedCourse)
+                  //             .id
+                  //             .toString();
+                  //         String assignmentName =
+                  //             _assignmentNameController.text;
+                  //         String description =
+                  //             _quillController.document.toPlainText();
+                  //         String dueDate =
+                  //             '$selectedDayDue $selectedMonthDue $selectedYearDue $selectedHourDue:$selectedMinuteDue';
+                  //         String allowSubmissionFrom =
+                  //             '$selectedDaySubmission $selectedMonthSubmission $selectedYearSubmission $selectedHourSubmission:$selectedMinuteSubmission';
 
-                          await createAssignment(
-                            token,
-                            courseId,
-                            assignmentName,
-                            description,
-                            dueDate,
-                            allowSubmissionFrom,
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text('Failed to retrieve user token.')));
-                        }
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text(
-                                'Please fill out all fields and ensure a course, description, and valid availability dates are selected.')));
-                      }
-                    },
-                    child: Text('Send to Moodle'),
-                  ),
+                  //         await createAssignment(
+                  //           token,
+                  //           courseId,
+                  //           assignmentName,
+                  //           description,
+                  //           dueDate,
+                  //           allowSubmissionFrom,
+                  //         );
+                  //       } else {
+                  //         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  //             content: Text('Failed to retrieve user token.')));
+                  //       }
+                  //     } else {
+                  //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  //           content: Text(
+                  //               'Please fill out all fields and ensure a course, description, and valid availability dates are selected.')));
+                  //     }
+                  //   },
+                  //   child: Text('Send to Moodle'),
+                  // ),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).push(
