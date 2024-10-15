@@ -7,10 +7,11 @@ version: 0.0.1+1
 
 environment:
   sdk: ^3.1.1
+
 dependencies:
   flutter:
     sdk: flutter
-  editable: ^2.0.0
+  editable: 2.0.0
   flutter_dotenv: ^5.1.0
   xml: ^6.2.2
   http: ^1.2.1 
@@ -24,10 +25,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
   flutter_lints: ^2.0.0
 
 flutter:
   uses-material-design: true
-  assets:
-    - lib/assets/login_image.png
- 
