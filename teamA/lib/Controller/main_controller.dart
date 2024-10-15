@@ -52,12 +52,10 @@ class MainController
     return isLoggedIn;
   }
 
-  bool selectCourse(int index) {
+  void selectCourse(int index) {
     var api = MoodleApiSingleton();
     if (index < (api.moodleCourses?.length ?? 0)){
       selectedCourse = api.moodleCourses?[index];
-      return true;
     }
-    return false;
   }
 }
