@@ -13,7 +13,6 @@ class CreatePage extends StatefulWidget {
 }
 
 class _CreatePageState extends State<CreatePage> {
-
   List<String> subjects = [
     'Math',
     'Chemistry',
@@ -289,8 +288,11 @@ class _UiAssignmentFormState extends State<UiAssignmentForm> {
                               _selectedAssignmentType ?? QuestionType.essay,
                           codingLanguage: _selectedCodingLanguage,
                           topic: _topicController.text,
-                          questionCount: _numQuestions,
+                          //questionCount: _numQuestions,
                           maximumGrade: 100,
+                          trueFalseCount: 0,
+                          shortAnswerCount: 0,
+                          multipleChoiceCount: 0,
                         );
 
                         bool success =

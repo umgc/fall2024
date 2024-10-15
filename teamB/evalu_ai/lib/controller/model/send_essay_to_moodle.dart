@@ -288,12 +288,13 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
               children: [
                 ElevatedButton(
                   onPressed: () async {
-                    var result = await MoodleApiSingleton().createAssignnment(
+                    var api = MoodleApiSingleton();
+                    var result = await api.createAssignment(
                         '2',
                         '2',
-                        'Sunday Assignment',
-                        '2024-10-6',
-                        '2024-10-14',
+                        'Test Essay Assignment',
+                        '2024-10-15',
+                        '2024-10-21',
                         widget.updatedJson,
                         'This is the description');
                     print(result);
