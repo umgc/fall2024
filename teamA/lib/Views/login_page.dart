@@ -128,7 +128,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         if (wasSuccessful) {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => TeacherDashboard()),
+                            //MaterialPageRoute(builder: (context) => TeacherDashboard()),
+                            MaterialPageRoute(builder: (context) => DevLaunch())
                           );
                         } else {
                           _showLoginFailedDialog();
