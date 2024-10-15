@@ -16,7 +16,7 @@ class MainController
   // Internal constructor
   MainController._internal();
   static bool isLoggedIn = false;
-  final llm = LlmApi(dotenv.env['PERPLEXITY_API_KEY']!);
+  // final llm = LlmApi(dotenv.env['PERPLEXITY_API_KEY']!);
   final ValueNotifier<bool> isUserLoggedInNotifier = ValueNotifier(false);
   List<Course> courses = [];
   Course? selectedCourse;
