@@ -229,7 +229,6 @@ class MoodleApiSingleton {
     } else {
       throw StateError('Unexpected response format');
     }
-
     return participants;
   }
 
