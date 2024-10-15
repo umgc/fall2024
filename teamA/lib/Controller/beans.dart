@@ -138,6 +138,57 @@ class RubricCriteria
   }
 }
 
+
+class MoodleRubric {
+  final String title;
+  final List<MoodleRubricCriteria> criteria;
+
+  MoodleRubric({required this.title, required this.criteria});
+
+  factory MoodleRubric.fromJson(Map<String, dynamic> json) {
+    var criteriaList = (json['rubric_criteria'] as List)
+        .map((c) => MoodleRubricCriteria.fromJson(c))
+        .toList();
+
+    return MoodleRubric(
+      title: json['criteria_title'] ?? 'Rubric',
+      criteria: criteriaList,
+    );
+  }
+}
+
+class MoodleRubricCriteria {
+  final String description;
+  final List<Level> levels;
+
+  MoodleRubricCriteria({required this.description, required this.levels});
+
+  factory MoodleRubricCriteria.fromJson(Map<String, dynamic> json) {
+    var levelsList = (json['levels'] as List)
+        .map((l) => Level.fromJson(l))
+        .toList();
+
+    return MoodleRubricCriteria(
+      description: json['description'] ?? '',
+      levels: levelsList,
+    );
+  }
+}
+
+class Level {
+  final String description;
+  final int score;
+
+  Level({required this.description, required this.score});
+
+  factory Level.fromJson(Map<String, dynamic> json) {
+    return Level(
+      description: json['definition'] ?? '',
+      score: json['score'] ?? 0,
+    );
+  }
+}
+
 class Essay {
   //todo more vars as needed (like the Rubric for starters)
   String? name;
@@ -600,55 +651,6 @@ class Participant {
   }
 }
 
-class Rubric {
-  final String title;
-  final List<Criterion> criteria;
-
-  Rubric({required this.title, required this.criteria});
-
-  factory Rubric.fromJson(Map<String, dynamic> json) {
-    var criteriaList = (json['rubric_criteria'] as List)
-        .map((c) => Criterion.fromJson(c))
-        .toList();
-
-    return Rubric(
-      title: json['criteria_title'] ?? 'Rubric',
-      criteria: criteriaList,
-    );
-  }
-}
-
-class Criterion {
-  final String description;
-  final List<Level> levels;
-
-  Criterion({required this.description, required this.levels});
-
-  factory Criterion.fromJson(Map<String, dynamic> json) {
-    var levelsList = (json['levels'] as List)
-        .map((l) => Level.fromJson(l))
-        .toList();
-
-    return Criterion(
-      description: json['description'] ?? '',
-      levels: levelsList,
-    );
-  }
-}
-
-class Level {
-  final String description;
-  final int score;
-
-  Level({required this.description, required this.score});
-
-  factory Level.fromJson(Map<String, dynamic> json) {
-    return Level(
-      description: json['definition'] ?? '',
-      score: json['score'] ?? 0,
-    );
-  }
-}
 
 class Grade {
   final int id;
