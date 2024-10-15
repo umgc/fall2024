@@ -87,9 +87,7 @@ class _DevLaunch extends State {
           ElevatedButton(
               child: const Text('Open Contents Carousel'),
               onPressed: () async {
-                MoodleApiSingleton api = MoodleApiSingleton();
                 MainController main = MainController();
-                //await api.login('insert test username', 'insert test pw', 'insert test url');
                 await main.updateCourses();
                 await main.selectCourse(1);
                 // current issue: while the courses do come in, the quiz and essay list do not seem to come in quickly enough.

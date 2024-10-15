@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:http/http.dart' as http;
 import 'package:learninglens_app/Views/essay_edit_page.dart';
-import '../controller/main_controller.dart';
+// import '../controller/main_controller.dart';
 import '/Controller/beans.dart'; // Import the file that contains the Course class
 import 'dart:convert';
-import 'dart:io';
+// import 'dart:io';
 import '../Api/moodle_api_singleton.dart'; // Import the Moodle API Singleton
 
 class EssayAssignmentSettings extends StatefulWidget {
@@ -61,7 +61,7 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   List<String> minutes =
       List.generate(60, (index) => index.toString().padLeft(2, '0'));
 
-  TextEditingController _courseNameController = TextEditingController();
+  // TextEditingController _courseNameController = TextEditingController();
   TextEditingController _assignmentNameController = TextEditingController();
 
   // Quill Editor controller
@@ -71,29 +71,30 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   List<Course> courses = [];
   String selectedCourse = 'Select a course';
 
-  @override
-  void initState() {
-    super.initState();
-    // fetchCourses(); // Fetch courses on page load
-    populateHeadersAndRows();
-  }
+@override
+void initState() {
+  super.initState();
+  fetchCourses(); // Fetch courses on page load
+  populateHeadersAndRows();
+}
 
 // Fetch courses from the controller
-  // Future<void> fetchCourses() async {
-  //   try {
-  //     List<Course> courseList = await MainController().getCourses();
-  //     setState(() {
-  //       courses = courseList;
-  //       // Don't auto-select any course here, leave it to the user to select.
-  //       selectedCourse = 'Select a course';
-  //     });
-  //   } catch (e) {
-  //     debugPrint('Error fetching courses: $e');
-  //     setState(() {
-  //       selectedCourse = 'No courses available'; // Handle the empty case
-  //     });
-  //   }
-  // }
+Future<void> fetchCourses() async {
+  try {
+    List<Course>? courseList = MoodleApiSingleton().moodleCourses;
+    setState(() {
+      courses = courseList ?? [];
+      // Don't auto-select any course here, leave it to the user to select.
+      selectedCourse = 'Select a course';
+    });
+  } catch (e) {
+    debugPrint('Error fetching courses: $e');
+    setState(() {
+      selectedCourse = 'No courses available'; // Handle the empty case
+    });
+  }
+}
+  
 
   // Headers and Rows for Rubric Display
   List headers = [];
