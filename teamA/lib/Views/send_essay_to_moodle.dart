@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
-import 'package:http/http.dart' as http;
 import 'package:learninglens_app/Views/essay_edit_page.dart';
-import 'package:learninglens_app/Views/quiz_generator.dart';
-// import '../controller/main_controller.dart';
-import '/Controller/beans.dart'; // Import the file that contains the Course class
+import '/Controller/beans.dart';
 import 'dart:convert';
-// import 'dart:io';
-import '../Api/moodle_api_singleton.dart'; // Import the Moodle API Singleton
+import '../Api/moodle_api_singleton.dart';
 
 class EssayAssignmentSettings extends StatefulWidget {
   final String updatedJson;

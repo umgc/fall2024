@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'Api/moodle_api_singleton.dart';
@@ -145,8 +147,31 @@ class _DevLaunch extends State {
         ]));
   }
 
+  final jsonData = '''
+{
+    "criteria": [
+      {
+        "description": "Content",
+        "levels": [
+          {"definition": "Excellent", "score": 5},
+          {"definition": "Good", "score": 3},
+          {"definition": "Poor", "score": 1}
+        ]
+      },
+      {
+        "description": "Clarity",
+        "levels": [
+          {"definition": "Very Clear", "score": 5},
+          {"definition": "Somewhat Clear", "score": 3},
+          {"definition": "Unclear", "score": 1}
+        ]
+      }
+    ]
+  }
+''';
+
+
   final tempRubricXML = '''
-[
   {
     "criteria": [
       {
@@ -199,6 +224,5 @@ class _DevLaunch extends State {
       }
     ]
   }
-]
 ''';
 }
