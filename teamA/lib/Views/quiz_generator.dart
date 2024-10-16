@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:learninglens_app/Api/llm/prompt_engine.dart';
 import '../Controller/beans.dart';
 import 'edit_questions.dart';
 import 'package:llm_api_modules/openai_api.dart';
@@ -162,16 +163,20 @@ class SubmitButton extends StatelessWidget {
         maximumGrade: 100
       );
 
-      //final Object aiModel;
-      //if (selectedLLM == 'OpenAi') {
-      //  aiModel = OpenAiLLM('');
-      //} else if (selectedLLM == 'CLAUDE') {
-      //  aiModel = ClaudeAiAPI('');
-      //} else {
-      //  aiModel = OpenAiLLM('');
-      //  print("Third API Model");
-      //}
+      final aiModel;
+      if (selectedLLM == 'ChatGPT') {
+        aiModel = OpenAiLLM(String.fromEnvironment('openai_apikey'));
+      } else if (selectedLLM == 'CLAUDE') {
+        aiModel = ClaudeAiAPI(String.fromEnvironment('claude_apikey'));
+      } else {
+        aiModel = OpenAiLLM('');
+        //aiModel = PerplexityAPI(String.fromEnvironment('perplexity_apikey'));
+      }
 
+      var result = await aiModel.postToLlm(PromptEngine.generatePrompt(af));
+      if (result.isNotEmpty) {
+        print("Result: $result");
+      }
       //aiModel.postToLlm('');
       //if (await File('J:\\Users\\Conor Moore\\Downloads\\UMGC\\fall2024\\teamA\\lib\\TestFiles\\allThree.xml').exists()) {
       //  File('J:\\Users\\Conor Moore\\Downloads\\UMGC\\fall2024\\teamA\\lib\\TestFiles\\allThree.xml').readAsString().then((String fileContents) {
@@ -179,7 +184,7 @@ class SubmitButton extends StatelessWidget {
       //  });
       //} else {
         print("Getting open ai response");
-        const apiKey = String.fromEnvironment('openai_apikey');
+        const apiKey = String.fromEnvironment('openai_apikey', defaultValue: "No Value Found");
         print('api key: $apiKey');
         //final openai = OpenAiLLM(apiKey);
         //print("OpenAi");
