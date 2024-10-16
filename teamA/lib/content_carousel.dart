@@ -29,10 +29,10 @@ class _ContentState extends State<ContentCarousel>{
   factory _ContentState(String type, List? input) {
     //generate the full list of cards
     if (type == "assessment"){
-      return _ContentState._(type, CarouselCard.fromQuizzes(input) ?? [Text('This course has no generated quizzes.', style: TextStyle(fontSize: 32))]);
+      return _ContentState._(type, CarouselCard.fromQuizzes(input) ?? [Text('There are no generated quizzes that match the requirements.', style: TextStyle(fontSize: 32))]);
     }
     else if (type == 'essay'){
-      return _ContentState._(type, CarouselCard.fromEssays(input) ?? [Text('This course has no generated essays.', style: TextStyle(fontSize: 32))]);
+      return _ContentState._(type, CarouselCard.fromEssays(input) ?? [Text('This are no generated essays that match the requirements.', style: TextStyle(fontSize: 32))]);
     }
     //todo: add submission type
     else {
