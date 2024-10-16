@@ -50,32 +50,21 @@ class TeacherDashboard extends StatelessWidget {
   print(myUserName);
             },
           ),
-
-IconButton(
+          IconButton(
             icon: Icon(
               Icons.edit, // Icon for Edit Questions button
               color: Theme.of(context).colorScheme.onPrimaryContainer,
             ),
-                          
-                onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => SubmissionList(
-                          // moodleService: MoodleApiSingleton(),
-                          assignmentId: 207,
-                          courseId: '2')));
-                },
-                
-              ),
-            // onPressed: () {
-            //   // Navigate to the EditQuestions page
-            //   Navigator.push(
-            //     context,
-            //     MaterialPageRoute(
-            //       builder: (context) => EditQuestions(''),
-            //     ),
-            //   );
-            // }
-// )
+            onPressed: () {
+              // Navigate to the EditQuestions page
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditQuestions(),
+                ),
+              );
+            }
+          )
         ],
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,

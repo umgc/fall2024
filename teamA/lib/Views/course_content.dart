@@ -21,7 +21,7 @@ class ViewCourseContents extends StatefulWidget {
 }
 
 class _CourseState extends State{
-  final String courseName = MainController().getSelectedCourse()?.fullName ?? "Test Course";
+  final String courseName = MainController().selectedCourse?.fullName ?? "Test Course";
 
   @override
   Widget build(BuildContext context){
@@ -33,8 +33,8 @@ class _CourseState extends State{
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Text(courseName, style: TextStyle(fontSize: 64),),
-              ContentCarousel('assessment', MainController().quizzes),
-              ContentCarousel('essay', MainController().essays),
+              ContentCarousel('assessment', MainController().selectedCourse?.quizzes),
+              ContentCarousel('essay', MainController().selectedCourse?.essays),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [CreateButton('assessment'), CreateButton('essay')]
