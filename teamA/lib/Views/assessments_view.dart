@@ -27,7 +27,10 @@ class _AssessmentsState extends State{
           children:[
             Text('All Quizzes', style: TextStyle(fontSize: 64)),
             ContentCarousel('assessment', getAllQuizzes()),
-            CreateButton('assessment')
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children:[CreateButton('assessment')]
+            )
           ]
         )
       )
