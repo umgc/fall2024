@@ -89,12 +89,9 @@ class _DevLaunch extends State {
           ElevatedButton(
               child: const Text('Open Contents Carousel'),
               onPressed: () async {
-                MainController main = MainController();
-                await main.updateCourses();
-                await main.selectCourse(1);
-                // current issue: while the courses do come in, the quiz and essay list do not seem to come in quickly enough.
-                // Solution for this is to go back using the navigator and open the page again, then it'll work.
-                // I'm not fixing this because it's just for test purposes.
+                if (MoodleApiSingleton().isLoggedIn()){
+                  MainController().selectCourse(0);
+                }
                 Navigator.push(
                   context,
                   MaterialPageRoute(

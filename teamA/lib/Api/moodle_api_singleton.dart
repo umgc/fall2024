@@ -138,15 +138,15 @@ class MoodleApiSingleton {
             String description = '';
             //todo learn how to get the questions from quizzes
             //all this is literally only enough to make the CarouselCards
-            if (module.containsKey('intro')) {
+            if (module.containsKey('intro')){
               //while all the null-shorting is amazingly useful, I don't know if Dart has KeyErrors
               description = module['intro'];
             }
-            if (module['modname'] == 'quiz') {
-              results.insert(
-                  results.length, Quiz(name: name, description: description));
-            } else {
-              // results.insert(results.length, Essay(name: name, description: description));
+            if (module['modname'] == 'quiz'){
+              results.insert(results.length, Quiz(name: name, description: description));
+            }
+            else{
+              results.insert(results.length, Essay(name: name, description: description));
             }
           }
         }
@@ -262,6 +262,11 @@ class MoodleApiSingleton {
       courses = courseList.map((i) => Course.fromJson(i)).toList();
     } else {
       throw StateError('Unexpected response format');
+    }
+    //obtain the contents of each course
+    for (Course course in courses){
+      course.quizzes = await getQuizzes(course.id);
+      course.essays = await getEssays(course.id);
     }
     return courses;
   }
@@ -609,7 +614,6 @@ Future<SubmissionStatus?> getSubmissionStatus(int assignmentId, int userId) asyn
   // ********************************************************************************************************************
   // Create a new assignment with optional rubric JSON in the specified course using learninglens plugin.
   // ********************************************************************************************************************
-
 
   Future<Map<String, dynamic>?> createAssignment(
       String courseid,

@@ -29,10 +29,10 @@ class _ContentState extends State<ContentCarousel>{
   factory _ContentState(String type, List? input) {
     //generate the full list of cards
     if (type == "assessment"){
-      return _ContentState._(type, CarouselCard.fromQuizzes(input) ?? [Text('This course has no generated quizzes.')]);
+      return _ContentState._(type, CarouselCard.fromQuizzes(input) ?? [Text('This course has no generated quizzes.', style: TextStyle(fontSize: 32))]);
     }
     else if (type == 'essay'){
-      return _ContentState._(type, CarouselCard.fromEssays(input) ?? [Text('This course has no generated essays.')]);
+      return _ContentState._(type, CarouselCard.fromEssays(input) ?? [Text('This course has no generated essays.', style: TextStyle(fontSize: 32))]);
     }
     //todo: add submission type
     else {
@@ -44,15 +44,27 @@ class _ContentState extends State<ContentCarousel>{
 
   @override
   Widget build(BuildContext context){
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxHeight: 400), //testing width
-      child: CarouselView(
-        backgroundColor: Theme.of(context).primaryColor,
-        itemExtent: 600,
-        shrinkExtent: 350,
-        children: children
-      )
-    );
+    //For empty contents, we don't build a carousel
+    if (_children.length == 1 && _children[0].runtimeType == Text){
+      return ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: 400),
+        child: Center(
+          child: _children[0]
+        )
+      );
+    }
+
+    else{
+      return ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: 400), //testing width
+        child: CarouselView(
+          backgroundColor: Theme.of(context).primaryColor,
+          itemExtent: 600,
+          shrinkExtent: 350,
+          children: children
+        )
+      );
+    }
   }
 }
 
