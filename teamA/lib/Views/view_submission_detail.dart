@@ -17,7 +17,7 @@ class SubmissionDetail extends StatefulWidget {
 }
 
 class SubmissionDetailState extends State<SubmissionDetail> {
-  Rubric? rubric;
+  MoodleRubric? rubric;
   bool isLoading = true;
   String errorMessage = '';
 

@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../Controller/beans.dart';
 import 'edit_questions.dart';
-import '../Api/llm/prompt_engine.dart';
 import 'package:llm_api_modules/openai_api.dart';
+import 'package:llm_api_modules/claudeai_api.dart';
+
 
 
 class CreateAssessment extends StatefulWidget {
@@ -106,7 +107,7 @@ class _AssessmentState extends State<CreateAssessment> {
                               selectedLLM = newValue;
                             });
                           },
-                          items: ['ChatGPT', 'LLAMA', 'Perplexity'].map((String value) {
+                          items: ['ChatGPT', 'CLAUDE', 'Perplexity'].map((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
                               child: Text(value),
@@ -161,11 +162,22 @@ class SubmitButton extends StatelessWidget {
         maximumGrade: 100
       );
 
-      if (await File('J:\\Users\\Conor Moore\\Downloads\\UMGC\\fall2024\\teamA\\lib\\TestFiles\\allThree.xml').exists()) {
-        File('J:\\Users\\Conor Moore\\Downloads\\UMGC\\fall2024\\teamA\\lib\\TestFiles\\allThree.xml').readAsString().then((String fileContents) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => EditQuestions(fileContents)));
-        });
-      } else {
+      //final Object aiModel;
+      //if (selectedLLM == 'OpenAi') {
+      //  aiModel = OpenAiLLM('');
+      //} else if (selectedLLM == 'CLAUDE') {
+      //  aiModel = ClaudeAiAPI('');
+      //} else {
+      //  aiModel = OpenAiLLM('');
+      //  print("Third API Model");
+      //}
+
+      //aiModel.postToLlm('');
+      //if (await File('J:\\Users\\Conor Moore\\Downloads\\UMGC\\fall2024\\teamA\\lib\\TestFiles\\allThree.xml').exists()) {
+      //  File('J:\\Users\\Conor Moore\\Downloads\\UMGC\\fall2024\\teamA\\lib\\TestFiles\\allThree.xml').readAsString().then((String fileContents) {
+      //    Navigator.push(context, MaterialPageRoute(builder: (context) => EditQuestions(fileContents)));
+      //  });
+      //} else {
         print("Getting open ai response");
         const apiKey = String.fromEnvironment('openai_apikey');
         print('api key: $apiKey');
@@ -175,7 +187,7 @@ class SubmitButton extends StatelessWidget {
         //if (result.isNotEmpty) {
         //  print("Result: $result");
         //}
-      }
+      //}
     }
   }
 
