@@ -46,8 +46,7 @@ class TeacherDashboard extends StatelessWidget {
               // Handle profile/account actions here
             },
           ),
-
-IconButton(
+          IconButton(
             icon: Icon(
               Icons.edit, // Icon for Edit Questions button
               color: Theme.of(context).colorScheme.onPrimaryContainer,
