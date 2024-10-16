@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/Views/assessments_view.dart';
 import 'Api/moodle_api_singleton.dart';
 import 'Controller/main_controller.dart';
 import 'Views/login_page.dart';
@@ -48,6 +49,7 @@ class MyApp extends StatelessWidget {
         // '/create': (context) => const CreatePage(),
         '/dashboard': (context) => TeacherDashboard(),
         '/send_essay_to_moodle': (context) => EssayAssignmentSettings(''),
+        '/assessments': (context) => AssessmentsView(),
         // '/viewExams': (context) => const ViewExamPage(),
         // '/settings': (context) => Setting(themeModeNotifier: _themeModeNotifier)
       },
@@ -138,6 +140,16 @@ class _DevLaunch extends State {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => EditQuestions()));
             },
+          ),
+          ElevatedButton(
+            child: const Text('View Quizzes'),
+            onPressed: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AssessmentsView())
+              );
+            }
           )
         ]));
   }
