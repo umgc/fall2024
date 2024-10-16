@@ -36,10 +36,13 @@ class _AssessmentsState extends State{
 }
 
 //Helper function that pulls the quizzes from all the user's courses
-List<Quiz> getAllQuizzes(){
-  List<Quiz> result = [];
+List<Quiz>? getAllQuizzes(){
+  List<Quiz>? result;
   for (Course c in MoodleApiSingleton().moodleCourses ?? []){
-    result += c.quizzes ?? [];
+    result = (result ?? []) + (c.quizzes ?? []);
+  }
+  if (result == []){
+    return null;
   }
   return result;
 }
