@@ -33,6 +33,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  @override
   Widget build(BuildContext context) {
   return Scaffold(
     appBar: AppBar(
@@ -68,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
                               borderRadius:
                                   BorderRadius.circular(10), // Circular border
                             ),//look here
-                            padding: EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
                         const Text(

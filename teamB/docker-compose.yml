@@ -1,0 +1,21 @@
+version: '3'
+services:
+  flutterApp:
+    build: ./evalu_ai/
+    ports:
+      - "8081:80"
+  dartCompiler:
+    build: ./compiler/bin/dart_compiler
+    ports:
+      - "8080:8080"
+  javascriptCompiler:
+    build: ./compiler/bin/javascript_compiler
+    ports: 
+      - "3000:3000"
+  pythonCompiler:
+    build: ./compiler/bin/python_compiler
+    ports: 
+      - "8082:8082"
+volumes:
+  db-data:
+

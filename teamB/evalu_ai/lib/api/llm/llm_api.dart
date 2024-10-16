@@ -16,7 +16,7 @@ class LlmApi {
   String getPostBody(String queryMessage) {
     return jsonEncode({
       // 'model': 'llama-3-sonar-large-32k-online',
-      'model': 'llama-3-sonar-large-32k-chat',
+      'model': 'llama-3.1-sonar-large-128k-chat',
       'messages': [
         {'role': 'system', 'content': 'Be precise and concise'},
         {'role': 'user', 'content': queryMessage}
