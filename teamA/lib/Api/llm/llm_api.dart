@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class OpenAiLLM {
-  final String openAiKey;
-  OpenAiLLM(this.openAiKey);
+class LlmApi {
+  final String apiKey;
+  LlmApi(this.apiKey);
 
   Map<String, dynamic> convertHttpRespToJson(String httpResponseString) {
     return (json.decode(httpResponseString) as Map<String, dynamic>);
@@ -15,7 +15,8 @@ class OpenAiLLM {
   ///
   String getPostBody(String queryMessage) {
     return jsonEncode({
-      'model': 'gpt-4o-mini',
+      // 'model': 'llama-3-sonar-large-32k-online',
+      'model': 'llama-3-sonar-large-32k-chat',
       'messages': [
         {'role': 'system', 'content': 'Be precise and concise'},
         {'role': 'user', 'content': queryMessage}
@@ -30,14 +31,14 @@ class OpenAiLLM {
     return ({
       'accept': 'application/json',
       'content-type': 'application/json',
-      'authorization': 'Bearer $openAiKey',
+      'authorization': 'Bearer $apiKey',
     });
   }
 
   ///
   ///
   ///
-  Uri getPostUrl() => Uri.https('api.openai.com', '/v1/chat/completions');
+  Uri getPostUrl() => Uri.https('api.perplexity.ai', '/chat/completions');
 
   ///
   ///
@@ -46,10 +47,6 @@ class OpenAiLLM {
       Uri url, Map<String, String> postHeaders, Object postBody) async {
     final httpPackageResponse =
         await http.post(url, headers: postHeaders, body: postBody);
-
-    print(url);
-    print(postHeaders);
-    print(postBody);
 
     if (httpPackageResponse.statusCode != 200) {
       print('Failed to retrieve the http package!');

@@ -48,7 +48,7 @@ class TeacherDashboard extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => EditQuestions(),
+                    builder: (context) => EditQuestions(''),
                   ),
                 );
               })
@@ -324,7 +324,7 @@ class TeacherDashboard extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      CreateAssessment(''), // Passing empty userName
+                      CreateAssessment(),
                 ),
               );
             } else if (title == 'Essays') {
