@@ -10,7 +10,7 @@ environment:
     
 dependencies:
   llm_api_modules:
-    path: ../LLM-API-Modules
+    path: LLM-API-Modules
   flutter:
     sdk: flutter
 
