@@ -46,22 +46,28 @@ class _ContentState extends State<ContentCarousel>{
   Widget build(BuildContext context){
     //For empty contents, we don't build a carousel
     if (_children.length == 1 && _children[0].runtimeType == Text){
-      return ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: 400),
-        child: Center(
-          child: _children[0]
+      return Padding(
+        padding: EdgeInsets.all(20),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: 400),
+          child: Center(
+            child: _children[0]
+          )
         )
       );
     }
 
     else{
-      return ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: 400), //testing width
-        child: CarouselView(
-          backgroundColor: Theme.of(context).primaryColor,
-          itemExtent: 600,
-          shrinkExtent: 350,
-          children: children
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: 20),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: 400), //testing width
+          child: CarouselView(
+            backgroundColor: Theme.of(context).primaryColor,
+            itemExtent: 600,
+            shrinkExtent: 350,
+            children: children
+          )
         )
       );
     }
@@ -116,8 +122,9 @@ class CarouselCard extends StatelessWidget{
   @override
   StatelessWidget build(BuildContext context){
     return Card.filled(
-      color: Theme.of(context).primaryColor,
+      color: Theme.of(context).cardColor,
       child: Scaffold(
+        backgroundColor: Theme.of(context).cardColor,
         body: Column(
           children:[
             Center(
