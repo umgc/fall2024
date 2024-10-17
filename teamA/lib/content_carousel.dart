@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/Api/moodle_api_singleton.dart';
+import 'package:learninglens_app/Views/essay_edit_page.dart';
+import 'package:learninglens_app/Views/essay_generation.dart';
+import 'package:learninglens_app/Views/quiz_generator.dart';
+import 'package:learninglens_app/Views/send_essay_to_moodle.dart';
 import "Controller/beans.dart";
 
 //Provides a carousel of either assessments, essays, or submission
@@ -141,17 +146,20 @@ class CarouselCard extends StatelessWidget{
   Row cardButtons(BuildContext context){
     if (type == 'assessment'){
       return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [OutlinedButton(onPressed:() {
-          //will navigate to this assessment's edit screen
-        }, child: Text('Edit Assessment'))]
+          //Navigator.push(context, MaterialPageRoute(builder: (context) => //todo find the actual page))
+        }, child: Text('Edit Assessment')),
+        OutlinedButton(onPressed: () {
+          //Navigator.push(context, MaterialPageRoute(builder: (context) => EditQuestions(//todo special editing version of this page)))
+        }, child: Text('Edit Questions'))]
       );
     }
     else if (type == 'essay'){
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [OutlinedButton(onPressed:() {
-          //will navigate to this assignment's edit screen
+          //Navigator.push(context, MaterialPageRoute(builder: (context) => EssayAssignmentSettings('//todo get the correct details for this')));
         }, child: Text('Edit Assignment')),
         OutlinedButton(onPressed:() {
           //will navigate to this assignment's submissions screen
@@ -190,7 +198,18 @@ class CreateButton extends StatelessWidget{
   @override
   Widget build(BuildContext context){
     return OutlinedButton(
-      onPressed: () {}, 
+      onPressed: () {
+        MaterialPageRoute? route;
+        if (type == 'assessment'){
+          route = MaterialPageRoute(builder: (context) => CreateAssessment(MoodleApiSingleton().moodleFirstName ?? 'TestUser'));
+        }
+        else if (type == 'essay'){
+          route = MaterialPageRoute(builder:(context) => EssayGeneration(title: 'New Essay'));
+        }
+        if (route != null){
+          Navigator.push(context, route);
+        }
+      }, 
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
