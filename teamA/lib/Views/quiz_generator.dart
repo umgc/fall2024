@@ -13,7 +13,6 @@ import 'package:llm_api_modules/claudeai_api.dart';
 
 class CreateAssessment extends StatefulWidget {
 
-  final String userName;
   static TextEditingController nameController = TextEditingController();
   static TextEditingController descriptionController = TextEditingController();
   static TextEditingController sourceController = TextEditingController();
@@ -21,7 +20,7 @@ class CreateAssessment extends StatefulWidget {
   static TextEditingController trueFalseController = TextEditingController();
   static TextEditingController shortAnswerController = TextEditingController();
   static TextEditingController topicController = TextEditingController();
-  CreateAssessment(this.userName);
+  CreateAssessment();
 
   @override
   State createState() {
@@ -169,30 +168,13 @@ class SubmitButton extends StatelessWidget {
       } else if (selectedLLM == 'CLAUDE') {
         aiModel = ClaudeAiAPI(String.fromEnvironment('claude_apikey'));
       } else {
-        aiModel = OpenAiLLM('');
+        aiModel = OpenAiLLM(''); // Awaiting perplexity implementation
         //aiModel = PerplexityAPI(String.fromEnvironment('perplexity_apikey'));
       }
-
       var result = await aiModel.postToLlm(PromptEngine.generatePrompt(af));
       if (result.isNotEmpty) {
-        print("Result: $result");
+       Navigator.push(context, MaterialPageRoute(builder: (context) => EditQuestions(result)));
       }
-      //aiModel.postToLlm('');
-      //if (await File('J:\\Users\\Conor Moore\\Downloads\\UMGC\\fall2024\\teamA\\lib\\TestFiles\\allThree.xml').exists()) {
-      //  File('J:\\Users\\Conor Moore\\Downloads\\UMGC\\fall2024\\teamA\\lib\\TestFiles\\allThree.xml').readAsString().then((String fileContents) {
-      //    Navigator.push(context, MaterialPageRoute(builder: (context) => EditQuestions(fileContents)));
-      //  });
-      //} else {
-        print("Getting open ai response");
-        const apiKey = String.fromEnvironment('openai_apikey', defaultValue: "No Value Found");
-        print('api key: $apiKey');
-        //final openai = OpenAiLLM(apiKey);
-        //print("OpenAi");
-        //var result = await openai.postToLlm(PromptEngine.generatePrompt(af));
-        //if (result.isNotEmpty) {
-        //  print("Result: $result");
-        //}
-      //}
     }
   }
 
