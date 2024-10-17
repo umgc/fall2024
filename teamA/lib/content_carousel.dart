@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/Api/moodle_api_singleton.dart';
+import 'package:learninglens_app/Views/essay_edit_page.dart';
+import 'package:learninglens_app/Views/essay_generation.dart';
+import 'package:learninglens_app/Views/quiz_generator.dart';
+import 'package:learninglens_app/Views/send_essay_to_moodle.dart';
 import "Controller/beans.dart";
 
 //Provides a carousel of either assessments, essays, or submission
@@ -29,10 +34,10 @@ class _ContentState extends State<ContentCarousel>{
   factory _ContentState(String type, List? input) {
     //generate the full list of cards
     if (type == "assessment"){
-      return _ContentState._(type, CarouselCard.fromQuizzes(input) ?? [Text('This course has no generated quizzes.', style: TextStyle(fontSize: 32))]);
+      return _ContentState._(type, CarouselCard.fromQuizzes(input) ?? [Text('There are no generated quizzes that match the requirements.', style: TextStyle(fontSize: 32))]);
     }
     else if (type == 'essay'){
-      return _ContentState._(type, CarouselCard.fromEssays(input) ?? [Text('This course has no generated essays.', style: TextStyle(fontSize: 32))]);
+      return _ContentState._(type, CarouselCard.fromEssays(input) ?? [Text('This are no generated essays that match the requirements.', style: TextStyle(fontSize: 32))]);
     }
     //todo: add submission type
     else {
@@ -46,22 +51,28 @@ class _ContentState extends State<ContentCarousel>{
   Widget build(BuildContext context){
     //For empty contents, we don't build a carousel
     if (_children.length == 1 && _children[0].runtimeType == Text){
-      return ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: 400),
-        child: Center(
-          child: _children[0]
+      return Padding(
+        padding: EdgeInsets.all(20),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: 400),
+          child: Center(
+            child: _children[0]
+          )
         )
       );
     }
 
     else{
-      return ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: 400), //testing width
-        child: CarouselView(
-          backgroundColor: Theme.of(context).primaryColor,
-          itemExtent: 600,
-          shrinkExtent: 350,
-          children: children
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: 20),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: 400), //testing width
+          child: CarouselView(
+            backgroundColor: Theme.of(context).primaryColor,
+            itemExtent: 600,
+            shrinkExtent: 350,
+            children: children
+          )
         )
       );
     }
@@ -116,8 +127,9 @@ class CarouselCard extends StatelessWidget{
   @override
   StatelessWidget build(BuildContext context){
     return Card.filled(
-      color: Theme.of(context).primaryColor,
+      color: Theme.of(context).cardColor,
       child: Scaffold(
+        backgroundColor: Theme.of(context).cardColor,
         body: Column(
           children:[
             Center(
@@ -134,17 +146,20 @@ class CarouselCard extends StatelessWidget{
   Row cardButtons(BuildContext context){
     if (type == 'assessment'){
       return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [OutlinedButton(onPressed:() {
-          //will navigate to this assessment's edit screen
-        }, child: Text('Edit Assessment'))]
+          //Navigator.push(context, MaterialPageRoute(builder: (context) => //todo find the actual page))
+        }, child: Text('Edit Assessment')),
+        OutlinedButton(onPressed: () {
+          //Navigator.push(context, MaterialPageRoute(builder: (context) => EditQuestions(//todo special editing version of this page)))
+        }, child: Text('Edit Questions'))]
       );
     }
     else if (type == 'essay'){
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [OutlinedButton(onPressed:() {
-          //will navigate to this assignment's edit screen
+          //Navigator.push(context, MaterialPageRoute(builder: (context) => EssayAssignmentSettings('//todo get the correct details for this')));
         }, child: Text('Edit Assignment')),
         OutlinedButton(onPressed:() {
           //will navigate to this assignment's submissions screen
@@ -183,7 +198,18 @@ class CreateButton extends StatelessWidget{
   @override
   Widget build(BuildContext context){
     return OutlinedButton(
-      onPressed: () {}, 
+      onPressed: () {
+        MaterialPageRoute? route;
+        if (type == 'assessment'){
+          route = MaterialPageRoute(builder: (context) => CreateAssessment(MoodleApiSingleton().moodleFirstName ?? 'TestUser'));
+        }
+        else if (type == 'essay'){
+          route = MaterialPageRoute(builder:(context) => EssayGeneration(title: 'New Essay'));
+        }
+        if (route != null){
+          Navigator.push(context, route);
+        }
+      }, 
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
