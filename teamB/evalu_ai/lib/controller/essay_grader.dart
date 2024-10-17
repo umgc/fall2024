@@ -18,7 +18,7 @@ class EssayGrader extends StatefulWidget {
 class EssayGraderState extends State<EssayGrader> {
   // JSON data to be used
   late dynamic rubric;
-  late dynamic submission;
+  late dynamic essaySubmission;
 
   // Convert JSON to rows compatible with Editable
   List rows = [];
@@ -104,7 +104,9 @@ class EssayGraderState extends State<EssayGrader> {
             child: const Text('Finish and Assign'),
             onPressed: () {
               String updatedJson = getUpdatedJson();
-              /*
+
+              /* **Add Button Logic**
+
               // Navigate to the Essay Assignment Settings page with the updated JSON
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => EssayAssignmentSettings(updatedJson)));

@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:intelligrade/api/llm/llm_api.dart';
 import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
 
 class AssignmentSubmissionsPage extends StatelessWidget {
@@ -9,6 +12,18 @@ class AssignmentSubmissionsPage extends StatelessWidget {
     required this.assignmentTitle,
     required this.studentSubmissions,
   });
+
+  //Function to query Perplexity to generate a rubric
+  Future<dynamic> genRubricFromAi(String inputs) async {
+    String apiKey = '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';
+    LlmApi myLLM = LlmApi(apiKey);
+    String queryPrompt = '''
+
+$inputs
+''';
+    String rubric = await myLLM.postToLlm(queryPrompt);
+    return jsonDecode(rubric);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,8 +58,11 @@ class AssignmentSubmissionsPage extends StatelessWidget {
                       title: Text('Student Submission ${index + 1}'),
                       subtitle: Text(studentSubmissions[index]),
                       trailing: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           // Handle grade button press, e.g., navigate to grading page
+                          var api = MoodleApiSingleton();
+                          //var result = await api.getRubric();
+                          //print();
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('Grade button pressed')),
                           );
