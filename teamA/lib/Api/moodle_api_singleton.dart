@@ -142,7 +142,7 @@ class MoodleApiSingleton {
             String description = '';
             //todo learn how to get the questions from quizzes
             //all this is literally only enough to make the CarouselCards
-            if (module.containsKey('intro')) {
+            if (module.containsKey('intro')){
               //while all the null-shorting is amazingly useful, I don't know if Dart has KeyErrors
               description = module['intro'];
             }
@@ -510,14 +510,11 @@ Future<SubmissionStatus?> getSubmissionStatus(int assignmentId, int userId) asyn
     return null;
   }
 
-
-
   // ********************************************************************************************************************
   // Add random questions to the specified quiz using learninglens plugin.
   // ********************************************************************************************************************
 
-  Future<String> addRandomQuestions(
-      String categoryid, String quizid, String numquestions) async {
+  Future<String> addRandomQuestions(String categoryid, String quizid, String numquestions) async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
     final response = await http.post(
       Uri.parse(moodleURL + serverUrl),
