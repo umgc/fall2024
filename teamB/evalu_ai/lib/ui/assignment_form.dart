@@ -1,7 +1,11 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'package:flutter/material.dart';
+import 'package:intelligrade/ui/custom_navigation_bar.dart';
 import 'package:intelligrade/ui/dashboard_page.dart';
 import 'package:intelligrade/ui/generated_questions.dart';
 import 'package:intelligrade/api/llm/openai_api.dart';
+import 'package:intelligrade/ui/header.dart';
 
 
 void main() {
@@ -18,23 +22,48 @@ class CreateAssignmentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Column(
-        children: [
-          Header(),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: AssignmentForm(),
+    final int selectedIndex =
+        ModalRoute.of(context)?.settings.arguments as int? ??
+            0; //capture index for nav bar
+    return Scaffold(
+      appBar: const AppHeader(
+          title: "Create Assignment", //maybe change
+        ),
+      body: LayoutBuilder(builder: (context, constraints) {
+        return Row(
+          children: [
+            Container(
+                width: 250,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.blueGrey,
+                    width: 0.5,
+                  ),
+                ),
+                child: CustomNavigationBar(selectedIndex: selectedIndex),
+              ),
+            Expanded(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: AssignmentForm(),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      })
     );
   }
 }
+
+
 
 class Header extends StatelessWidget {
   const Header({super.key});
