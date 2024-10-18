@@ -1,24 +1,47 @@
-using Microsoft.AspNetCore.Builder;  // For building the ASP.NET Core application
-using Microsoft.AspNetCore.Hosting;  // For configuring the web hosting environment
-using Microsoft.Extensions.Hosting;  // For hosting utilities like creating a web server
-using Microsoft.Extensions.DependencyInjection;  // For adding services like controllers
-
-// Create a new web application builder instance
-var builder = WebApplication.CreateBuilder(args);
-
-// Add controller services to the application (optional, but required if you have controllers)
-builder.Services.AddControllers();
-
-// Build the application
-var app = builder.Build();
-
-// Define a POST endpoint at /compile/csharp that processes C# compilation requests
-app.MapPost("/compile/csharp", async (HttpContext context) =>
+/// <summary>
+/// Entry point for the CSharpServerApp, which listens for HTTP requests to compile and execute C# code.
+/// </summary>
+namespace CSharpServerApp
 {
-    var compiler = new CSharpCompiler();  // Create an instance of the CSharpCompiler class
-    var response = await compiler.ProcessCSRequest(context.Request);  // Process the incoming request with the compiler
-    return Results.Content(response);  // Return the compiler's response as plain text
-});
+    public class Program
+    {
+        /// <summary>
+        /// Main method that starts the web server and listens for requests.
+        /// </summary>
+        /// <param name="args">Command-line arguments for the application.</param>
+        public static void Main(string[] args)
+        {
+            // Create a new web application builder
+            var builder = WebApplication.CreateBuilder(args);
 
-// Run the application (start listening for requests)
-app.Run();
+            // Add controller services
+            builder.Services.AddControllers();
+
+            // Build the web application
+            var app = builder.Build();
+
+            // Map the POST request to the /compile/csharp endpoint
+            app.MapPost("/compile/csharp", async (HttpContext context) =>
+            {
+                try
+                {
+                    Console.WriteLine("Received POST request at /compile/csharp");
+
+                    // Initialize the CSharpCompiler to process the request
+                    var compiler = new CSharpCompiler();
+                    var response = await compiler.ProcessCSRequest(context.Request);
+                    return Results.Content(response);
+                }
+                catch (Exception ex)
+                {
+                    // Log any exceptions and return an error response
+                    Console.WriteLine("Error processing request: " + ex.Message);
+                    return Results.Problem("Internal server error: " + ex.Message);
+                }
+            });
+
+            // Run the web application on the specified URL
+            app.Run("http://0.0.0.0:8001");
+        }
+    }
+}

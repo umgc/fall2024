@@ -1,20 +1,37 @@
-# Use an official gcc image
-FROM gcc:latest
+# Use an official image for C++ development
+FROM ubuntu:20.04
+
+# Set environment variable to skip interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install required packages and libraries
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    curl \
+    unzip \
+    zip \
+    libzip-dev \
+    libssl-dev \
+    g++ \
+    wget \
+    tzdata \
+    && rm -rf /var/lib/apt/lists/*
+
+# Download httplib.h (cpp-httplib) from GitHub
+RUN curl -L https://github.com/yhirose/cpp-httplib/raw/master/httplib.h -o /usr/local/include/httplib.h
 
 # Set the working directory
 WORKDIR /app
 
-# Install HTTP library
-RUN apt-get update && apt-get install -y libhttplib-dev
+# Copy the entire source code into the container
+COPY . /app
 
-# Copy the source files
-COPY . .
+# Compile the application with C++17 support
+RUN g++ cppServer.cpp cppCompiler.cpp -o cppServerApp -lzip -lpthread -std=c++17
 
-# Compile the server
-RUN g++ -o server CppServer.cpp -lhttplib
-
-# Expose the port
-EXPOSE 8080
+# Expose port 8000 for the server
+EXPOSE 8000
 
 # Run the server
-CMD ["/app/server"]
+CMD ["./cppServerApp"]
