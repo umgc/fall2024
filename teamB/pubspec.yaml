@@ -8,6 +8,7 @@ environment:
 
 dependencies:
   args: ^2.4.0
+  flutter_dotenv: ^5.2.1
   shelf: ^1.4.0
   shelf_router: ^1.1.0
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intelligrade/ui/assignment_details_page.dart';
-import 'package:intelligrade/ui/create_page.dart';
+import 'package:intelligrade/ui/assignment_form.dart';
 import 'package:intelligrade/ui/essay_edit_page.dart';
 import 'package:intelligrade/ui/setting_page.dart';
 import 'package:intelligrade/ui/dashboard_page.dart';

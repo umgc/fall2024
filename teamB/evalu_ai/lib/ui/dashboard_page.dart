@@ -435,10 +435,8 @@ class _DashBoardPageState extends State<DashBoardPage> {
                           const Text('No saved exams yet.'),
                           ElevatedButton(
                             onPressed: () {
-                              // Navigator.pushReplacementNamed(
-                              //     context, '/create');
                               Navigator.pushReplacementNamed(
-                                  context, '/assignemntDetails');
+                                  context, '/create');
                             },
                             child: const Text('Create Exam'),
                           ),

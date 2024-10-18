@@ -1,4 +1,12 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'package:flutter/material.dart';
+import 'package:intelligrade/ui/custom_navigation_bar.dart';
+import 'package:intelligrade/ui/dashboard_page.dart';
+import 'package:intelligrade/ui/generated_questions.dart';
+import 'package:intelligrade/api/llm/openai_api.dart';
+import 'package:intelligrade/ui/header.dart';
+
 
 void main() {
   runApp(
@@ -14,23 +22,48 @@ class CreateAssignmentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Column(
-        children: [
-          Header(),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: AssignmentForm(),
+    final int selectedIndex =
+        ModalRoute.of(context)?.settings.arguments as int? ??
+            0; //capture index for nav bar
+    return Scaffold(
+      appBar: const AppHeader(
+          title: "Create Assignment", //maybe change
+        ),
+      body: LayoutBuilder(builder: (context, constraints) {
+        return Row(
+          children: [
+            Container(
+                width: 250,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.blueGrey,
+                    width: 0.5,
+                  ),
+                ),
+                child: CustomNavigationBar(selectedIndex: selectedIndex),
+              ),
+            Expanded(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: AssignmentForm(),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      })
     );
   }
 }
+
+
 
 class Header extends StatelessWidget {
   const Header({super.key});
@@ -62,7 +95,11 @@ class Header extends StatelessWidget {
           ),
           InkWell(
             onTap: () {
-              Navigator.pushNamed(context, '/user_profile');
+              // Navigate to the dashboard page when the profile icon is clicked
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const DashBoardPage()),
+              );
             },
             child: const CircleAvatar(
               radius: 18,
@@ -74,6 +111,7 @@ class Header extends StatelessWidget {
     );
   }
 }
+
 
 class AssignmentForm extends StatefulWidget {
   const AssignmentForm({super.key});
@@ -88,17 +126,69 @@ class _AssignmentFormState extends State<AssignmentForm> {
   String _selectedSubject = 'Usability Engineering 661';
   String _selectedDifficulty = 'Medium';
 
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _multipleChoiceController = TextEditingController(text: '0');
+  final TextEditingController _trueFalseController = TextEditingController(text: '0');
+  final TextEditingController _shortAnswerController = TextEditingController(text: '0');
+
+  final _formKey = GlobalKey<FormState>();
+
+  Future<void> generateQuestionsFromAI() async {
+    if (_formKey.currentState!.validate()) {
+      // Collect form data
+      String assignmentTitle = _titleController.text;
+      String assignmentType = _selectedType;
+      String subject = _selectedSubject;
+      String difficulty = _selectedDifficulty;
+      String description = _descriptionController.text;
+      int numMultipleChoice = int.parse(_multipleChoiceController.text);
+      int numTrueFalse = int.parse(_trueFalseController.text);
+      int numShortAnswer = int.parse(_shortAnswerController.text);
+
+      // Create OpenAiLLM instance with your API key
+      const apiKey = 'your-openai-api-key'; // Replace with your actual OpenAI API key
+      final openAiLLM = OpenAiLLM(apiKey);
+
+      // Create the query prompt
+      String queryPrompt = '''
+      Generate a $assignmentType on the subject of $subject. 
+      Difficulty: $difficulty. 
+      Number of Multiple Choice: $numMultipleChoice, 
+      True/False: $numTrueFalse, 
+      Short Answer: $numShortAnswer. 
+      Description: $description.
+      ''';
+
+     // Call the AI to generate questions
+      String generatedQuestions = await openAiLLM.queryAI(queryPrompt);
+
+    // Split the generated questions into a list (assuming they are separated by newlines)
+    List<String> questionList = generatedQuestions.split('\n');  // Adjust the delimiter based on your AI's response
+
+      // Navigate to a new page to view the generated questions
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => GeneratedQuestionsPage(generatedQuestions: questionList),
+        ),
+      );
+    }
+  }   
+
+
   @override
   Widget build(BuildContext context) {
     return Form(
+     key: _formKey, 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTextFormField('Assignment Title', 'Type name'),
+          _buildTextFormField('Assignment Title', 'Type name', controller: _titleController),
           const SizedBox(height: 20),
           Row(
             children: [
-              Expanded(child: _buildDropdown('Type', ['Quiz', 'Exam', 'Homework'], _selectedType, (value) => setState(() => _selectedType = value!))),
+              Expanded(child: _buildDropdown('Type', ['Quiz', 'Exam', 'Assignment'], _selectedType, (value) => setState(() => _selectedType = value!))),
               const SizedBox(width: 20),
               Expanded(child: _buildDropdown('Subject', ['Usability Engineering 661', 'Computer Science 101', 'Data Structures'], _selectedSubject, (value) => setState(() => _selectedSubject = value!))),
             ],
@@ -122,47 +212,50 @@ class _AssignmentFormState extends State<AssignmentForm> {
                 flex: 3,
                 child: Column(
                   children: [
-                    _buildNumberInput('Number of Multiple Choice Questions', '20'),
+                    _buildNumberInput('Number of Multiple Choice Questions', '0', controller: _multipleChoiceController),
                     const SizedBox(height: 15),
-                    _buildNumberInput('Number of True/False Questions', '10'),
+                    _buildNumberInput('Number of True/False Questions', '0', controller: _trueFalseController),
                     const SizedBox(height: 15),
-                    _buildNumberInput('Number of Short Answer Questions', '3'),
+                    _buildNumberInput('Number of Short Answer Questions', '0', controller: _shortAnswerController),
                     const SizedBox(height: 15),
-                    _buildNumberInput('Number of Long Answer Questions', '1'),
                   ],
                 ),
               ),
               const SizedBox(width: 20),
               Expanded(
                 flex: 7,
-                child: _buildTextFormField('Description', 'Enter assignment description', maxLines: 10),
+                child: _buildTextFormField('Description', 'Enter assignment description', maxLines: 10, controller: _descriptionController),
               ),
             ],
           ),
+
           const SizedBox(height: 30),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               ElevatedButton(
-                onPressed: () {
-                  // TODO: Implement generate exam logic
-                },
+                onPressed: generateQuestionsFromAI,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF7D6CE2),
                   padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                 ),
-                child: const Text('Generate Exam'),
+                child: const Text('Generate'),
               ),
               const SizedBox(width: 20),
               TextButton(
-                onPressed: () {
-                  // TODO: Implement cancel logic
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFFC1C3C5),
+               onPressed: () {
+                // Navigate back to the dashboard page without saving any results
+                  Navigator.pushReplacement(
+                    context,
+                      MaterialPageRoute(builder: (context) => const DashBoardPage()),
+                      );
+                      },
+                      style: TextButton.styleFrom(
+                      foregroundColor: const Color(0xFFC1C3C5),
+                      ),
+                      child: const Text('Cancel'),
                 ),
-                child: const Text('Cancel'),
-              ),
+
             ],
           ),
         ],
@@ -170,13 +263,14 @@ class _AssignmentFormState extends State<AssignmentForm> {
     );
   }
 
-  Widget _buildTextFormField(String label, String hintText, {int maxLines = 1}) {
+  Widget _buildTextFormField(String label, String hintText, {int maxLines = 1, TextEditingController? controller}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(color: Color(0xFF8B8F96), fontWeight: FontWeight.bold, fontSize: 14)),
         const SizedBox(height: 5),
         TextFormField(
+          controller: controller,
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: const TextStyle(color: Color(0xFFD7DADF)),
@@ -244,20 +338,22 @@ class _AssignmentFormState extends State<AssignmentForm> {
     );
   }
 
-  Widget _buildNumberInput(String label, String initialValue) {
+  Widget _buildNumberInput(String label, String hintText, {TextEditingController? controller}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(color: Color(0xFF8B8F96), fontWeight: FontWeight.bold, fontSize: 14)),
         const SizedBox(height: 5),
         TextFormField(
-          initialValue: initialValue,
+          controller: controller,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: const TextStyle(color: Color(0xFFD7DADF)),
             filled: true,
             fillColor: const Color(0xFFF3F4F6),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(3),
               borderSide: BorderSide.none,
             ),
           ),
