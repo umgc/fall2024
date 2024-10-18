@@ -5,16 +5,16 @@ import "package:learninglens_app/content_carousel.dart";
 
 
 //The Page
-class AssessmentsView extends StatefulWidget{
-  AssessmentsView();
+class EssaysView extends StatefulWidget{
+  EssaysView();
 
   @override
   State createState(){
-    return _AssessmentsState();
+    return _EssaysState();
   }
 }
 
-class _AssessmentsState extends State{
+class _EssaysState extends State{
 
 
   @override

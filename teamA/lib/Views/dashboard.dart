@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:learninglens_app/Views/assessments_view.dart';
 import 'package:learninglens_app/Views/edit_questions.dart';
+import 'package:learninglens_app/Views/essays_view.dart';
 import 'package:learninglens_app/main.dart';
 import 'essay_generation.dart';
 import 'quiz_generator.dart';
@@ -333,7 +334,7 @@ class TeacherDashboard extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      const EssayGeneration(title: 'Essay Generation'),
+                      EssaysView(), // Naviagate to the Essays page
                 ),
               );
             }
