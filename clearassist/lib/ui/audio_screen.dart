@@ -1,14 +1,13 @@
 // ignore_for_file: avoid_print, prefer_const_constructors
 /// Importing required packages and screens.
+library;
+
 import 'package:clearassistapp/src/data_service.dart';
 import 'package:clearassistapp/src/database/model/audio.dart';
 import 'package:clearassistapp/src/s3_connection.dart';
-import 'package:clearassistapp/ui/home_screen.dart';
-import 'package:clearassistapp/ui/reusable/custom_title.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:clearassistapp/src/typingIndicator.dart';
-import 'package:clearassistapp/src/utils/ui_utils.dart';
 import 'package:intl/intl.dart';
 
 /// FlutterSound provides functionality for recording and playing audio.
@@ -30,7 +29,6 @@ import 'package:http/http.dart' as http;
 // Record button glow effect
 import 'package:avatar_glow/avatar_glow.dart';
 
-import 'home_screen_content.dart';
 
 const API_URL = 'https://api.openai.com/v1/completions';
 final API_KEY = dotenv.env['OPEN_AI_API_KEY']; // Replace with your API key
@@ -493,7 +491,7 @@ class _AudioScreenState extends State<AudioScreen> {
                                 children: [
                                   TextButton(
                                     style: ButtonStyle(
-                                      shape: MaterialStateProperty.all<
+                                      shape: WidgetStateProperty.all<
                                           RoundedRectangleBorder>(
                                         RoundedRectangleBorder(
                                           borderRadius:
@@ -630,7 +628,7 @@ class _AudioScreenState extends State<AudioScreen> {
                           child: TextButton(
                             onPressed: _startRecording,
                             style: ButtonStyle(
-                              shape: MaterialStateProperty.all<
+                              shape: WidgetStateProperty.all<
                                   RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(75.0),

@@ -4,10 +4,8 @@ import 'dart:async';
 
 import 'package:clearassistapp/src/database/model/audio.dart';
 import 'package:clearassistapp/src/typingIndicator.dart';
-import 'package:clearassistapp/ui/reusable/custom_title.dart';
 import 'package:dart_openai/dart_openai.dart';
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -280,15 +278,13 @@ class _AssistantScreenState extends State<AssistantScreen> {
 
   Future<String> getTranscript() async {
     File? file = await widget.conversation!.loadTranscriptFile();
-    if (file != null) {
-      try {
-        return await file.readAsString();
-      } on Exception catch (e) {
-        _showAlert("Missing Transcript", "Transcript file could not be read.");
-        return "";
-      }
+    try {
+      return await file!.readAsString();
+    } on Exception {
+      _showAlert("Missing Transcript", "Transcript file could not be read.");
+      return "";
     }
-    _showAlert("Missing Transcript", "Transcript file not found.");
+      _showAlert("Missing Transcript", "Transcript file not found.");
 
     return widget.conversation!.description ?? "";
   }

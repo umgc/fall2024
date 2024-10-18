@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import '../src/utils/contact_display.dart';
 import 'calendar_screen.dart';
-import 'assistant_screen.dart';
-import 'gallery_screen.dart';
 import 'response_screen.dart';
 import 'audio_screen.dart';
 import 'location_history_screen.dart';
 import 'tour_screen.dart';
 
 class HomeScreenContent extends StatefulWidget {
-  const HomeScreenContent({Key? key}) : super(key: key);
+  const HomeScreenContent({super.key});
 
   @override
   _HomeScreenContentState createState() => _HomeScreenContentState();
@@ -37,7 +35,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
 }
 
 class HomeScreenContentBody extends StatelessWidget {
-  const HomeScreenContentBody({Key? key}) : super(key: key);
+  const HomeScreenContentBody({super.key});
 
   @override
   Widget build(BuildContext context) {

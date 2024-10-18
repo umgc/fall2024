@@ -49,7 +49,7 @@ class _ContactDisplayState extends State<ContactDisplay> {
 
 class ContactPage extends StatelessWidget {
   final Contact contact;
-  ContactPage(this.contact);
+  const ContactPage(this.contact, {super.key});
 
   @override
   Widget build(BuildContext context) => Scaffold(
