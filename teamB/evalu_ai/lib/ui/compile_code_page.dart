@@ -3,12 +3,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intelligrade/ui/header.dart';
 
-import 'package:intelligrade/controller/main_controller.dart';
+import '../controller/main_controller.dart';
 import 'package:intelligrade/controller/model/beans.dart';
 
 class GradingPage extends StatefulWidget {
-  const GradingPage({super.key, required this.title});
-  final String title;
+  const GradingPage({super.key});
 
   static MainController controller = MainController();
 
@@ -20,7 +19,7 @@ class _GradingPageState extends State<GradingPage> {
 
   Course? _selectedCourse;
   String? _selectedExam;
-  String? _selectedLanguage;
+  String? _selectedStudent;
   List<FileNameAndBytes> _studentFiles = [];
   FileNameAndBytes? _gradingFile;
   // List<String> _studentFileNamesDisplay = []; // names to display
@@ -28,18 +27,19 @@ class _GradingPageState extends State<GradingPage> {
   // Uint8List? _gradingFileBytes;
   // List<Uint8List> _studentFileBytesList = [];
 
-  final List<String> _programmingLanguage = [
-    'C#', 
-    'C++', 
-    'Dart', 
-    'Java', 
-    'JavaScript', 
-    'Python', 
-    'SQL'
+  final List<String> _exams = [
+    'Exam 1',
+    'Exam 2',
+    'Exam 3'
+  ]; // Example exam list
+
+  final List<String> _students = [
+    'Bill Gates',
+    'Steve Jobs',
+    'Linus Torvalds'
   ]; // Example student list
 
   List<Course> courses = [];
-  final List<Quiz?> _exams = GradingPage.controller.listAllAssessments();
 
   bool readyForUpload() {
     return _gradingFile != null && _studentFiles.isNotEmpty;
@@ -96,9 +96,6 @@ class _GradingPageState extends State<GradingPage> {
     super.initState();
     MainController().getCourses().then((result) {
       courses = result;
-      for (var item in courses) {
-        print(item.fullName);
-      }
       setState((){});
     });
   }
@@ -126,9 +123,8 @@ class _GradingPageState extends State<GradingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+      appBar: const AppHeader(
+        title: 'Compile and Grade Code',
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -144,10 +140,10 @@ class _GradingPageState extends State<GradingPage> {
               items: courses.map((course) {
                 return DropdownMenuItem(
                   value: course,
-                  child: Text(course.fullName),
+                  child: Text(course.shortName),
                 );
               }).toList(),
-              onChanged: (value) async {
+              onChanged: (value) {
                 setState(() {
                   _selectedCourse = value;
                 });
@@ -156,38 +152,19 @@ class _GradingPageState extends State<GradingPage> {
             const SizedBox(height: 20),
             DropdownButtonFormField<String>(
               decoration: const InputDecoration(
-                labelText: 'Select Assessment',
+                labelText: 'Select Quiz',
                 border: OutlineInputBorder(),
               ),
               value: _selectedExam,
               items: _exams.map((exam) {
                 return DropdownMenuItem<String>(
-                  value: exam?.name,
-                  child: Text(exam.toString())
+                  value: exam,
+                  child: Text(exam),
                 );
               }).toList(),
               onChanged: (value) {
                 setState(() {
                   _selectedExam = value;
-                });
-              },
-            ),
-            const SizedBox(height: 20),
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(
-                labelText: 'Select Programming Language',
-                border: OutlineInputBorder(),
-              ),
-              value: _selectedLanguage,
-              items: _programmingLanguage.map((lang) {
-                return DropdownMenuItem<String>(
-                  value: lang,
-                  child: Text(lang),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedLanguage = value;
                 });
               },
             ),

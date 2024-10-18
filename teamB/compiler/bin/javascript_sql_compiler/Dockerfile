@@ -19,5 +19,8 @@ RUN npm run build
 # Expose the port that the application will run on
 EXPOSE 3000
 
+# Set environment variable
+ENV COMPILER_KEY="evaluAIteamB"
+
 # Set the command to start the application
 CMD ["npm", "start"]

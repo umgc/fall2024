@@ -16,5 +16,8 @@ COPY . .
 # Expose the port that the application will run on
 EXPOSE 8082
 
+# Set environment variable
+ENV COMPILER_KEY="evaluAIteamB"
+
 # Set the command to run the application
 CMD ["python", "app.py"]

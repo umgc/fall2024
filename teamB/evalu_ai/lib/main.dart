@@ -8,6 +8,7 @@ import 'package:intelligrade/ui/dashboard_page.dart';
 import 'package:intelligrade/ui/grading_page.dart';
 import 'package:intelligrade/ui/login_page.dart';
 import 'package:intelligrade/ui/view_assignments_page.dart';
+import 'package:intelligrade/ui/code_compiler.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
@@ -35,12 +36,12 @@ class MyApp extends StatelessWidget {
           home: const LoginPage(),
           routes: {
             '/login': (context) => const LoginPage(),
-            '/grading': (context) => const GradingPage(),
-            '/create': (context) => const CreateAssignmentScreen(), //CreatePage(),
+            '/create': (context) => const AssignmentDetailsPage(), //CreatePage(),
             '/dashboard': (context) => const DashBoardPage(),
             '/viewAssignments': (context) => const ViewAssignmentsPage(),
             '/assignemntDetails': (context) => const AssignmentDetailsPage(),
             '/editEssay': (context) => const EssayEditPage(),
+            '/compileCode': (context) => const CodeCompilerPage(),
             '/settings': (context) =>
                 Setting(themeModeNotifier: _themeModeNotifier)
           },

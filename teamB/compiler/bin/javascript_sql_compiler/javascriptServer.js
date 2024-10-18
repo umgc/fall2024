@@ -5,10 +5,23 @@ const PORT = 3000;
 const processJSRequest = require('./javascriptCompiler');
 const processSQLRequest = require('./sqlCompiler');
 
+function checkAuth(req) {
+  const apiKey = req.headers['x-api-key'];
+  return apiKey === process.env.COMPILER_KEY;
+}
+
 const server = http.createServer((req, res) => {
   console.log('Server has been created');
   const parsedUrl = url.parse(req.url, true);
   const path = parsedUrl.pathname;
+
+  // Check authorization
+  if (!checkAuth(req)) {
+    res.statusCode = 401;
+    res.setHeader('Content-Type', 'text/plain');
+    res.end('401 Unauthorized\n');
+    return;
+  }
 
   // Set response headers
   res.statusCode = 200;

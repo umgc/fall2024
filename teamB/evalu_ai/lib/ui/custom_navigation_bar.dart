@@ -48,9 +48,14 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
           index: 3,
         ),
         _buildListTile(
+          title: 'Compile Code',
+          icon: Icons.code,
+          index: 4,
+        ),
+        _buildListTile(
           title: 'Chatbot Assistance',
           icon: Icons.chat_outlined,
-          index: 4,
+          index: 5,
         ),
       ],
     );
@@ -101,6 +106,10 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
                 arguments: index);
             break;
           case 4:
+            Navigator.pushReplacementNamed(context, '/compileCode',
+                arguments: index);
+            break;
+          case 5:
             // Add navigation logic for Chatbot Assistance here
             break;
         }

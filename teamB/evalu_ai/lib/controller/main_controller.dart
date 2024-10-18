@@ -277,10 +277,10 @@ class MainController {
     var moodleApi = MoodleApiSingleton();
     try {
       List<Course> courses = (await moodleApi.getCourses()).cast<Course>();
-      if (courses.isNotEmpty) {
-        courses.removeAt(
-            0); // first course is always "Moodle" - no need to show it
-      }
+      // if (courses.isNotEmpty) {
+      //   courses.removeAt(
+      //       0); // first course is always "Moodle" - no need to show it
+      // }
       return courses;
     } catch (e) {
       if (kDebugMode) {
