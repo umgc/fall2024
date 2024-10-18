@@ -28,57 +28,36 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         textTheme: Theme.of(context).textTheme.copyWith(
-              // Body text styles
-              bodySmall: TextStyle(color: Colors.white), // Small body text
-              bodyMedium: TextStyle(color: Colors.white), // Medium body text
-              bodyLarge: TextStyle(color: Colors.white), // Large body text
-
-              // Display text styles (headings)
-              displayLarge:
-                  TextStyle(color: Colors.white), // Large display text (H1)
-              displayMedium:
-                  TextStyle(color: Colors.white), // Medium display text (H2)
-              displaySmall:
-                  TextStyle(color: Colors.white), // Small display text (H3)
-
-              // Headline text styles
-              headlineLarge: TextStyle(
-                  color: Colors.white), // Large headline (H1 equivalent)
-              headlineMedium: TextStyle(
-                  color: Colors.white), // Medium headline (H2 equivalent)
-              headlineSmall: TextStyle(
-                  color: Colors.white,
-                  fontWeight:
-                      FontWeight.bold), // Small headline (H3 equivalent)
-
-              // Title text styles
-              titleLarge:
-                  TextStyle(color: Colors.white), // Large title (T1 equivalent)
-              titleMedium: TextStyle(
-                  color: Colors.white), // Medium title (T2 equivalent)
-              titleSmall:
-                  TextStyle(color: Colors.white), // Small title (T3 equivalent)
-
-              // Label text styles (for buttons or smaller elements)
-              labelLarge: TextStyle(color: Colors.white), // Large label
-              labelMedium: TextStyle(color: Colors.white), // Medium label
-              labelSmall: TextStyle(color: Colors.white), // Small label
+              bodySmall: TextStyle(color: Colors.white),
+              bodyMedium: TextStyle(color: Colors.white),
+              bodyLarge: TextStyle(color: Colors.white),
+              displayLarge: TextStyle(color: Colors.white),
+              displayMedium: TextStyle(color: Colors.white),
+              displaySmall: TextStyle(color: Colors.white),
+              headlineLarge: TextStyle(color: Colors.white),
+              headlineMedium: TextStyle(color: Colors.white),
+              headlineSmall:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              titleLarge: TextStyle(color: Colors.white),
+              titleMedium: TextStyle(color: Colors.white),
+              titleSmall: TextStyle(color: Colors.white),
+              labelLarge: TextStyle(color: Colors.white),
+              labelMedium: TextStyle(color: Colors.white),
+              labelSmall: TextStyle(color: Colors.white),
             ),
       ),
-      initialRoute: '/loginScreen', // the initial screen when the app starts
+      initialRoute: '/loginScreen',
       routes: {
         '/loginScreen': (context) => const LoginScreen(),
         '/homeScreen': (context) => const HomeScreen(),
-        // You can add other routes as needed
+        // Add more routes if necessary
       },
     );
   }
 }
 
-// These are all singleton objects and should be initialized at the beginning
+// Singleton initialization
 void initializeData() async {
-  //initialize backend services
-  // ignore: unused_local_variable
   S3Bucket s3 = S3Bucket();
   CameraManager cm = CameraManager();
   await PermissionManager.requestInitialPermissions();
