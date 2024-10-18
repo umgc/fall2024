@@ -6,14 +6,14 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'onboardingScreen.dart';
 
-class RegistrationScreen extends StatefulWidget {
-  const RegistrationScreen({super.key});
+class RegistrationScreenCareGiver extends StatefulWidget {
+  const RegistrationScreenCareGiver({super.key});
 
   @override
   _RegistrationScreenState createState() => _RegistrationScreenState();
 }
 
-class _RegistrationScreenState extends State<RegistrationScreen> {
+class _RegistrationScreenState extends State<RegistrationScreenCareGiver> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -29,7 +29,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   Future<File> get _localFile async {
     final path = await _localPath;
-    return File('$path/user_data.txt');
+    return File('$path/user_caregiver_data.txt');
   }
 
   Future<File> writeUserData(String data) async {
@@ -52,8 +52,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           elevation: 0.0,
           centerTitle: true,
           leading: const BackButton(color: Colors.black54),
-          title:
-              const Text('Registration', style: TextStyle(color: Colors.white)),
+          title: const Text('Care Giver Registration',
+              style: TextStyle(color: Colors.white)),
         ),
         body: Container(
           decoration: const BoxDecoration(
