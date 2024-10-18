@@ -46,8 +46,8 @@ class MyApp extends StatelessWidget {
         '/EssayEditPage': (context) => EssayEditPage(),
         '/Content': (context) => ViewCourseContents(),
         '/EssayGenerationPage': (context) => EssayGeneration(title: 'Essay Generation'),
-        '/QuizGenerationPage': (context) => CreateAssessment('Tester'),
-        '/EditQuestions': (context) => EditQuestions(),
+        '/QuizGenerationPage': (context) => CreateAssessment(),
+        '/EditQuestions': (context) => EditQuestions(''),
         // '/create': (context) => const CreatePage(),
         '/dashboard': (context) => TeacherDashboard(),
         '/send_essay_to_moodle': (context) => EssayAssignmentSettings(''),
@@ -133,14 +133,14 @@ class _DevLaunch extends State {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => CreateAssessment('Tester')));
+                      builder: (context) => CreateAssessment()));
             },
           ),
           ElevatedButton(
             child: const Text('Edit Questions'),
             onPressed: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => EditQuestions()));
+                  MaterialPageRoute(builder: (context) => EditQuestions('')));
             },
           ),
           ElevatedButton(

@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <quiz>
+    <question type="category">
+        <category>
+        <text>Pythagorean Theorem</text>
+        </category>
+    </question>
     <question type="truefalse">
         <name>
             <text>Question 1</text>
