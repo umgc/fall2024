@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
-import 'package:learninglens_app/Views/essay_edit_page.dart';
 import '/Controller/beans.dart';
 import 'dart:convert';
 import '../Api/moodle_api_singleton.dart';
@@ -452,11 +451,7 @@ Future<void> fetchCourses() async {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => EssayEditPage(),
-                        ),
-                      );
+                      Navigator.pop(context);
                     },
                     child: Text('Go Back to Edit Essay'),
                   ),

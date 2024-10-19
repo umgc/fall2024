@@ -24,6 +24,7 @@ class XmlConsts
   static const responsetemplate = 'responsetemplate';
   static const graderinfo = 'graderinfo';
   static const promptUsed = 'promptused';
+  static const category = 'category';
 
   // Essay Rubric Tags
   static const rubric = 'rubric';
@@ -44,151 +45,101 @@ class XmlConsts
 
 // A generated rubric containing criteria for an essay prompt.
 // Commented out as the only other instance of Rubric being used is the other one.
-// class Rubric 
-// {
-//   String title;
-//   String subject;
-//   String gradeLevel;
-//   int maxPoints;
-//   List<RubricCriteria> criteriaList;
+class Rubric 
+{
+  String title;
+  String subject;
+  String gradeLevel;
+  int maxPoints;
+  List<RubricCriteria> criteriaList;
 
-//   Rubric({
-//     required this.title,
-//     required this.subject,
-//     required this.gradeLevel,
-//     required this.maxPoints,
-//     required this.criteriaList,
-//   });
+  Rubric({
+    required this.title,
+    required this.subject,
+    required this.gradeLevel,
+    required this.maxPoints,
+    required this.criteriaList,
+  });
 
-//   // Factory constructor to create a Rubric from XML
-//   factory Rubric.fromXmlString(String xmlStr) 
-//   {
-//     final document = XmlDocument.parse(xmlStr);
-//     final rubricElement = document.getElement(XmlConsts.rubric);
+  // Factory constructor to create a Rubric from XML
+  factory Rubric.fromXmlString(String xmlStr) 
+  {
+    final document = XmlDocument.parse(xmlStr);
+    final rubricElement = document.getElement(XmlConsts.rubric);
 
-//     return Rubric(
-//       title: rubricElement?.getElement(XmlConsts.title)?.innerText ?? 'Untitled',
-//       subject: rubricElement?.getElement(XmlConsts.subject)?.innerText ?? 'Unknown',
-//       gradeLevel: rubricElement?.getElement(XmlConsts.gradeLevel)?.innerText ?? 'Unknown',
-//       maxPoints: int.parse(rubricElement?.getElement(XmlConsts.maxPoints)?.innerText ?? '0'),
-//       criteriaList: rubricElement
-//           ?.findElements(XmlConsts.criteria)
-//           .map((e) => RubricCriteria.fromXml(e))
-//           .toList() ?? [],
-//     );
-//   }
-
-//     // Convert the Rubric object to an XML string
-//   String toXmlString() {
-//     final builder = XmlBuilder();
-//     builder.element(XmlConsts.rubric, nest: () {
-//       builder.element(XmlConsts.title, nest: title);
-//       builder.element(XmlConsts.subject, nest: subject);
-//       builder.element(XmlConsts.gradeLevel, nest: gradeLevel);
-//       builder.element(XmlConsts.maxPoints, nest: maxPoints.toString());
-
-//       for (var criteria in criteriaList) {
-//         builder.element(XmlConsts.criteria, nest: criteria.toXml);
-//       }
-//     });
-//     return builder.buildDocument().toXmlString(pretty: true);
-//   }
-
-//   @override
-//   String toString() {
-//     return toXmlString();
-//   }
-// }
-
-// // Specific Rubric Criteria
-// class RubricCriteria 
-// {
-//   String description;
-//   int points;
-//   String feedback;
-
-//   RubricCriteria({
-//     required this.description,
-//     required this.points,
-//     this.feedback = '',
-//   });
-
-//   // Factory constructor to create criteria from XML
-//   factory RubricCriteria.fromXml(XmlElement criteriaElement) 
-//   {
-//     return RubricCriteria(
-//       description: criteriaElement.getElement(XmlConsts.description)?.innerText ?? 'Unknown',
-//       points: int.parse(criteriaElement.getElement(XmlConsts.points)?.innerText ?? '0'),
-//       feedback: criteriaElement.getElement(XmlConsts.feedback)?.innerText ?? '',
-//     );
-//   }
-
-//   // Convert the criteria to XML format
-//   void toXml(XmlBuilder builder) 
-//   {
-//     builder.element(XmlConsts.description, nest: description);
-//     builder.element(XmlConsts.points, nest: points.toString());
-//     builder.element(XmlConsts.feedback, nest: feedback);
-//   }
-
-//   @override
-//   String toString() {
-//     final builder = XmlBuilder();
-//     toXml(builder);
-//     return builder.buildFragment().toXmlString();
-//   }
-// }
-
-
-class MoodleRubric {
-  final String title;
-  final List<MoodleRubricCriteria> criteria;
-
-  MoodleRubric({required this.title, required this.criteria});
-
-  factory MoodleRubric.fromJson(Map<String, dynamic> json) {
-    var criteriaList = (json['rubric_criteria'] as List)
-        .map((c) => MoodleRubricCriteria.fromJson(c))
-        .toList();
-
-    return MoodleRubric(
-      title: json['criteria_title'] ?? 'Rubric',
-      criteria: criteriaList,
+    return Rubric(
+      title: rubricElement?.getElement(XmlConsts.title)?.innerText ?? 'Untitled',
+      subject: rubricElement?.getElement(XmlConsts.subject)?.innerText ?? 'Unknown',
+      gradeLevel: rubricElement?.getElement(XmlConsts.gradeLevel)?.innerText ?? 'Unknown',
+      maxPoints: int.parse(rubricElement?.getElement(XmlConsts.maxPoints)?.innerText ?? '0'),
+      criteriaList: rubricElement
+          ?.findElements(XmlConsts.criteria)
+          .map((e) => RubricCriteria.fromXml(e))
+          .toList() ?? [],
     );
+  }
+
+    // Convert the Rubric object to an XML string
+  String toXmlString() {
+    final builder = XmlBuilder();
+    builder.element(XmlConsts.rubric, nest: () {
+      builder.element(XmlConsts.title, nest: title);
+      builder.element(XmlConsts.subject, nest: subject);
+      builder.element(XmlConsts.gradeLevel, nest: gradeLevel);
+      builder.element(XmlConsts.maxPoints, nest: maxPoints.toString());
+
+      for (var criteria in criteriaList) {
+        builder.element(XmlConsts.criteria, nest: criteria.toXml);
+      }
+    });
+    return builder.buildDocument().toXmlString(pretty: true);
+  }
+
+  @override
+  String toString() {
+    return toXmlString();
   }
 }
 
-class MoodleRubricCriteria {
-  final String description;
-  final List<Level> levels;
+// Specific Rubric Criteria
+class RubricCriteria 
+{
+  String description;
+  int points;
+  String feedback;
 
-  MoodleRubricCriteria({required this.description, required this.levels});
+  RubricCriteria({
+    required this.description,
+    required this.points,
+    this.feedback = '',
+  });
 
-  factory MoodleRubricCriteria.fromJson(Map<String, dynamic> json) {
-    var levelsList = (json['levels'] as List)
-        .map((l) => Level.fromJson(l))
-        .toList();
-
-    return MoodleRubricCriteria(
-      description: json['description'] ?? '',
-      levels: levelsList,
+  // Factory constructor to create criteria from XML
+  factory RubricCriteria.fromXml(XmlElement criteriaElement) 
+  {
+    return RubricCriteria(
+      description: criteriaElement.getElement(XmlConsts.description)?.innerText ?? 'Unknown',
+      points: int.parse(criteriaElement.getElement(XmlConsts.points)?.innerText ?? '0'),
+      feedback: criteriaElement.getElement(XmlConsts.feedback)?.innerText ?? '',
     );
+  }
+
+  // Convert the criteria to XML format
+  void toXml(XmlBuilder builder) 
+  {
+    builder.element(XmlConsts.description, nest: description);
+    builder.element(XmlConsts.points, nest: points.toString());
+    builder.element(XmlConsts.feedback, nest: feedback);
+  }
+
+  @override
+  String toString() {
+    final builder = XmlBuilder();
+    toXml(builder);
+    return builder.buildFragment().toXmlString();
   }
 }
 
-class Level {
-  final String description;
-  final int score;
-
-  Level({required this.description, required this.score});
-
-  factory Level.fromJson(Map<String, dynamic> json) {
-    return Level(
-      description: json['definition'] ?? '',
-      score: json['score'] ?? 0,
-    );
-  }
-}
 
 class Essay {
   //todo more vars as needed (like the Rubric for starters)
@@ -239,6 +190,49 @@ class Quiz {
     return quiz;
   }
 
+
+
+  String toXmlString() {
+    final builder = XmlBuilder();
+    builder.element(XmlConsts.quiz, nest: () {
+      // Name element
+      if (name != null) {
+        builder.element(XmlConsts.name, nest: () {
+          builder.element(XmlConsts.text, nest: name);
+        });
+      }
+
+      // Description element
+      if (description != null) {
+        builder.element(XmlConsts.description, nest: description);
+      }
+
+            // Insert a "category" type question using the description as the category name
+      if (description != null) {
+        builder.element(XmlConsts.question, attributes: {XmlConsts.type: 'category'}, nest: () {
+          builder.element(XmlConsts.category, nest: () {
+            builder.element(XmlConsts.text, nest: '\$course\$/Top/$description');
+          });
+        });
+      }
+
+      // PromptUsed element
+      if (promptUsed != null) {
+        builder.element(XmlConsts.promptUsed, nest: promptUsed);
+      }
+
+      // Questions
+      for (var question in questionList) {
+        question.buildXml(builder);
+      }
+    });
+
+    return builder.buildDocument().toXmlString(pretty: true);
+  }
+
+
+
+
   @override
   String toString() {
     final sb = StringBuffer();
@@ -256,12 +250,8 @@ class Quiz {
 // Abstract class that represents a single question.
 class Question {
 
-
-
   Question copyWith({String? name, List? answerList, String? type, String? questionText, bool? isFavorite}) =>
       Question(name: this.name, answerList: this.answerList,type: this.type, questionText: this.questionText, isFavorite: isFavorite ?? this.isFavorite);
-
-
 
   String name; // question name - required.
   String type; // question type (multichoice, truefalse, shortanswer, essay) - required.
@@ -331,6 +321,58 @@ class Question {
     name = newname;
   }
 
+void buildXml(XmlBuilder builder) {
+    builder.element(XmlConsts.question, attributes: {XmlConsts.type: type}, nest: () {
+      builder.element(XmlConsts.name, nest: () {
+        builder.element(XmlConsts.text, nest: name);
+      });
+
+      builder.element(XmlConsts.questiontext, nest: () {
+        builder.element(XmlConsts.text, nest: questionText);
+      });
+
+      if (generalFeedback != null) {
+        builder.element(XmlConsts.generalfeedback, nest: () {
+          builder.element(XmlConsts.text, nest: generalFeedback);
+        });
+      }
+
+      if (defaultGrade != null) {
+        builder.element(XmlConsts.defaultgrade, nest: defaultGrade);
+      }
+
+      if (responseFormat != null) {
+        builder.element(XmlConsts.responseformat, nest: responseFormat);
+      }
+
+      if (responseRequired != null) {
+        builder.element(XmlConsts.responserequired, nest: responseRequired);
+      }
+
+      if (attachmentsRequired != null) {
+        builder.element(XmlConsts.attachmentsrequired, nest: attachmentsRequired);
+      }
+
+      if (responseTemplate != null) {
+        builder.element(XmlConsts.responsetemplate, nest: responseTemplate);
+      }
+
+      if (graderInfo != null) {
+        builder.element(XmlConsts.graderinfo, nest: () {
+          builder.element(XmlConsts.text, nest: graderInfo);
+        });
+      }
+
+      // Answers
+      for (var answer in answerList) {
+        answer.buildXml(builder);
+      }
+    });
+  }
+
+
+
+
   @override
   String toString() {
     final sb = StringBuffer();
@@ -364,6 +406,17 @@ class Answer {
             .getElement(XmlConsts.feedback)
             ?.getElement(XmlConsts.text)
             ?.innerText);
+  }
+
+  void buildXml(XmlBuilder builder) {
+    builder.element(XmlConsts.answer, attributes: {XmlConsts.fraction: fraction}, nest: () {
+      builder.element(XmlConsts.text, nest: answerText);
+      if (feedbackText != null) {
+        builder.element(XmlConsts.feedback, nest: () {
+          builder.element(XmlConsts.text, nest: feedbackText);
+        });
+      }
+    });
   }
 
   @override
@@ -637,12 +690,16 @@ class Participant {
   final int id;
   final String username;
   final String fullname;
+  final String firstname;
+  final String lastname;
   final List<String> roles;
 
   Participant({
     required this.id,
     required this.username,
     required this.fullname,
+    required this.firstname,
+    required this.lastname,
     required this.roles,
   });
 
@@ -660,11 +717,94 @@ class Participant {
       id: json['id'] as int,
       username: json['username'] as String,
       fullname: json['fullname'] as String,
+      firstname: json['firstname'] as String,
+      lastname: json['lastname'] as String,
       roles: rolesList,
     );
   }
 }
 
+class MoodleRubric {
+  final String title;
+  final List<MoodleRubricCriteria> criteria;
+
+  MoodleRubric({required this.title, required this.criteria});
+
+  factory MoodleRubric.fromJson(Map<String, dynamic> json) {
+    var criteriaList = (json['rubric_criteria'] as List)
+        .map((c) => MoodleRubricCriteria.fromJson(c))
+        .toList();
+
+    return MoodleRubric(
+      title: json['criteria_title'] ?? 'Rubric',
+      criteria: criteriaList,
+    );
+  }
+
+  Map<String, dynamic> toJson() 
+  {
+    return {
+      'title': title,
+      'criteria': criteria.map((c) => c.toJson()).toList(),
+    };
+  }
+}
+
+class MoodleRubricCriteria {
+  final int id;
+  final String description;
+  final List<Level> levels;
+
+  MoodleRubricCriteria({required this.id, required this.description, required this.levels});
+
+  factory MoodleRubricCriteria.fromJson(Map<String, dynamic> json) 
+  {
+    var levelsList = (json['levels'] as List)
+        .map((l) => Level.fromJson(l))
+        .toList();
+
+    return MoodleRubricCriteria(
+      id: json['id'] ?? 0,
+      description: json['description'] ?? '',
+      levels: levelsList,
+    );
+  }
+
+  Map<String, dynamic> toJson() 
+  {
+    return {
+      'id': id,
+      'description': description,
+      'levels': levels.map((l) => l.toJson()).toList(),
+    };
+  }
+}
+
+class Level {
+  final int id;
+  final String description;
+  final int score;
+
+  Level({required this.id, required this.description, required this.score});
+
+  factory Level.fromJson(Map<String, dynamic> json) 
+  {
+    return Level(
+      id: json['id'] ?? 0,
+      description: json['definition'] ?? '',
+      score: json['score'] ?? 0,
+    );
+  }
+
+   Map<String, dynamic> toJson() 
+   {
+    return {
+      'id': id,
+      'description': description,
+      'score': score,
+    };
+   }
+}
 
 class Grade {
   final int id;

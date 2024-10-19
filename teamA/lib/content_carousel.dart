@@ -201,7 +201,7 @@ class CreateButton extends StatelessWidget{
       onPressed: () {
         MaterialPageRoute? route;
         if (type == 'assessment'){
-          route = MaterialPageRoute(builder: (context) => CreateAssessment(MoodleApiSingleton().moodleFirstName ?? 'TestUser'));
+          route = MaterialPageRoute(builder: (context) => CreateAssessment());
         }
         else if (type == 'essay'){
           route = MaterialPageRoute(builder:(context) => EssayGeneration(title: 'New Essay'));

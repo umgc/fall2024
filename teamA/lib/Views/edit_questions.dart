@@ -1,30 +1,47 @@
+import 'package:learninglens_app/Views/send_quiz_to_moodle.dart';
+
 import '../Api/moodle_api_singleton.dart';
 import 'package:image_network/image_network.dart';
-import '../controller/beans.dart';
+import '../Controller/beans.dart';
 import 'package:flutter/material.dart';
+import 'package:llm_api_modules/openai_api.dart';
+import 'quiz_generator.dart';
 
 class EditQuestions extends StatefulWidget {
+  final String questionXML;
+
+  EditQuestions(this.questionXML);
+
   @override
-  State<EditQuestions> createState() => _EditQuestionsState();
+  EditQuestionsState createState() => EditQuestionsState();
 }
 
-class _EditQuestionsState extends State<EditQuestions> {
+class EditQuestionsState extends State<EditQuestions> {
   late Quiz myQuiz;
   final TextEditingController _textController = TextEditingController();
+  static const apikey = String.fromEnvironment('openai_apikey');
+  final openai = OpenAiLLM(apikey);
+  bool _isLoading = false;
+
+  String subject = CreateAssessment.descriptionController.text;
+  String topic = CreateAssessment.topicController.text;
+  late String promptstart;
 
   @override
   void initState() {
     super.initState();
-    // temporary code to load the quiz from the sample XML
-    myQuiz = Quiz.fromXmlString(sampleXML);
-    myQuiz.name = "My Quiz";
-    myQuiz.description = "This is a quiz about the Pythagorean Theorem.";
+    myQuiz = Quiz.fromXmlString(widget.questionXML);
+    myQuiz.name = CreateAssessment.nameController.text;
+    myQuiz.description = CreateAssessment.descriptionController.text;
+
+    promptstart =
+        'Create a question that is compatible with Moodle XML import. Be a bit creative in how you design the question and answers, making sure it is engaging but still on the subject of $subject and related to $topic. Make sure the XML specification is included, and the question is wrapped in the quiz XML element required by Moodle. Each answer should have feedback that fits the Moodle XML format, and avoid using HTML elements within a CDATA field. The quiz should be challenging and thought-provoking, but appropriate for high school students who speak English. The quesiton typ shoud be ';
   }
 
   @override
   Widget build(BuildContext context) {
     var userprofileurl = MoodleApiSingleton().moodleProfileImage!;
-    
+
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 100,
@@ -71,18 +88,27 @@ class _EditQuestionsState extends State<EditQuestions> {
             child: ListView.builder(
               itemCount: myQuiz.questionList.length,
               itemBuilder: (context, index) {
-                final question = myQuiz.questionList[index];
+                var question = myQuiz.questionList[index];
                 return Dismissible(
                   key: Key(question.toString()),
-                  background: Container(
-                    color: Colors.green,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 16),
-                        child: Icon(Icons.favorite),
+                  background: Stack(
+                    children: [
+                      Container(
+                        color: Colors.green,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 16),
+                            child: Icon(Icons.favorite),
+                          ),
+                        ),
                       ),
-                    ),
+                      if (_isLoading)
+                        Center(
+                          child:
+                              CircularProgressIndicator(), // Spinner behind the item
+                        ),
+                    ],
                   ),
                   secondaryBackground: Container(
                     color: Colors.red,
@@ -97,9 +123,25 @@ class _EditQuestionsState extends State<EditQuestions> {
                   confirmDismiss: (direction) async {
                     if (direction == DismissDirection.startToEnd) {
                       setState(() {
-                        myQuiz.questionList[index] =
-                            question.copyWith(isFavorite: !question.isFavorite);
+                        _isLoading = true;
                       });
+                      var result = await openai
+                          // .postToLlm(promptstart + question.toString());
+                          .postToLlm(promptstart + question.type.toString());
+
+                      setState(() {
+                        _isLoading = false; // Stop showing the spinner
+                      });
+
+                      if (result.isNotEmpty) {
+                        setState(() {
+                          //replace the old question with the new one from the api call
+                          question = Quiz.fromXmlString(result).questionList[0];
+                          question.setName = 'Question ${index + 1}';
+                          myQuiz.questionList[index] = question.copyWith(
+                              isFavorite: !question.isFavorite);
+                        });
+                      }
                       return false;
                     } else {
                       bool delete = true;
@@ -136,6 +178,17 @@ class _EditQuestionsState extends State<EditQuestions> {
           Row(
             children: [
               ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QuizMoodle(quiz: myQuiz)
+                    ),
+                  );
+                },
+                child: const Text('Send to Moodle Set up'),
+              ),
+              ElevatedButton(
                 onPressed: () async {
                   var result = await MoodleApiSingleton().getRubric('205');
                   print(result);
@@ -144,28 +197,38 @@ class _EditQuestionsState extends State<EditQuestions> {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  var result = await MoodleApiSingleton().addRandomQuestions('50', '22', '2');
+                  var result = await MoodleApiSingleton()
+                      .addRandomQuestions('50', '22', '2');
                   print(result);
                 },
                 child: const Text('Add Random Questions'),
               ),
               ElevatedButton(
                 onPressed: () async {
-                  var result = await MoodleApiSingleton().importQuizQuestions('2', myXML);
+                  var result = await MoodleApiSingleton()
+                      .importQuizQuestions('2', myXML);
                   print(result);
                 },
                 child: const Text('Import Questions'),
               ),
               ElevatedButton(
                 onPressed: () async {
-                  var result = await MoodleApiSingleton().createQuiz('2', 'Sunday Quiz', 'Sunday Quiz Intro');
+                  var result = await MoodleApiSingleton()
+                      .createQuiz('2', 'Sunday Quiz', 'Sunday Quiz Intro');
                   print(result);
                 },
                 child: const Text('Create Quiz'),
               ),
               ElevatedButton(
                 onPressed: () async {
-                  var result = await MoodleApiSingleton().createAssignment('2', '2', 'Sunday Assignment', '2024-10-6', '2024-10-14', rubricDefinition, 'This is the description');
+                  var result = await MoodleApiSingleton().createAssignment(
+                      '2',
+                      '2',
+                      'Sunday Assignment',
+                      '2024-10-6',
+                      '2024-10-14',
+                      rubricDefinition,
+                      'This is the description');
                   print(result);
                 },
                 child: const Text('Create Assignment'),
@@ -178,7 +241,7 @@ class _EditQuestionsState extends State<EditQuestions> {
   }
 }
 
- //debugging code for bottom row buttons and temp quiz information
+//debugging code for bottom row buttons and temp quiz information
 String myXML = '''
 <?xml version="1.0" encoding="UTF-8"?>
 <quiz>
@@ -186,56 +249,180 @@ String myXML = '''
   <!-- Define the category for the questions -->
   <question type="category">
     <category>
-      <text>\$course\$/top/2112 Quiz Category</text>
+      <text>\$course\$/top/Key Signature Quiz Category</text>
     </category>
   </question>
 
-  <!-- Multiple Choice Question -->
+  <!-- Multiple Choice Question 1 -->
   <question type="multichoice">
     <name>
-      <text>Multiple Choice Question</text>
+      <text>Multiple Choice Question 1</text>
     </name>
     <questiontext format="html">
-      <text><![CDATA[What is the capital of France?]]></text>
+      <text><![CDATA[What is the key signature with one sharp?]]></text>
     </questiontext>
     <answer fraction="100">
-      <text>Paris</text>
+      <text>G Major</text>
       <feedback>
         <text>Correct!</text>
       </feedback>
     </answer>
     <answer fraction="0">
-      <text>London</text>
+      <text>D Major</text>
       <feedback>
-        <text>Incorrect.</text>
+        <text>Incorrect. D Major has two sharps.</text>
       </feedback>
     </answer>
     <answer fraction="0">
-      <text>Rome</text>
+      <text>A Major</text>
       <feedback>
-        <text>Incorrect.</text>
+        <text>Incorrect. A Major has three sharps.</text>
       </feedback>
     </answer>
     <answer fraction="0">
-      <text>Berlin</text>
+      <text>E Major</text>
       <feedback>
-        <text>Incorrect.</text>
+        <text>Incorrect. E Major has four sharps.</text>
       </feedback>
     </answer>
   </question>
 
-  <!-- True/False Question -->
-  <question type="truefalse">
+  <!-- Multiple Choice Question 2 -->
+  <question type="multichoice">
     <name>
-      <text>True/False Question</text>
+      <text>Multiple Choice Question 2</text>
     </name>
     <questiontext format="html">
-      <text><![CDATA[The Earth is flat.]]></text>
+      <text><![CDATA[What is the key signature with two flats?]]></text>
+    </questiontext>
+    <answer fraction="100">
+      <text>B♭ Major</text>
+      <feedback>
+        <text>Correct!</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>E♭ Major</text>
+      <feedback>
+        <text>Incorrect. E♭ Major has three flats.</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>A♭ Major</text>
+      <feedback>
+        <text>Incorrect. A♭ Major has four flats.</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>F Major</text>
+      <feedback>
+        <text>Incorrect. F Major has one flat.</text>
+      </feedback>
+    </answer>
+  </question>
+
+  <!-- Multiple Choice Question 3 -->
+  <question type="multichoice">
+    <name>
+      <text>Multiple Choice Question 3</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[Which key has no sharps or flats?]]></text>
+    </questiontext>
+    <answer fraction="100">
+      <text>C Major</text>
+      <feedback>
+        <text>Correct!</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>G Major</text>
+      <feedback>
+        <text>Incorrect. G Major has one sharp.</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>F Major</text>
+      <feedback>
+        <text>Incorrect. F Major has one flat.</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>D Major</text>
+      <feedback>
+        <text>Incorrect. D Major has two sharps.</text>
+      </feedback>
+    </answer>
+  </question>
+
+  <!-- Multiple Choice Question 4 -->
+  <question type="multichoice">
+    <name>
+      <text>Multiple Choice Question 4</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[Which of the following keys has three sharps?]]></text>
+    </questiontext>
+    <answer fraction="100">
+      <text>A Major</text>
+      <feedback>
+        <text>Correct!</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>G Major</text>
+      <feedback>
+        <text>Incorrect. G Major has one sharp.</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>D Major</text>
+      <feedback>
+        <text>Incorrect. D Major has two sharps.</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>E Major</text>
+      <feedback>
+        <text>Incorrect. E Major has four sharps.</text>
+      </feedback>
+    </answer>
+  </question>
+
+  <!-- True/False Question 1 -->
+  <question type="truefalse">
+    <name>
+      <text>True/False Question 1</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[C Major has no sharps or flats.]]></text>
+    </questiontext>
+    <answer fraction="100">
+      <text>true</text>
+      <feedback>
+        <text>Correct!</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>false</text>
+      <feedback>
+        <text>Incorrect. C Major has no accidentals.</text>
+      </feedback>
+    </answer>
+  </question>
+
+  <!-- True/False Question 2 -->
+  <question type="truefalse">
+    <name>
+      <text>True/False Question 2</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[D Major has three sharps.]]></text>
     </questiontext>
     <answer fraction="0">
       <text>true</text>
       <feedback>
-        <text>Incorrect.</text>
+        <text>Incorrect. D Major has two sharps.</text>
       </feedback>
     </answer>
     <answer fraction="100">
@@ -246,74 +433,113 @@ String myXML = '''
     </answer>
   </question>
 
-  <!-- Short Answer Question -->
+  <!-- True/False Question 3 -->
+  <question type="truefalse">
+    <name>
+      <text>True/False Question 3</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[F Major has one flat.]]></text>
+    </questiontext>
+    <answer fraction="100">
+      <text>true</text>
+      <feedback>
+        <text>Correct!</text>
+      </feedback>
+    </answer>
+    <answer fraction="0">
+      <text>false</text>
+      <feedback>
+        <text>Incorrect. F Major has one flat, which is B♭.</text>
+      </feedback>
+    </answer>
+  </question>
+
+  <!-- True/False Question 4 -->
+  <question type="truefalse">
+    <name>
+      <text>True/False Question 4</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[E Major has five sharps.]]></text>
+    </questiontext>
+    <answer fraction="0">
+      <text>true</text>
+      <feedback>
+        <text>Incorrect. E Major has four sharps.</text>
+      </feedback>
+    </answer>
+    <answer fraction="100">
+      <text>false</text>
+      <feedback>
+        <text>Correct!</text>
+      </feedback>
+    </answer>
+  </question>
+
+  <!-- Short Answer Question 1 -->
   <question type="shortanswer">
     <name>
-      <text>Short Answer Question</text>
+      <text>Short Answer Question 1</text>
     </name>
     <questiontext format="html">
-      <text><![CDATA[What is the chemical symbol for water?]]></text>
+      <text><![CDATA[Name the key that has one flat.]]></text>
     </questiontext>
     <answer fraction="100">
-      <text>H2O</text>
+      <text>F Major</text>
       <feedback>
         <text>Correct!</text>
       </feedback>
     </answer>
   </question>
 
-  <!-- Matching Question -->
-  <question type="matching">
+  <!-- Short Answer Question 2 -->
+  <question type="shortanswer">
     <name>
-      <text>Matching Question</text>
+      <text>Short Answer Question 2</text>
     </name>
     <questiontext format="html">
-      <text><![CDATA[Match the countries to their capitals.]]></text>
-    </questiontext>
-    <subquestion format="html">
-      <text><![CDATA[France]]></text>
-      <answer>
-        <text>Paris</text>
-      </answer>
-    </subquestion>
-    <subquestion format="html">
-      <text><![CDATA[Italy]]></text>
-      <answer>
-        <text>Rome</text>
-      </answer>
-    </subquestion>
-  </question>
-
-  <!-- Essay Question -->
-  <question type="essay">
-    <name>
-      <text>Essay Question</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[Describe the impact of climate change on global weather patterns.]]></text>
-    </questiontext>
-    <graderinfo format="html">
-      <text><![CDATA[Grading instructions for this question.]]></text>
-    </graderinfo>
-  </question>
-
-  <!-- Numerical Question -->
-  <question type="numerical">
-    <name>
-      <text>Numerical Question</text>
-    </name>
-    <questiontext format="html">
-      <text><![CDATA[What is the square root of 64?]]></text>
+      <text><![CDATA[Name the key that has three flats.]]></text>
     </questiontext>
     <answer fraction="100">
-      <text>8</text>
-      <tolerance>0</tolerance>
+      <text>E♭ Major</text>
       <feedback>
         <text>Correct!</text>
       </feedback>
     </answer>
   </question>
 
+  <!-- Short Answer Question 3 -->
+  <question type="shortanswer">
+    <name>
+      <text>Short Answer Question 3</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[What is the relative minor of C Major?]]></text>
+    </questiontext>
+    <answer fraction="100">
+      <text>A minor</text>
+      <feedback>
+        <text>Correct! A minor is the relative minor of C Major.</text>
+      </feedback>
+    </answer>
+  </question>
+
+  <!-- Short Answer Question 4 -->
+  <question type="shortanswer">
+    <name>
+      <text>Short Answer Question 4</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[Name the key that has five sharps.]]></text>
+    </questiontext>
+    <answer fraction="100">
+      <text>B Major</text>
+      <feedback>
+        <text>Correct!</text>
+      </feedback>
+    </answer>
+  </question>
 </quiz>
 ''';
 String rubricDefinition = '''

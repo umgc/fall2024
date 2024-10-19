@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/Views/essay_edit_page.dart';
 import 'dart:convert';
 import '../Api/llm_api.dart';
 
@@ -32,6 +33,8 @@ class _MyHomePageState extends State<EssayGeneration>
   final TextEditingController _additionalCustomizationController = TextEditingController();
 
   dynamic globalRubric;
+  dynamic rubricasjson;
+  static const apikey = String.fromEnvironment('perplexity_apikey');
 
   void _handlePointScaleChanged(int? newValue) 
   {
@@ -59,7 +62,9 @@ class _MyHomePageState extends State<EssayGeneration>
       {
         _isLoading = true; // Set loading state to true
       });
-      LlmApi myLLM = LlmApi(String.fromEnvironment('perplexity_apikey'));
+
+
+      LlmApi myLLM = LlmApi(apikey);
       String queryPrompt = '''
         I am building a program that creates rubrics when provided with assignment information. I will provide you with the following information about the assignment that needs a rubric:
         Difficulty level, point scale, assignment objective, assignment description. You may also receive additional customization rules.
@@ -211,6 +216,7 @@ class _MyHomePageState extends State<EssayGeneration>
                       {
                         setState(() 
                         {
+                          rubricasjson = globalRubric;
                           globalRubric = results;  // Store the rubric
                         });
                       });
@@ -314,7 +320,15 @@ class _MyHomePageState extends State<EssayGeneration>
                 ),
                 const SizedBox(height: 16),
                 // Send to Moodle Button
-                Button("assessment"),
+                Button("assessment",
+                onPressed: (){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EssayEditPage(rubricasjson),
+                    ),
+                  );
+                },),
               ],
             ),
           ),
@@ -338,7 +352,9 @@ class Button extends StatelessWidget {
   factory Button(String type, {VoidCallback? onPressed}) 
   {
     if (type == "assessment") {
-      return Button._(type, "Send to Moodle");
+      return Button._(type, "Send to Moodle",
+        onPressed: onPressed,
+      );
     } else if (type == "essay") {
       return Button._(
         type,
