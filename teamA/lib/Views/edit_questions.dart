@@ -1,3 +1,5 @@
+import 'package:learninglens_app/Views/send_quiz_to_moodle.dart';
+
 import '../Api/moodle_api_singleton.dart';
 import 'package:image_network/image_network.dart';
 import '../Controller/beans.dart';
@@ -19,6 +21,7 @@ class EditQuestionsState extends State<EditQuestions> {
   final TextEditingController _textController = TextEditingController();
   static const apikey = String.fromEnvironment('openai_apikey');
   final openai = OpenAiLLM(apikey);
+  bool _isLoading = false;
 
   String subject = CreateAssessment.descriptionController.text;
   String topic = CreateAssessment.topicController.text;
@@ -32,7 +35,7 @@ class EditQuestionsState extends State<EditQuestions> {
     myQuiz.description = CreateAssessment.descriptionController.text;
 
     promptstart =
-        'Remake this question that is compatible with Moodle XML import. Do not include the original question in your response. Make sure the xml specification is included and the question is wrapped in the quiz xml element required by Moodle. The quiz is to be on the subject of $subject and should be related to $topic. The quiz should be the same level of difficulty for high school students of the English-speaking language. ';
+        'Create a question that is compatible with Moodle XML import. Be a bit creative in how you design the question and answers, making sure it is engaging but still on the subject of $subject and related to $topic. Make sure the XML specification is included, and the question is wrapped in the quiz XML element required by Moodle. Each answer should have feedback that fits the Moodle XML format, and avoid using HTML elements within a CDATA field. The quiz should be challenging and thought-provoking, but appropriate for high school students who speak English. The quesiton typ shoud be ';
   }
 
   @override
@@ -88,15 +91,24 @@ class EditQuestionsState extends State<EditQuestions> {
                 var question = myQuiz.questionList[index];
                 return Dismissible(
                   key: Key(question.toString()),
-                  background: Container(
-                    color: Colors.green,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 16),
-                        child: Icon(Icons.favorite),
+                  background: Stack(
+                    children: [
+                      Container(
+                        color: Colors.green,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 16),
+                            child: Icon(Icons.favorite),
+                          ),
+                        ),
                       ),
-                    ),
+                      if (_isLoading)
+                        Center(
+                          child:
+                              CircularProgressIndicator(), // Spinner behind the item
+                        ),
+                    ],
                   ),
                   secondaryBackground: Container(
                     color: Colors.red,
@@ -110,9 +122,17 @@ class EditQuestionsState extends State<EditQuestions> {
                   ),
                   confirmDismiss: (direction) async {
                     if (direction == DismissDirection.startToEnd) {
-                      //********************************************************************************************
+                      setState(() {
+                        _isLoading = true;
+                      });
                       var result = await openai
-                          .postToLlm(promptstart + question.toString());
+                          // .postToLlm(promptstart + question.toString());
+                          .postToLlm(promptstart + question.type.toString());
+
+                      setState(() {
+                        _isLoading = false; // Stop showing the spinner
+                      });
+
                       if (result.isNotEmpty) {
                         setState(() {
                           //replace the old question with the new one from the api call
@@ -158,6 +178,17 @@ class EditQuestionsState extends State<EditQuestions> {
           Row(
             children: [
               ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QuizMoodle(quiz: myQuiz)
+                    ),
+                  );
+                },
+                child: const Text('Send to Moodle Set up'),
+              ),
+              ElevatedButton(
                 onPressed: () async {
                   var result = await MoodleApiSingleton().getRubric('205');
                   print(result);
@@ -190,7 +221,14 @@ class EditQuestionsState extends State<EditQuestions> {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  var result = await MoodleApiSingleton().createAssignment('2', '2', 'Sunday Assignment', '2024-10-6', '2024-10-14', rubricDefinition, 'This is the description');
+                  var result = await MoodleApiSingleton().createAssignment(
+                      '2',
+                      '2',
+                      'Sunday Assignment',
+                      '2024-10-6',
+                      '2024-10-14',
+                      rubricDefinition,
+                      'This is the description');
                   print(result);
                 },
                 child: const Text('Create Assignment'),

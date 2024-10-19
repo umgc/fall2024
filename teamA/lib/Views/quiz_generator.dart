@@ -1,6 +1,4 @@
-// import 'dart:io';
-import 'dart:io';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:learninglens_app/Api/llm/prompt_engine.dart';
@@ -15,13 +13,14 @@ class CreateAssessment extends StatefulWidget {
 
   static TextEditingController nameController = TextEditingController();
   static TextEditingController descriptionController = TextEditingController();
+  static TextEditingController subjectController = TextEditingController();
   static TextEditingController sourceController = TextEditingController();
   static TextEditingController multipleChoiceController = TextEditingController();
   static TextEditingController trueFalseController = TextEditingController();
   static TextEditingController shortAnswerController = TextEditingController();
   static TextEditingController topicController = TextEditingController();
   CreateAssessment();
-
+  
   @override
   State createState() {
     return _AssessmentState();
@@ -65,7 +64,7 @@ class _AssessmentState extends State<CreateAssessment> {
                         TextEntry._('Description', false, CreateAssessment.descriptionController, isTextArea: true,),
                         SizedBox(height: paddingHeight),
                         isAdvancedModeOnGetFromGlobalVarsLater ? 
-                          TextEntry._('Question Topic', true, CreateAssessment.topicController) :
+                          TextEntry._('Question Subject', true, CreateAssessment.subjectController) :
                           DropdownButtonFormField<String>(
                           value: selectedSubject,
                           decoration: const InputDecoration(labelText: "Select Subject"),
@@ -74,7 +73,7 @@ class _AssessmentState extends State<CreateAssessment> {
                               selectedSubject = newValue;
                             });
                           },
-                          items: ['Math', 'Science', 'Language Arts', 'Social Studies', 'History', 'Health'].map((String value) {
+                          items: ['Math', 'Science', 'Language Arts', 'Social Studies', 'Health', 'Art', 'Music'].map((String value) {
                                   return DropdownMenuItem(value: value, child: Text(value),);
                                 }).toList(),
                         ),
@@ -118,7 +117,7 @@ class _AssessmentState extends State<CreateAssessment> {
                         SubmitButton._(selectedSubject, selectedLLM,
                                         { "name" : CreateAssessment.nameController, 
                                           "description" : CreateAssessment.descriptionController,
-                                          "topic" : CreateAssessment.topicController,
+                                          "subject" : CreateAssessment.subjectController,
                                           "multipleChoice" : CreateAssessment.multipleChoiceController,
                                           "trueFalse" :  CreateAssessment.trueFalseController,
                                           "shortAns" : CreateAssessment.shortAnswerController
@@ -141,7 +140,8 @@ class SubmitButton extends StatelessWidget {
   final Map<String, TextEditingController> fields;
   final GlobalKey<FormState> formKey;
   final BuildContext context;
-
+  final openapikey = dotenv.env['openai_apikey']?? 'default_openai_api_key';
+  final claudapikey = dotenv.env['claudeai_apikey']?? 'default_claud_api_key';
   SubmitButton._(this.selectedSubject,
                  this.selectedLLM,
                  this.fields,
@@ -152,8 +152,8 @@ class SubmitButton extends StatelessWidget {
     if(formKey.currentState!.validate()) {
       AssignmentForm af = AssignmentForm(
         questionType: QuestionType.shortanswer, //Potentially not necessary? Need to see about essay generator
-        subject: selectedSubject != null ? selectedSubject.toString() :  fields['topic']!.text, 
-        topic: fields['topic']!.text, 
+        subject: selectedSubject != null ? selectedSubject.toString() :  fields['subject']!.text, 
+        topic: fields['description']!.text, 
         gradeLevel: 'Sophomore', // Get these programatically?
         title: fields['name']!.text,
         trueFalseCount: int.parse(fields['trueFalse']!.text),
@@ -164,9 +164,9 @@ class SubmitButton extends StatelessWidget {
 
       final aiModel;
       if (selectedLLM == 'ChatGPT') {
-        aiModel = OpenAiLLM(String.fromEnvironment('openai_apikey'));
+        aiModel = OpenAiLLM(openapikey);
       } else if (selectedLLM == 'CLAUDE') {
-        aiModel = ClaudeAiAPI(String.fromEnvironment('claude_apikey'));
+        aiModel = ClaudeAiAPI(claudapikey);
       } else {
         aiModel = OpenAiLLM(''); // Awaiting perplexity implementation
         //aiModel = PerplexityAPI(String.fromEnvironment('perplexity_apikey'));

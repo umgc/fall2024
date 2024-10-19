@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:learninglens_app/Api/moodle_api_singleton.dart';
 import 'package:learninglens_app/main.dart';
 import '/controller/main_controller.dart';
 import '/Views/dashboard.dart';
