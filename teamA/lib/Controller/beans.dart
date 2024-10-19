@@ -190,19 +190,6 @@ class Level {
   }
 }
 
-class Essay {
-  //todo more vars as needed (like the Rubric for starters)
-  String? name;
-  String? description;
-
-  Essay({this.name,this.description});
-
-  @override
-  String toString(){
-    return '$name: $description';
-  }
-}
-
 // A Moodle quiz containing a list of questions.
 class Quiz {
   String? name; // quiz name - optional.
@@ -390,7 +377,7 @@ class Course {
   String fullName;
 
   List<Quiz>? quizzes;
-  List<Essay>? essays;
+  List<Assignment>? essays;
 
   // Barebones constructor.
   Course(this.id, this.shortName, this.fullName, [this.quizzes, this.essays]);
@@ -503,7 +490,7 @@ class Assignment {
     return Assignment(
       id: json['id'] ?? 0,
       name: json['name'] ?? 'Untitled',
-      description: json['description'] ?? '',
+      description: json['description'] ?? json['intro'] ?? '',
       dueDate: json['duedate'] != null
           ? DateTime.fromMillisecondsSinceEpoch(json['duedate'] * 1000)
           : null,
