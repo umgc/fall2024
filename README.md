@@ -1,4 +1,4 @@
-# fall2024
+# fall2024 Sewen670
 Fall SWEN 670 Cohort
 
 Team A (Learning Lens) - LLM Integrated Software Application for K-12 Education
