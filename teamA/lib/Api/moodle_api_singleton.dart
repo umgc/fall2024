@@ -172,19 +172,31 @@ class MoodleApiSingleton {
   }
 
   Future<List<Quiz>> getQuizzes(int? courseID) async {
-    List contents;
-    if (courseID != null) {
-      contents = await getCourseContents(courseID);
-    } else {
-      contents = await getAllContents();
+    if (_userToken == null) throw StateError('User not logged in to Moodle');
+
+    // URL of the Moodle server
+    final response = await http.post(Uri.parse(moodleURL + serverUrl), body: {
+      'wstoken': _userToken,
+      'wsfunction': 'mod_quiz_get_quizzes_by_courses',
+      'moodlewsrestformat': 'json',
+    });
+
+    if (response.statusCode != 200) {
+      throw HttpException(response.body);
     }
+
+    List<dynamic>? decodedJson = (jsonDecode(response.body) as Map<String,List>)['quizzes'];
+    if (decodedJson == null){
+      return [];
+    }
+
     List<Quiz> results = [];
-    for (Object c in contents) {
-      if (c is Quiz) {
-        results.insert(results.length, c);
+    for (int i = 0; i < decodedJson.length; i++){
+      if (courseID == null || decodedJson[i]['course'] == courseID){
+        //todo more complex quiz creation, we need questions
+        results.insert(results.length, Quiz(name: decodedJson[i]['name'],description: decodedJson[i]['intro']));
       }
     }
-    print(results.toString());
     return results;
   }
 
