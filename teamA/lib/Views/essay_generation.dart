@@ -62,9 +62,9 @@ class _MyHomePageState extends State<EssayGeneration>
       {
         _isLoading = true; // Set loading state to true
       });
-String apiKey = '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';
 
-      LlmApi myLLM = LlmApi(apiKey);
+
+      LlmApi myLLM = LlmApi(apikey);
       String queryPrompt = '''
         I am building a program that creates rubrics when provided with assignment information. I will provide you with the following information about the assignment that needs a rubric:
         Difficulty level, point scale, assignment objective, assignment description. You may also receive additional customization rules.
