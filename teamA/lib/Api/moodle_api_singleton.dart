@@ -602,7 +602,7 @@ Future<SubmissionStatus?> getSubmissionStatus(int assignmentId, int userId) asyn
   // Import XML quiz questions into the specified course using learninglens plugin.
   // ********************************************************************************************************************
 
-  Future<Map<String, dynamic>?> importQuizQuestions(
+  Future<int?> importQuizQuestions(
       String courseid, String quizXml) async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
     try {
@@ -617,9 +617,10 @@ Future<SubmissionStatus?> getSubmissionStatus(int assignmentId, int userId) asyn
         },
       );
       if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
+        String jsonPart = response.body.substring(response.body.indexOf('{'));
+        final Map<String, dynamic> responseData = json.decode(jsonPart);
         print('Response: $responseData');
-        return responseData;
+        return responseData['categoryid'];
       } else {
         print('Request failed with status: ${response.statusCode}.');
         return null;
@@ -633,7 +634,7 @@ Future<SubmissionStatus?> getSubmissionStatus(int assignmentId, int userId) asyn
   // Create a new quiz in the specified course using learninglens plugin.
   // ********************************************************************************************************************
 
-  Future<Map<String, dynamic>?> createQuiz(
+  Future <int?> createQuiz(
       String courseid, String quizname, String quizintro) async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
     // const String url = 'webservice/rest/server.php';
@@ -653,7 +654,7 @@ Future<SubmissionStatus?> getSubmissionStatus(int assignmentId, int userId) asyn
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         print('Response: $responseData');
-        return responseData;
+        return responseData['quizid'];
       } else {
         print('Request failed with status: ${response.statusCode}.');
         return null;
