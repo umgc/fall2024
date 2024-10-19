@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../Api/moodle_api_singleton.dart';
 import '../Controller/beans.dart';
 import 'view_submission_detail.dart';
+import '../Api/llm_api.dart';
+import 'dart:convert';
 
 class SubmissionList extends StatefulWidget {
   final int assignmentId;
@@ -18,6 +20,7 @@ class SubmissionList extends StatefulWidget {
 
 class SubmissionListState extends State<SubmissionList> {
   MoodleApiSingleton api = MoodleApiSingleton();
+  bool isLoading = false;
 
   late Future<List<SubmissionWithGrade>> futureSubmissionsWithGrades =
       api.getSubmissionsWithGrades(widget.assignmentId);
@@ -196,22 +199,132 @@ class SubmissionListState extends State<SubmissionList> {
                                               'notgraded')
                                         ElevatedButton(
                                           onPressed: () async {
-                                            // Fetch submission and rubric for grading
-                                            var submissionText =
-                                                submissionWithGrade
-                                                    .submission.onlineText;
-                                            int? contextId =
-                                                await MoodleApiSingleton()
-                                                    .getContextId(
-                                                        widget.assignmentId,
-                                                        widget.courseId);
-                                            if (contextId != null) {
-                                              var fetchedRubric =
-                                                  await MoodleApiSingleton()
-                                                      .getRubric(widget
-                                                          .assignmentId
-                                                          .toString());
-                                            }
+                                              try
+                                              {
+                                                // TODO: Add Loading indicator
+                                                setState(() {
+                                                  isLoading = true;
+                                                });
+                                                // Fetch submission and context ID
+                                                var submissionText =submissionWithGrade.submission.onlineText;
+                                                int? contextId = await MoodleApiSingleton().getContextId(widget.assignmentId, widget.courseId);
+
+                                                // Fetch rubric
+                                                var fetchedRubric;
+                                                if (contextId != null) 
+                                                {
+                                                  fetchedRubric = await MoodleApiSingleton().getRubric(widget.assignmentId.toString());
+                                                  if (fetchedRubric == null) 
+                                                  {
+                                                    print('Failed to fetch rubric.');
+                                                    return;
+                                                  }
+                                                  // Ensure the rubric is serialized to JSON format
+                                                  fetchedRubric = jsonEncode(fetchedRubric?.toJson() ?? {});
+                                                }
+                                                
+                                                // Create prompt to send to LLM for grading
+                                                String queryPrompt = '''
+                                                  I am building a program that generates essay rubric assignments that teachers can distribute to students
+                                                  who can then submit their responses to be graded. Here is an example format of a rubric roughly:
+                                                  [
+                                                      {
+                                                          "id": 82,
+                                                          "rubric_criteria": [
+                                                              {
+                                                                  "id": 52,
+                                                                  "description": "Content",
+                                                                  "levels": [
+                                                                      {
+                                                                          "id": 157,
+                                                                          "score": 1,
+                                                                          "definition": "Poor"
+                                                                      },
+                                                                      {
+                                                                          "id": 156,
+                                                                          "score": 3,
+                                                                          "definition": "Good"
+                                                                      },
+                                                                      {
+                                                                          "id": 155,
+                                                                          "score": 5,
+                                                                          "definition": "Excellent"
+                                                                      }
+                                                                  ]
+                                                              },
+                                                              {
+                                                                  "id": 53,
+                                                                  "description": "Clarity",
+                                                                  "levels": [
+                                                                      {
+                                                                          "id": 160,
+                                                                          "score": 1,
+                                                                          "definition": "Unclear"
+                                                                      },
+                                                                      {
+                                                                          "id": 159,
+                                                                          "score": 3,
+                                                                          "definition": "Somewhat Clear"
+                                                                      },
+                                                                      {
+                                                                          "id": 158,
+                                                                          "score": 5,
+                                                                          "definition": "Very Clear"
+                                                                      }
+                                                                  ]
+                                                              }
+                                                          ]
+                                                      }
+                                                  ]
+
+                                                  I have the following generated essay rubric:
+                                                  Rubric: $fetchedRubric
+
+                                                  Grade the following submission based on that rubric: 
+                                                  Submission: $submissionText 
+
+                                                  You must reply with a representation of the rubric in JSON format that matches this example format, 
+                                                  obviously put your generated scores in and be specific with the remarks on the scoring and give specific examples from the 
+                                                  submitted assignment that were either good or bad depending on the score given. Also cut out anything that is not
+                                                  the json response. No extraneous comments outside that: 
+                                                  {
+                                                      "criterionid": 52,
+                                                      "criterion_description": "Content",
+                                                      "levelid": 157,
+                                                      "level_description": "Poor",
+                                                      "score": 1,
+                                                      "remark": "Done with mirrors."
+                                                  },
+                                                  {
+                                                      "criterionid": 53,
+                                                      "criterion_description": "Clarity",
+                                                      "levelid": 160,
+                                                      "level_description": "Unclear",
+                                                      "score": 1,
+                                                      "remark": "Rocks."
+                                                  }
+                                                ''';
+
+                                                // Initialize the LLM API with your Perplexity API key
+                                                String apiKey = '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';
+                                                final llmApi = LlmApi(apiKey);
+
+                                                // Retrieve response in the format of a graded JSON rubric
+                                                String gradedResponse = await llmApi.postToLlm(queryPrompt);
+                                                gradedResponse = gradedResponse.replaceAll('```json', '').replaceAll('```', '').trim();
+                                                print("debug line");
+                                              }
+                                              catch (e)
+                                              {
+                                                print('An error occurred: $e');
+                                              }
+                                              finally 
+                                              {
+                                                // Hide loading indicator
+                                                setState(() {
+                                                  isLoading = false; // Update your loading state
+                                                });
+                                              }
                                           },
                                           child: Text('Grade'),
                                         ),

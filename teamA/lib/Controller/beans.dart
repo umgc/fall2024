@@ -740,6 +740,14 @@ class MoodleRubric {
       criteria: criteriaList,
     );
   }
+
+  Map<String, dynamic> toJson() 
+  {
+    return {
+      'title': title,
+      'criteria': criteria.map((c) => c.toJson()).toList(),
+    };
+  }
 }
 
 class MoodleRubricCriteria {
@@ -749,7 +757,8 @@ class MoodleRubricCriteria {
 
   MoodleRubricCriteria({required this.id, required this.description, required this.levels});
 
-  factory MoodleRubricCriteria.fromJson(Map<String, dynamic> json) {
+  factory MoodleRubricCriteria.fromJson(Map<String, dynamic> json) 
+  {
     var levelsList = (json['levels'] as List)
         .map((l) => Level.fromJson(l))
         .toList();
@@ -760,6 +769,15 @@ class MoodleRubricCriteria {
       levels: levelsList,
     );
   }
+
+  Map<String, dynamic> toJson() 
+  {
+    return {
+      'id': id,
+      'description': description,
+      'levels': levels.map((l) => l.toJson()).toList(),
+    };
+  }
 }
 
 class Level {
@@ -769,13 +787,23 @@ class Level {
 
   Level({required this.id, required this.description, required this.score});
 
-  factory Level.fromJson(Map<String, dynamic> json) {
+  factory Level.fromJson(Map<String, dynamic> json) 
+  {
     return Level(
       id: json['id'] ?? 0,
       description: json['definition'] ?? '',
       score: json['score'] ?? 0,
     );
   }
+
+   Map<String, dynamic> toJson() 
+   {
+    return {
+      'id': id,
+      'description': description,
+      'score': score,
+    };
+   }
 }
 
 class Grade {
