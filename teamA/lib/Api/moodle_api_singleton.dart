@@ -201,19 +201,33 @@ class MoodleApiSingleton {
   }
 
   Future<List<Essay>> getEssays(int? courseID) async {
-    List contents;
-    if (courseID != null) {
-      contents = await getCourseContents(courseID);
-    } else {
-      contents = await getAllContents();
+    if (_userToken == null) throw StateError('User not logged in to Moodle');
+
+    // URL of the Moodle server
+    final response = await http.post(Uri.parse(moodleURL + serverUrl), body: {
+      'wstoken': _userToken,
+      'wsfunction': 'mod_assign_get_assignments',
+      'moodlewsrestformat': 'json',
+    });
+
+    if (response.statusCode != 200) {
+      throw HttpException(response.body);
     }
+
+    List<dynamic>? decodedJson = (jsonDecode(response.body) as Map<String,List>)['courses'];
+    if (decodedJson == null){
+      return [];
+    }
+
     List<Essay> results = [];
-    for (Object c in contents) {
-      if (c is Essay) {
-        results.insert(results.length, c);
+    for (int i = 0; i < decodedJson.length; i++){
+      if (courseID == null || decodedJson[i]['id'] == courseID){
+        for (Map<String,dynamic> a in decodedJson[i]['assignments']){
+          //todo more complex essay creation, we need a connection to the rubric
+          results.insert(results.length, Essay(name: a['name'],description: a['intro']));
+        }
       }
     }
-    print(results.toString());
     return results;
   }
 
