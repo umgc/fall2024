@@ -194,7 +194,7 @@ class MoodleApiSingleton {
     for (int i = 0; i < decodedJson.length; i++){
       if (courseID == null || decodedJson[i]['course'] == courseID){
         //todo more complex quiz creation, we need questions
-        results.insert(results.length, Quiz(name: decodedJson[i]['name'],description: decodedJson[i]['intro']));
+        results.insert(results.length, Quiz(name: decodedJson[i]['name'],description: decodedJson[i]['intro'],id: decodedJson[i]['id']));
       }
     }
     return results;
