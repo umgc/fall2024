@@ -3,6 +3,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:learninglens_app/Views/essay_edit_page.dart';
 import 'dart:convert';
 import '../Api/llm_api.dart';
+import 'package:llm_api_modules/openai_api.dart';
+import 'package:llm_api_modules/claudeai_api.dart';
 
 // Required Components:
 // 2 Dropdowns: 1 for the Grade Level and 1 for the Point Scale
@@ -28,6 +30,10 @@ class _MyHomePageState extends State<EssayGeneration>
   int _selectedPointScale = 3; // Default value
   String _selectedGradeLevel = '12th grade'; // Default value for GradeLevelDropdown
   bool _isLoading = false;
+  String? selectedLLM = 'Perplexity'; // default
+
+  // llm options
+  final List<String> llmOptions = ['ChatGPT', 'CLAUDE', 'Perplexity'];
 
   // Variables to store the text inputs
   final TextEditingController _standardObjectiveController = TextEditingController();
@@ -36,8 +42,13 @@ class _MyHomePageState extends State<EssayGeneration>
 
   dynamic globalRubric;
   dynamic rubricasjson;
-    static var apikey = dotenv.env['perplexity_apikey'] ?? '';
 
+  // api keys
+  final perplexityApiKey = dotenv.env['perplexity_apikey'] ?? '';
+  final openApiKey = dotenv.env['openai_apikey']?? 'perplexity_apikey';
+  final claudeApiKey = dotenv.env['claudeApiKey']?? 'perplexity_apikey';
+
+  // event handlers
   void _handlePointScaleChanged(int? newValue) 
   {
     setState(() {
@@ -57,7 +68,31 @@ class _MyHomePageState extends State<EssayGeneration>
     });
   }
 
-  Future<dynamic> apiTest(String inputs) async {
+  // Handle LLM Selection
+  void _handleLLMChanged(String? newValue) 
+  {
+    setState(() {
+      if (newValue != null) {
+        selectedLLM = newValue;
+      }
+    });
+  }
+
+  // Get api key for selected LLM
+  String getApiKey() 
+  {
+    switch (selectedLLM) 
+    {
+      case 'OpenAI':
+        return openApiKey;
+      case 'Claude':
+        return claudeApiKey;
+      default:
+        return perplexityApiKey;
+    }
+  }
+
+  Future<dynamic> pingApi(String inputs) async {
     try
     {
       setState(() 
@@ -65,11 +100,23 @@ class _MyHomePageState extends State<EssayGeneration>
         _isLoading = true; // Set loading state to true
       });
 
-
-      if (apikey.isEmpty) {
+      String apiKey = getApiKey(); // Get the correct API key based on the selected LLM
+      if (apiKey.isEmpty) {
         throw Exception("API key is missing");
       }
-      LlmApi myLLM = LlmApi(apikey);
+
+      // Dynamically instantiate the appropriate LLM class based on the selectedLLM
+      dynamic llmInstance;
+      if (selectedLLM == 'OpenAI') {
+        llmInstance = OpenAiLLM(openApiKey);
+      } else if (selectedLLM == 'Claude') {
+        llmInstance = ClaudeAiAPI(claudeApiKey);
+      } else if (selectedLLM == 'Perplexity') {
+        llmInstance = LlmApi(perplexityApiKey); // Perplexity API class
+      } else {
+        throw Exception('Invalid LLM selected.');
+      }
+
       String queryPrompt = '''
         I am building a program that creates rubrics when provided with assignment information. I will provide you with the following information about the assignment that needs a rubric:
         Difficulty level, point scale, assignment objective, assignment description. You may also receive additional customization rules.
@@ -94,7 +141,7 @@ class _MyHomePageState extends State<EssayGeneration>
         Here is the assignment information:
         $inputs
       ''';
-      globalRubric = await myLLM.postToLlm(queryPrompt);
+      globalRubric = await llmInstance.postToLlm(queryPrompt);
       globalRubric = globalRubric.replaceAll('```', '').trim();
       return jsonDecode(globalRubric);
     }
@@ -170,6 +217,21 @@ class _MyHomePageState extends State<EssayGeneration>
 
                   const SizedBox(height: 16),
 
+                  // LLM Selection Dropdown
+                  DropdownButton<String>(
+                    value: selectedLLM,
+                    onChanged: _handleLLMChanged,
+                    items: <String>['Perplexity', 'OpenAI', 'Claude']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+
+                  const SizedBox(height: 16),
+
                   // Standard/objective
                   TextBox(
                     label: "Standard / Objective",
@@ -217,7 +279,7 @@ class _MyHomePageState extends State<EssayGeneration>
                     {
                       final result = getSelectedResponses();
 
-                      apiTest(result).then((dynamic results) 
+                      pingApi(result).then((dynamic results) 
                       {
                         setState(() 
                         {
