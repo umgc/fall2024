@@ -240,6 +240,10 @@ class Quiz {
     return quiz;
   }
 
+  bool isNew(){
+    return id == null;
+  }
+
   @override
   String toString() {
     final sb = StringBuffer();
@@ -467,7 +471,7 @@ class FileNameAndBytes {
 }
 
 class Assignment {
-  final int id;
+  final int? id;
   final String name;
   final String description;
   final DateTime? dueDate;
@@ -481,7 +485,7 @@ class Assignment {
   final List<SubmissionWithGrade>? submissionsWithGrades;
 
   Assignment({
-    required this.id,
+    this.id,
     required this.name,
     required this.description,
     this.dueDate,
@@ -515,6 +519,10 @@ class Assignment {
       courseId: json['course'] ?? 0,
 
     );
+  }
+
+  bool isNew(){
+    return id == null;
   }
 
   // Convert the Assignment object back to JSON (useful for POST requests or local storage)
