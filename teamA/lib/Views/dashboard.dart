@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/Views/assessments_view.dart';
 import 'package:learninglens_app/Views/edit_questions.dart';
 import 'package:learninglens_app/main.dart';
 import 'essay_generation.dart';
@@ -324,7 +325,7 @@ class TeacherDashboard extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      CreateAssessment(),
+                      AssessmentsView(),  // Navigate to the Assessments page
                 ),
               );
             } else if (title == 'Essays') {
