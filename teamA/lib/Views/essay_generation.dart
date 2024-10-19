@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:learninglens_app/Views/essay_edit_page.dart';
 import 'dart:convert';
 import '../Api/llm_api.dart';
@@ -15,6 +16,7 @@ class EssayGeneration extends StatefulWidget
 {
   const EssayGeneration({super.key, required this.title});
   final String title;
+
 
   @override
   State<EssayGeneration> createState() => _MyHomePageState();
@@ -34,7 +36,7 @@ class _MyHomePageState extends State<EssayGeneration>
 
   dynamic globalRubric;
   dynamic rubricasjson;
-  static const apikey = String.fromEnvironment('perplexity_apikey');
+    static var apikey = dotenv.env['perplexity_apikey'] ?? '';
 
   void _handlePointScaleChanged(int? newValue) 
   {
@@ -64,6 +66,9 @@ class _MyHomePageState extends State<EssayGeneration>
       });
 
 
+      if (apikey.isEmpty) {
+        throw Exception("API key is missing");
+      }
       LlmApi myLLM = LlmApi(apikey);
       String queryPrompt = '''
         I am building a program that creates rubrics when provided with assignment information. I will provide you with the following information about the assignment that needs a rubric:
