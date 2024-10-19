@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:learninglens_app/Views/assessments_view.dart';
+import 'package:learninglens_app/Views/course_list.dart';
 import 'package:learninglens_app/Views/edit_questions.dart';
 import 'package:learninglens_app/main.dart';
 import 'essay_generation.dart';
@@ -314,12 +315,12 @@ class TeacherDashboard extends StatelessWidget {
           onPressed: () {
             // Button functionality based on title
             if (title == 'Courses') {
-              /*  Navigator.push(
+               Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => CoursesPage(), // Navigate to Courses page (once created)
+                builder: (context) => CourseList(), // Navigate to Courses page (once created)
               ),
-            );*/
+            );
             } else if (title == 'Assessments') {
               Navigator.push(
                 context,

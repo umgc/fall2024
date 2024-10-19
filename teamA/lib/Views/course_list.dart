@@ -1,23 +1,27 @@
 import 'package:flutter/material.dart';
-import '/main.dart';
+import '../Controller/beans.dart'; // Assuming this contains the Course class
+import '../main.dart';
+import '../Api/moodle_api_singleton.dart';
 
 // This is the course list UI
-
 class CourseList extends StatelessWidget {
-  const CourseList({super.key});
+  final MoodleApiSingleton api = MoodleApiSingleton();
+  late final Future<List<Course>> courses;
+
+  CourseList({super.key}) {
+    courses = api.getUserCourses();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Theme.of(context)
-                .colorScheme
-                .primaryContainer, // Use primary container color
-            elevation: 0,
-            flexibleSpace: SafeArea(
-                child: Row(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+          elevation: 0,
+          flexibleSpace: SafeArea(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
@@ -27,14 +31,13 @@ class CourseList extends StatelessWidget {
                       context,
                       MaterialPageRoute(builder: (context) => DevLaunch()),
                     );
-                    //to do something once pressed
                   },
                 ),
                 Expanded(
                   child: Align(
                     alignment: Alignment.center,
                     child: Text(
-                      'Learning Lens',
+                      'Learning Lens - Courses',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onPrimaryContainer,
                         fontSize: 20,
@@ -44,172 +47,63 @@ class CourseList extends StatelessWidget {
                   ),
                 ),
               ],
-            )),
+            ),
           ),
-          body: SingleChildScrollView(
-              child: Wrap(
-                  direction: Axis.horizontal,
-                  alignment: WrapAlignment.center,
-                  spacing: 8.0,
-                  runAlignment: WrapAlignment.center,
-                  runSpacing: 8.0,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  textDirection: TextDirection.ltr,
-                  verticalDirection: VerticalDirection.down,
-                  children: [
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 15.0),
-                    child: Text(
-                      'Course List',
-                      textDirection: TextDirection.ltr,
-                      style: TextStyle(
-                          fontSize: 25, fontWeight: FontWeight.normal),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                SizedBox(
-                  width: 300,
-                  height: 150,
-                  child: Expanded(
-                      child: ElevatedButton(
-                    onPressed: () {
-                      //Button onPressed Action
-                    },
-                    style: ButtonStyle(
-                        backgroundColor:
-                            WidgetStatePropertyAll(Color(0xFF6A5A99)),
-                        minimumSize: WidgetStatePropertyAll(Size(250, 5)),
-                        shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
+        ),
+        body: FutureBuilder<List<Course>>(
+          future: courses,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error loading courses'));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(child: Text('No courses found'));
+            } else {
+              final courseList = snapshot.data!;
+
+              return ListView.builder(
+                itemCount: courseList.length,
+                itemBuilder: (context, index) {
+                  final course = courseList[index];
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Button onPressed Action (e.g., navigate to course details)
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(Color(0xFF6A5A99)),
+                        minimumSize: MaterialStateProperty.all(Size(250, 5)),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0)),
-                        )),
-                    child: ListTile(
-                      title: Text(
-                        'Course 1',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color:
-                              Theme.of(context).colorScheme.onPrimaryContainer,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
                         ),
                       ),
-                      subtitle: Text(
-                        'Course ID',
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  )),
-                ),
-                SizedBox(height: 16),
-                SizedBox(
-                  width: 300,
-                  height: 150,
-                  child: Expanded(
-                      child: ElevatedButton(
-                    onPressed: () {
-                      //Button onPressed Action
-                    },
-                    style: ButtonStyle(
-                        backgroundColor:
-                            WidgetStatePropertyAll(Color(0xFF6A5A99)),
-                        minimumSize: WidgetStatePropertyAll(Size(250, 5)),
-                        shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0)),
-                        )),
-                    child: ListTile(
-                      title: Text(
-                        'Course 2',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color:
-                              Theme.of(context).colorScheme.onPrimaryContainer,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      child: ListTile(
+                        title: Text(
+                          course.fullName, // Assuming Course has a 'name' field
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: Text(
+                          'Course ID: ${course.id}', // Assuming Course has an 'id' field
+                          textAlign: TextAlign.center,
                         ),
                       ),
-                      subtitle: Text(
-                        'Course ID',
-                        textAlign: TextAlign.center,
-                      ),
                     ),
-                  )),
-                ),
-                SizedBox(height: 16),
-                SizedBox(
-                  width: 300,
-                  height: 150,
-                  child: Expanded(
-                      child: ElevatedButton(
-                    onPressed: () {
-                      //Button onPressed Action
-                    },
-                    style: ButtonStyle(
-                        backgroundColor:
-                            WidgetStatePropertyAll(Color(0xFF6A5A99)),
-                        minimumSize: WidgetStatePropertyAll(Size(250, 5)),
-                        shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0)),
-                        )),
-                    child: ListTile(
-                      title: Text(
-                        'Course 3',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color:
-                              Theme.of(context).colorScheme.onPrimaryContainer,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      subtitle: Text(
-                        'Course ID',
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  )),
-                ),
-                SizedBox(height: 16),
-                SizedBox(
-                  width: 300,
-                  height: 150,
-                  child: Expanded(
-                      child: ElevatedButton(
-                    onPressed: () {
-                      //Button onPressed Action
-                    },
-                    style: ButtonStyle(
-                        backgroundColor:
-                            WidgetStatePropertyAll(Color(0xFF6A5A99)),
-                        minimumSize: WidgetStatePropertyAll(Size(250, 5)),
-                        shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0)),
-                        )),
-                    child: ListTile(
-                      title: Text(
-                        'Course 4',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color:
-                              Theme.of(context).colorScheme.onPrimaryContainer,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      subtitle: Text(
-                        'Course ID',
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  )),
-                ),
-              ])),
-        ));
+                  );
+                },
+              );
+            }
+          },
+        ),
+      ),
+    );
   }
 }
