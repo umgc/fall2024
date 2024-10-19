@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -45,7 +43,7 @@ class MyApp extends StatelessWidget {
       scrollBehavior: CustomScrollBehavior(),
       routes: {
         'LoginPage': (context) => LoginApp(),
-        '/EssayEditPage': (context) => EssayEditPage(),
+        // '/EssayEditPage': (context) => EssayEditPage(jsonData),
         '/Content': (context) => ViewCourseContents(),
         '/EssayGenerationPage': (context) => EssayGeneration(title: 'Essay Generation'),
         '/QuizGenerationPage': (context) => CreateAssessment(),
@@ -82,14 +80,14 @@ class _DevLaunch extends State {
                   MaterialPageRoute(builder: (context) => LoginApp()),
                 );
               }),
-          ElevatedButton(
-              child: const Text('Open Edit Essay'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => EssayEditPage()),
-                );
-              }),
+          // ElevatedButton(
+          //     child: const Text('Open Edit Essay'),
+          //     onPressed: () {
+          //       Navigator.push(
+          //         context,
+          //         MaterialPageRoute(builder: (context) => EssayEditPage(jsonData)),
+          //       );
+          //     }),
           ElevatedButton(
               child: const Text('Open Contents Carousel'),
               onPressed: () async {
