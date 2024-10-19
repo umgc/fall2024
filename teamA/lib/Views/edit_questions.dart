@@ -190,7 +190,14 @@ class EditQuestionsState extends State<EditQuestions> {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  var result = await MoodleApiSingleton().createAssignment('2', '2', 'Sunday Assignment', '2024-10-6', '2024-10-14', rubricDefinition, 'This is the description');
+                  var result = await MoodleApiSingleton().createAssignment(
+                      '2',
+                      '2',
+                      'Sunday Assignment',
+                      '2024-10-6',
+                      '2024-10-14',
+                      rubricDefinition,
+                      'This is the description');
                   print(result);
                 },
                 child: const Text('Create Assignment'),
