@@ -1,3 +1,5 @@
+import 'dart:js_interop';
+
 import '../Api/moodle_api_singleton.dart';
 import 'package:image_network/image_network.dart';
 import '../Controller/beans.dart';
@@ -19,6 +21,7 @@ class EditQuestionsState extends State<EditQuestions> {
   final TextEditingController _textController = TextEditingController();
   static const apikey = String.fromEnvironment('openai_apikey');
   final openai = OpenAiLLM(apikey);
+  bool _isLoading = false;
 
   String subject = CreateAssessment.descriptionController.text;
   String topic = CreateAssessment.topicController.text;
@@ -31,8 +34,8 @@ class EditQuestionsState extends State<EditQuestions> {
     myQuiz.name = CreateAssessment.nameController.text;
     myQuiz.description = CreateAssessment.descriptionController.text;
 
-    promptstart =
-        'Remake this question that is compatible with Moodle XML import. Do not include the original question in your response. Make sure the xml specification is included and the question is wrapped in the quiz xml element required by Moodle. The quiz is to be on the subject of $subject and should be related to $topic. The quiz should be the same level of difficulty for high school students of the English-speaking language. ';
+
+promptstart = 'Create a question that is compatible with Moodle XML import. Be a bit creative in how you design the question and answers, making sure it is engaging but still on the subject of $subject and related to $topic. Make sure the XML specification is included, and the question is wrapped in the quiz XML element required by Moodle. Each answer should have feedback that fits the Moodle XML format, and avoid using HTML elements within a CDATA field. The quiz should be challenging and thought-provoking, but appropriate for high school students who speak English. The quesiton typ shoud be ';
   }
 
   @override
@@ -69,144 +72,168 @@ class EditQuestionsState extends State<EditQuestions> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _textController,
-              decoration: InputDecoration(
-                labelText: 'Prompt: ${myQuiz.promptUsed}',
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: myQuiz.questionList.length,
-              itemBuilder: (context, index) {
-                var question = myQuiz.questionList[index];
-                return Dismissible(
-                  key: Key(question.toString()),
-                  background: Container(
-                    color: Colors.green,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 16),
-                        child: Icon(Icons.favorite),
-                      ),
-                    ),
-                  ),
-                  secondaryBackground: Container(
-                    color: Colors.red,
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 16),
-                        child: Icon(Icons.delete),
-                      ),
-                    ),
-                  ),
-                  confirmDismiss: (direction) async {
-                    if (direction == DismissDirection.startToEnd) {
-                      //********************************************************************************************
-                      var result = await openai
-                          .postToLlm(promptstart + question.toString());
-                      if (result.isNotEmpty) {
-                        setState(() {
-                          //replace the old question with the new one from the api call
-                          question = Quiz.fromXmlString(result).questionList[0];
-                          question.setName = 'Question ${index + 1}';
-                          myQuiz.questionList[index] = question.copyWith(
-                              isFavorite: !question.isFavorite);
-                        });
-                      }
-                      return false;
-                    } else {
-                      bool delete = true;
-                      final snackbarController =
-                          ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Deleted $Question'),
-                          action: SnackBarAction(
-                              label: 'Undo', onPressed: () => delete = false),
-                        ),
-                      );
-                      await snackbarController.closed;
-                      return delete;
-                    }
-                  },
-                  onDismissed: (_) {
-                    setState(() {
-                      myQuiz.questionList.removeAt(index);
-                    });
-                  },
-                  child: ListTile(
-                    title: Text(question.toString()),
-                    tileColor: (index.isEven)
-                        ? Theme.of(context).colorScheme.secondary
-                        : Theme.of(context).colorScheme.secondaryContainer,
-                    textColor: (index.isEven)
-                        ? Theme.of(context).colorScheme.onSecondary
-                        : Theme.of(context).colorScheme.onSecondaryContainer,
-                  ),
-                );
-              },
-            ),
-          ),
-          Row(
+      body:
+          Column(
             children: [
-              ElevatedButton(
-                onPressed: () async {
-                  var result = await MoodleApiSingleton().getRubric('205');
-                  print(result);
-                },
-                child: const Text('Get Rubric'),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _textController,
+                  decoration: InputDecoration(
+                    labelText: 'Prompt: ${myQuiz.promptUsed}',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  var result = await MoodleApiSingleton()
-                      .addRandomQuestions('50', '22', '2');
-                  print(result);
-                },
-                child: const Text('Add Random Questions'),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  var result = await MoodleApiSingleton()
-                      .importQuizQuestions('2', myXML);
-                  print(result);
-                },
-                child: const Text('Import Questions'),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  var result = await MoodleApiSingleton()
-                      .createQuiz('2', 'Sunday Quiz', 'Sunday Quiz Intro');
-                  print(result);
-                },
-                child: const Text('Create Quiz'),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  var result = await MoodleApiSingleton().createAssignment(
-                      '2',
-                      '2',
-                      'Sunday Assignment',
-                      '2024-10-6',
-                      '2024-10-14',
-                      rubricDefinition,
-                      'This is the description');
-                  print(result);
-                },
-                child: const Text('Create Assignment'),
-              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: myQuiz.questionList.length,
+                  itemBuilder: (context, index) {
+                    var question = myQuiz.questionList[index];
+                    return Dismissible(
+                      key: Key(question.toString()),
+                      background: Stack(
+                        children: [
+                          Container(
+                            color: Colors.green,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 16),
+                                child: Icon(Icons.favorite),
+                              ),
+                            ),
+                          ),
+                          if (_isLoading)
+                            Center(
+                              child:
+                                  CircularProgressIndicator(), // Spinner behind the item
+                            ),
+                        ],
+                      ),
+                      secondaryBackground: Container(
+                        color: Colors.red,
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 16),
+                            child: Icon(Icons.delete),
+                          ),
+                        ),
+                      ),
+                      confirmDismiss: (direction) async {
+                        if (direction == DismissDirection.startToEnd) {
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          var result = await openai
+                              // .postToLlm(promptstart + question.toString());
+                              .postToLlm(
+                                  promptstart + question.type.toString());
 
+                          setState(() {
+                            _isLoading = false; // Stop showing the spinner
+                          });
+
+                          if (result.isNotEmpty) {
+                            setState(() {
+                              //replace the old question with the new one from the api call
+                              question =
+                                  Quiz.fromXmlString(result).questionList[0];
+                              question.setName = 'Question ${index + 1}';
+                              myQuiz.questionList[index] = question.copyWith(
+                                  isFavorite: !question.isFavorite);
+                            });
+                          }
+                          return false;
+                        } else {
+                          bool delete = true;
+                          final snackbarController =
+                              ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Deleted $Question'),
+                              action: SnackBarAction(
+                                  label: 'Undo',
+                                  onPressed: () => delete = false),
+                            ),
+                          );
+                          await snackbarController.closed;
+                          return delete;
+                        }
+                      },
+                      onDismissed: (_) {
+                        setState(() {
+                          myQuiz.questionList.removeAt(index);
+                        });
+                      },
+                      child: ListTile(
+                        title: Text(question.toString()),
+                        tileColor: (index.isEven)
+                            ? Theme.of(context).colorScheme.secondary
+                            : Theme.of(context).colorScheme.secondaryContainer,
+                        textColor: (index.isEven)
+                            ? Theme.of(context).colorScheme.onSecondary
+                            : Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer,
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      var result = await MoodleApiSingleton().getRubric('205');
+                      print(result);
+                    },
+                    child: const Text('Get Rubric'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      var result = await MoodleApiSingleton()
+                          .addRandomQuestions('50', '22', '2');
+                      print(result);
+                    },
+                    child: const Text('Add Random Questions'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      var result = await MoodleApiSingleton()
+                          .importQuizQuestions('2', myXML);
+                      print(result);
+                    },
+                    child: const Text('Import Questions'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      var result = await MoodleApiSingleton()
+                          .createQuiz('2', 'Sunday Quiz', 'Sunday Quiz Intro');
+                      print(result);
+                    },
+                    child: const Text('Create Quiz'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      var result = await MoodleApiSingleton().createAssignment(
+                          '2',
+                          '2',
+                          'Sunday Assignment',
+                          '2024-10-6',
+                          '2024-10-14',
+                          rubricDefinition,
+                          'This is the description');
+                      print(result);
+                    },
+                    child: const Text('Create Assignment'),
+                  ),
+                ],
+              )
             ],
-          )
-        ],
-      ),
+          ),
+
+
     );
   }
 }
