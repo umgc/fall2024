@@ -313,7 +313,18 @@ class SubmissionListState extends State<SubmissionList> {
                                                 // Retrieve response in the format of a graded JSON rubric
                                                 String gradedResponse = await llmApi.postToLlm(queryPrompt);
                                                 gradedResponse = gradedResponse.replaceAll('```json', '').replaceAll('```', '').trim();
-//********************************************************************************************************************************************************************************************
+                                                var results = await MoodleApiSingleton().setRubricGrades(widget.assignmentId, participant.id, gradedResponse);
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => SubmissionDetail(
+                                                      participant: participant,
+                                                      submission: submissionWithGrade.submission,
+                                                      courseId: widget.courseId,
+                                                    ),
+                                                  ),
+                                                );
+                                                print('Results: $results');
                                                 print("debug line");
                                               }
                                               catch (e)
