@@ -13,7 +13,7 @@ import 'Views/essay_generation.dart';
 import 'Views/quiz_generator.dart';
 import 'Views/edit_questions.dart';
 
-void main() async{
+void main() async {
   await dotenv.load();
   runApp(MyApp());
 }
@@ -45,7 +45,8 @@ class MyApp extends StatelessWidget {
         'LoginPage': (context) => LoginApp(),
         // '/EssayEditPage': (context) => EssayEditPage(jsonData),
         // '/Content': (context) => ViewCourseContents(),
-        '/EssayGenerationPage': (context) => EssayGeneration(title: 'Essay Generation'),
+        '/EssayGenerationPage': (context) =>
+            EssayGeneration(title: 'Essay Generation'),
         '/QuizGenerationPage': (context) => CreateAssessment(),
         '/EditQuestions': (context) => EditQuestions(''),
         // '/create': (context) => const CreatePage(),
@@ -124,16 +125,15 @@ class _DevLaunch extends State {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => EssayAssignmentSettings(tempRubricXML)),
+                      builder: (context) =>
+                          EssayAssignmentSettings(tempRubricXML)),
                 );
               }),
           ElevatedButton(
             child: const Text('Quiz Generator'),
             onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => CreateAssessment()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => CreateAssessment()));
             },
           ),
           ElevatedButton(
@@ -144,15 +144,11 @@ class _DevLaunch extends State {
             },
           ),
           ElevatedButton(
-            child: const Text('View Quizzes'),
-            onPressed: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AssessmentsView())
-              );
-            }
-          )
+              child: const Text('View Quizzes'),
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => AssessmentsView()));
+              })
         ]));
   }
 
@@ -178,7 +174,6 @@ class _DevLaunch extends State {
     ]
   }
 ''';
-
 
   final tempRubricXML = '''
   {

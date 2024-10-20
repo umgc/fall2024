@@ -2,19 +2,16 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class LlmApi 
-{
+class LlmApi {
   final String apiKey;
   LlmApi(this.apiKey);
 
-  Map<String, dynamic> convertHttpRespToJson(String httpResponseString) 
-  {
+  Map<String, dynamic> convertHttpRespToJson(String httpResponseString) {
     return (json.decode(httpResponseString) as Map<String, dynamic>);
   }
 
   //
-  String getPostBody(String queryMessage) 
-  {
+  String getPostBody(String queryMessage) {
     return jsonEncode({
       // 'model': 'llama-3-sonar-large-32k-online',
       'model': 'llama-3.1-sonar-large-128k-chat',
@@ -26,8 +23,7 @@ class LlmApi
   }
 
   //
-  Map<String, String> getPostHeaders() 
-  {
+  Map<String, String> getPostHeaders() {
     return ({
       'accept': 'application/json',
       'content-type': 'application/json',
@@ -40,8 +36,7 @@ class LlmApi
 
   //
   Future<String> postMessage(
-      Uri url, Map<String, String> postHeaders, Object postBody) async 
-  {
+      Uri url, Map<String, String> postHeaders, Object postBody) async {
     final httpPackageResponse =
         await http.post(url, headers: postHeaders, body: postBody);
 
@@ -52,12 +47,11 @@ class LlmApi
       return "";
     }
 
-    print("In postmessage : ${httpPackageResponse.body}");
+    // print("In postmessage : ${httpPackageResponse.body}");
     return httpPackageResponse.body;
   }
 
-  List<String> parseQueryResponse(String resp) 
-  {
+  List<String> parseQueryResponse(String resp) {
     // ignore: prefer_adjacent_string_concatenation
     String quizRegExp =
         // r'(<\?xml.*?\?>\s*<quiz>(\s*.*?<question>\s*.*?<text>\s*(.*?)</text>\s*.*?<options>(\s*.*?<option>\s*(.*?)</option>)+\s*</options>\s*.*?<answer>\s*(.*?)</answer>\s*.*?</question>)+\s*</quiz>)';
@@ -84,8 +78,7 @@ class LlmApi
   }
 
   //
-  Future<String> postToLlm(String queryPrompt) async 
-  {
+  Future<String> postToLlm(String queryPrompt) async {
     var resp = "";
 
     // use the following test query so Perplexity doesn't charge
@@ -97,8 +90,7 @@ class LlmApi
   }
 
   //
-  Future<String> queryAI(String query) async 
-  {
+  Future<String> queryAI(String query) async {
     final postHeaders = getPostHeaders();
     final postBody = getPostBody(query);
     final httpPackageUrl = getPostUrl();
