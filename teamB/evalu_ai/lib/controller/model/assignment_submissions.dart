@@ -1,19 +1,16 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:intelligrade/api/llm/llm_api.dart';
 import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
+import '/controller/model/beans.dart';
 
 class AssignmentSubmissionsPage extends StatelessWidget {
+  final int assignmentID;
   final String assignmentTitle;
-  final List<String> studentNames;
-  final List<String> studentSubmissions;
+  final List<Submission> studentSubmissions;
 
-  AssignmentSubmissionsPage({
-    required this.assignmentTitle,
-    required this.studentNames,
-    required this.studentSubmissions,
-  });
+  AssignmentSubmissionsPage(
+      this.assignmentID, this.assignmentTitle, this.studentSubmissions);
 
   //Function to query Perplexity to generate a rubric
   Future<dynamic> genRubricFromAi(String inputs) async {
@@ -25,6 +22,16 @@ $inputs
 ''';
     String rubric = await myLLM.postToLlm(queryPrompt);
     return jsonDecode(rubric);
+  }
+
+  Future<List<Submission>> getParticipantSubmissions() async {
+    var submissions =
+        await MoodleApiSingleton().getAssignmentSubmissions(assignmentID);
+    List<Submission> subs = [];
+    for (var s in submissions) {
+      subs.add(s);
+    }
+    return subs;
   }
 
   Future<List<String>> getParticipantNames() async {
@@ -60,28 +67,23 @@ $inputs
             // Student Submissions List
             Expanded(
               child: ListView.builder(
-                itemCount: studentNames.length,
+                itemCount: studentSubmissions.length,
                 itemBuilder: (context, index) {
                   return Card(
                     elevation: 3.0,
                     margin: EdgeInsets.symmetric(vertical: 8.0),
                     child: ListTile(
-                      title: Text(studentNames[index]), // Student name as title
+                      title: Text(studentSubmissions[index].userid.toString() +
+                          ' is student ID'), // Student name as title
                       //subtitle: Text('subtitle'),
                       trailing: ElevatedButton(
                         onPressed: () async {
-                          getParticipantNames().then((var results) {
+                          getParticipantSubmissions().then((var results) {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => AssignmentSubmissionsPage(
-                                  studentNames: results,
-                                  assignmentTitle: 'myEssay',
-                                  studentSubmissions: [
-                                    '1',
-                                    '22'
-                                  ], // Handle actual submissions
-                                ),
+                                    55, "My Assignment", results),
                               ),
                             );
                           });
