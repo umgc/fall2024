@@ -91,7 +91,7 @@ class CarouselCard extends StatelessWidget{
   CarouselCard(this.title, this.information, this.type);
 
   static CarouselCard fromQuiz(Quiz input){
-    return CarouselCard(input.name ?? "Unnamed Quiz", input.description ?? '', 'assessment');
+    return CarouselCard(input.name ?? "Unnamed Quiz", input.description?.replaceAll(RegExp(r"<[^>]*>"),"") ?? '', 'assessment');
   }
 
   static List<CarouselCard>? fromQuizzes(List? input){
@@ -107,8 +107,8 @@ class CarouselCard extends StatelessWidget{
     return output;
   }
 
-  static CarouselCard fromEssay(Essay input){
-    return CarouselCard(input.name ?? "Unnamed Essay", input.description ?? '', 'essay');
+  static CarouselCard fromEssay(Assignment input){
+    return CarouselCard(input.name, input.description.replaceAll(RegExp(r"<[^>]*>"),""), 'essay');
   }
 
   static List<CarouselCard>? fromEssays(List? input){
@@ -117,7 +117,7 @@ class CarouselCard extends StatelessWidget{
     }
     List<CarouselCard> output = [];
     for (Object c in input){
-      if (c is Essay){
+      if (c is Assignment){
         output.insert(output.length, fromEssay(c));
       }
     }

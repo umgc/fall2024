@@ -190,28 +190,16 @@ class Level {
   }
 }
 
-class Essay {
-  //todo more vars as needed (like the Rubric for starters)
-  String? name;
-  String? description;
-
-  Essay({this.name,this.description});
-
-  @override
-  String toString(){
-    return '$name: $description';
-  }
-}
-
 // A Moodle quiz containing a list of questions.
 class Quiz {
   String? name; // quiz name - optional.
   String? description; // quiz description - optional.
   List<Question> questionList = <Question>[]; // list of questions on the quiz.
   String? promptUsed;
+  int? id; // quiz id, null if the quiz doesn't exist in Moodle yet
 
   // Constructor with all optional params.
-  Quiz({this.name, this.description, List<Question>? questionList})
+  Quiz({this.name, this.description, int? id, List<Question>? questionList})
       : questionList = questionList ?? [];
 
   // XML factory constructor using XML string
@@ -237,6 +225,10 @@ class Quiz {
     }
     quiz.promptUsed = quizElement.getElement(XmlConsts.promptUsed)?.innerText;
     return quiz;
+  }
+
+  bool isNew(){
+    return id == null;
   }
 
   @override
@@ -385,7 +377,7 @@ class Course {
   String fullName;
 
   List<Quiz>? quizzes;
-  List<Essay>? essays;
+  List<Assignment>? essays;
 
   // Barebones constructor.
   Course(this.id, this.shortName, this.fullName, [this.quizzes, this.essays]);
@@ -466,7 +458,7 @@ class FileNameAndBytes {
 }
 
 class Assignment {
-  final int id;
+  final int? id;
   final String name;
   final String description;
   final DateTime? dueDate;
@@ -480,7 +472,7 @@ class Assignment {
   final List<SubmissionWithGrade>? submissionsWithGrades;
 
   Assignment({
-    required this.id,
+    this.id,
     required this.name,
     required this.description,
     this.dueDate,
@@ -498,7 +490,7 @@ class Assignment {
     return Assignment(
       id: json['id'] ?? 0,
       name: json['name'] ?? 'Untitled',
-      description: json['description'] ?? '',
+      description: json['description'] ?? json['intro'] ?? '',
       dueDate: json['duedate'] != null
           ? DateTime.fromMillisecondsSinceEpoch(json['duedate'] * 1000)
           : null,
@@ -514,6 +506,10 @@ class Assignment {
       courseId: json['course'] ?? 0,
 
     );
+  }
+
+  bool isNew(){
+    return id == null;
   }
 
   // Convert the Assignment object back to JSON (useful for POST requests or local storage)
