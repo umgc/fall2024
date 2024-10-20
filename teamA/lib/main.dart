@@ -12,7 +12,7 @@ import 'Views/edit_questions.dart';
 
 void main() async{
   await dotenv.load();
-  runApp(MyApp());
+  runApp(LoginApp());
 }
 
 //click and drag for intuitiveness
