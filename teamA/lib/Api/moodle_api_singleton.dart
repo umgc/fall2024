@@ -111,97 +111,61 @@ class MoodleApiSingleton {
     }
   }
 
-  // Gets the contents of the specified course.
-  Future<List> getCourseContents(int courseID) async {
+  Future<List<Quiz>> getQuizzes(int? courseID) async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
-    // Make the request.
-    final http.Response response = await http.post(Uri.parse(moodleURL + serverUrl), body: {
-        'wstoken': _userToken,
-        'wsfunction': 'core_course_get_contents',
-        'moodlewsrestformat': 'json',
-        'courseid': courseID.toString()
+
+    // URL of the Moodle server
+    final response = await http.post(Uri.parse(moodleURL + serverUrl), body: {
+      'wstoken': _userToken,
+      'wsfunction': 'mod_quiz_get_quizzes_by_courses',
+      'moodlewsrestformat': 'json',
     });
+
     if (response.statusCode != 200) {
       throw HttpException(response.body);
     }
 
-    // Decode the JSON to get the wanted information.
-    List<dynamic> temp = jsonDecode(response.body) as List<dynamic>;
-    List results = [];
-    for (int i = 0; i < temp.length; i++) {
-      var v = temp[i];
-      if (v['modules'] != []) {
-        //todo method for converting from json or xml
-        for (int i = 0; i < v['modules'].length; i++) {
-          // Collect important identifying information.
-          Map<String, dynamic> module = v['modules'][i];
-          // Skip modules that are not a quiz or assignment. //todo specific filter for app-created stuff
-          if (module['modname'] == "quiz" || module['modname'] == 'assign') {
-            //todo check neccessity of an id for modules (personally think that's a 'probably')
-            String name = module['name'];
-            String description = '';
-            //todo learn how to get the questions from quizzes
-            //all this is literally only enough to make the CarouselCards
-            if (module.containsKey('intro')){
-              //while all the null-shorting is amazingly useful, I don't know if Dart has KeyErrors
-              description = module['intro'];
-            }
-            if (module['modname'] == 'quiz'){
-              results.insert(results.length, Quiz(name: name, description: description));
-            }
-            else{
-              results.insert(results.length, Essay(name: name, description: description));
-            }
-          }
+    List<dynamic>? decodedJson = (jsonDecode(response.body) as Map<String,dynamic>)['quizzes'];
+    if (decodedJson == null){
+      return [];
+    }
+
+    List<Quiz> results = [];
+    for (int i = 0; i < decodedJson.length; i++){
+      if (courseID == null || decodedJson[i]['course'] == courseID){
+        results.insert(results.length, Quiz(name: decodedJson[i]['name'],description: decodedJson[i]['intro'],id: decodedJson[i]['id']));
+      }
+    }
+    return results;
+  }
+
+  Future<List<Assignment>> getEssays(int? courseID) async {
+    if (_userToken == null) throw StateError('User not logged in to Moodle');
+
+    // URL of the Moodle server
+    final response = await http.post(Uri.parse(moodleURL + serverUrl), body: {
+      'wstoken': _userToken,
+      'wsfunction': 'mod_assign_get_assignments',
+      'moodlewsrestformat': 'json',
+    });
+
+    if (response.statusCode != 200) {
+      throw HttpException(response.body);
+    }
+
+    List<dynamic>? decodedJson = (jsonDecode(response.body) as Map<String,dynamic>)['courses'];
+    if (decodedJson == null){
+      return [];
+    }
+
+    List<Assignment> results = [];
+    for (int i = 0; i < decodedJson.length; i++){
+      if (courseID == null || decodedJson[i]['id'] == courseID){
+        for (Map<String,dynamic> a in decodedJson[i]['assignments']){
+          results.insert(results.length, Assignment.fromJson(a));
         }
       }
     }
-    return results;
-  }
-
-  // Gets the contents of all courses.
-  Future<List> getAllContents() async {
-    // Collect all the course ids.
-    // List<Course> courses = await getCourses();
-    List<Course> courses = await getUserCourses();
-    List results = [];
-    for (Course c in courses) {
-      results = results + await getCourseContents(c.id);
-    }
-    return results;
-  }
-
-  Future<List<Quiz>> getQuizzes(int? courseID) async {
-    List contents;
-    if (courseID != null) {
-      contents = await getCourseContents(courseID);
-    } else {
-      contents = await getAllContents();
-    }
-    List<Quiz> results = [];
-    for (Object c in contents) {
-      if (c is Quiz) {
-        results.insert(results.length, c);
-      }
-    }
-    print(results.toString());
-    return results;
-  }
-
-  Future<List<Essay>> getEssays(int? courseID) async {
-    List contents;
-    if (courseID != null) {
-      contents = await getCourseContents(courseID);
-    } else {
-      contents = await getAllContents();
-    }
-    List<Essay> results = [];
-    for (Object c in contents) {
-      if (c is Essay) {
-        results.insert(results.length, c);
-      }
-    }
-    print(results.toString());
     return results;
   }
 
