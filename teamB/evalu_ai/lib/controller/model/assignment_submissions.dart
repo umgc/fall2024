@@ -6,10 +6,12 @@ import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
 
 class AssignmentSubmissionsPage extends StatelessWidget {
   final String assignmentTitle;
+  final List<String> studentNames;
   final List<String> studentSubmissions;
 
   AssignmentSubmissionsPage({
     required this.assignmentTitle,
+    required this.studentNames,
     required this.studentSubmissions,
   });
 
@@ -23,6 +25,15 @@ $inputs
 ''';
     String rubric = await myLLM.postToLlm(queryPrompt);
     return jsonDecode(rubric);
+  }
+
+  Future<List<String>> getParticipantNames() async {
+    var participants = await MoodleApiSingleton().getCourseParticipants('2');
+    List<String> names = [];
+    for (var p in participants) {
+      names.add(p.fullname);
+    }
+    return names;
   }
 
   @override
@@ -49,23 +60,31 @@ $inputs
             // Student Submissions List
             Expanded(
               child: ListView.builder(
-                itemCount: studentSubmissions.length,
+                itemCount: studentNames.length,
                 itemBuilder: (context, index) {
                   return Card(
                     elevation: 3.0,
                     margin: EdgeInsets.symmetric(vertical: 8.0),
                     child: ListTile(
-                      title: Text('Student Submission ${index + 1}'),
-                      subtitle: Text(studentSubmissions[index]),
+                      title: Text(studentNames[index]), // Student name as title
+                      //subtitle: Text('subtitle'),
                       trailing: ElevatedButton(
                         onPressed: () async {
-                          // Handle grade button press, e.g., navigate to grading page
-                          var api = MoodleApiSingleton();
-                          //var result = await api.getRubric();
-                          //print();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Grade button pressed')),
-                          );
+                          getParticipantNames().then((var results) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AssignmentSubmissionsPage(
+                                  studentNames: results,
+                                  assignmentTitle: 'myEssay',
+                                  studentSubmissions: [
+                                    '1',
+                                    '22'
+                                  ], // Handle actual submissions
+                                ),
+                              ),
+                            );
+                          });
                         },
                         child: Text('Grade'),
                       ),
@@ -81,16 +100,14 @@ $inputs
   }
 }
 
-void main() {
+/*
+Future<void> main() async {
+  
   runApp(MaterialApp(
     home: AssignmentSubmissionsPage(
       assignmentTitle: 'History Essay Assignment',
-      studentSubmissions: [
-        'John Doe - Submitted',
-        'Jane Smith - Submitted',
-        'Alice Johnson - Pending',
-        'Bob Williams - Submitted',
-      ],
+      studentSubmissions: [],
     ),
   ));
 }
+*/

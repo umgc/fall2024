@@ -215,6 +215,7 @@ Additional Customization: ${_additionalCustomizationController.text}
                         context,
                         MaterialPageRoute(
                           builder: (context) => AssignmentSubmissionsPage(
+                            studentNames: ['test'],
                             assignmentTitle: 'myEssay',
                             studentSubmissions: ['essay 1', 'essay 2'],
                           ),
