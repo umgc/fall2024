@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../Api/moodle_api_singleton.dart';
 import '../Controller/beans.dart';
 import 'view_submission_detail.dart';
@@ -8,7 +9,7 @@ import 'dart:convert';
 class SubmissionList extends StatefulWidget {
   final int assignmentId;
   final String courseId;
-
+   static var apiKey = dotenv.env['perplexity_apikey'] ?? '';
   SubmissionList({
     required this.assignmentId,
     required this.courseId,
@@ -307,11 +308,12 @@ class SubmissionListState extends State<SubmissionList> {
 
                                                 // Initialize the LLM API with your Perplexity API key
                            
-                                                final llmApi = LlmApi(apiKey);
+                                                final llmApi = LlmApi(SubmissionList.apiKey);
 
                                                 // Retrieve response in the format of a graded JSON rubric
                                                 String gradedResponse = await llmApi.postToLlm(queryPrompt);
                                                 gradedResponse = gradedResponse.replaceAll('```json', '').replaceAll('```', '').trim();
+//********************************************************************************************************************************************************************************************
                                                 print("debug line");
                                               }
                                               catch (e)
