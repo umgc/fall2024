@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
       routes: {
         'LoginPage': (context) => LoginApp(),
         // '/EssayEditPage': (context) => EssayEditPage(jsonData),
-        '/Content': (context) => ViewCourseContents(),
+        // '/Content': (context) => ViewCourseContents(),
         '/EssayGenerationPage': (context) => EssayGeneration(title: 'Essay Generation'),
         '/QuizGenerationPage': (context) => CreateAssessment(),
         '/EditQuestions': (context) => EditQuestions(''),
@@ -88,18 +88,18 @@ class _DevLaunch extends State {
           //         MaterialPageRoute(builder: (context) => EssayEditPage(jsonData)),
           //       );
           //     }),
-          ElevatedButton(
-              child: const Text('Open Contents Carousel'),
-              onPressed: () async {
-                if (MoodleApiSingleton().isLoggedIn()){
-                  MainController().selectCourse(0);
-                }
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ViewCourseContents()),
-                );
-              }),
+          // ElevatedButton(
+          //     child: const Text('Open Contents Carousel'),
+          //     onPressed: () async {
+          //       if (MoodleApiSingleton().isLoggedIn()){
+          //         MainController().selectCourse(0);
+          //       }
+          //       Navigator.push(
+          //         context,
+          //         MaterialPageRoute(
+          //             builder: (context) => ViewCourseContents()),
+          //       );
+          //     }),
           ElevatedButton(
               child: const Text('Open Essay Generation'),
               onPressed: () {

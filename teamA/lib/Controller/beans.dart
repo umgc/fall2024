@@ -150,7 +150,7 @@ class Quiz {
   int? id; // quiz id, null if the quiz doesn't exist in Moodle yet
 
   // Constructor with all optional params.
-  Quiz({this.name, this.description, int? id, List<Question>? questionList})
+  Quiz({this.name, this.description, this.id, List<Question>? questionList})
       : questionList = questionList ?? [];
 
   // XML factory constructor using XML string
