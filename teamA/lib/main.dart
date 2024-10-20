@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:learninglens_app/Views/assessments_view.dart';
+import 'package:learninglens_app/Views/essays_view.dart';
 import 'Api/moodle_api_singleton.dart';
 import 'Controller/main_controller.dart';
 import 'Views/login_page.dart';
@@ -52,6 +53,7 @@ class MyApp extends StatelessWidget {
         '/dashboard': (context) => TeacherDashboard(),
         '/send_essay_to_moodle': (context) => EssayAssignmentSettings(''),
         '/assessments': (context) => AssessmentsView(),
+        '/essays': (context) => EssaysView(),
         // '/viewExams': (context) => const ViewExamPage(),
         // '/settings': (context) => Setting(themeModeNotifier: _themeModeNotifier)
       },
@@ -150,6 +152,16 @@ class _DevLaunch extends State {
                 context,
                 MaterialPageRoute(
                   builder: (context) => AssessmentsView())
+              );
+            }
+          ),
+          ElevatedButton(
+            child: const Text('View Essays'),
+            onPressed: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EssaysView())
               );
             }
           )
