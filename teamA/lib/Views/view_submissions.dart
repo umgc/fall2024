@@ -5,6 +5,7 @@ import '../Controller/beans.dart';
 import 'view_submission_detail.dart';
 import '../Api/llm_api.dart';
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SubmissionList extends StatefulWidget {
   final int assignmentId;
@@ -49,22 +50,16 @@ class SubmissionListState extends State<SubmissionList> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text("View Submissions"),
-        actions: [
-          // IconButton(
-          //   icon: Icon(
-          //     Icons.edit, // Icon for Edit Questions button
-          //     color: Theme.of(context).colorScheme.onPrimaryContainer,
-          //   ),
-
-          //       onPressed: () {
-          //         Navigator.of(context).push(MaterialPageRoute(
-          //             builder: (context) => RubricScreen()));
-          //       },
-
-          //     ),
+        actions: 
+        [
         ],
       ),
-      body: FutureBuilder<List<Participant>>(
+      body: Stack(
+        children: [
+          
+          
+          
+          FutureBuilder<List<Participant>>(
         future: futureParticipants,
         builder: (BuildContext context,
             AsyncSnapshot<List<Participant>> participantSnapshot) {
@@ -327,10 +322,9 @@ class SubmissionListState extends State<SubmissionList> {
                                                   }
                                                 ''';
 
-                                              // Initialize the LLM API with your Perplexity API key
-
-                                              final llmApi =
-                                                  LlmApi(SubmissionList.apiKey);
+                                                // Initialize the LLM API with the Perplexity API key
+                                                final perplexityApiKey = dotenv.env['perplexity_apikey'] ?? '';
+                                                final llmApi = LlmApi(perplexityApiKey);
 
                                               // Retrieve response in the format of a graded JSON rubric
                                               String gradedResponse =
@@ -406,9 +400,13 @@ class SubmissionListState extends State<SubmissionList> {
                   );
                 }
               },
-            );
-          }
-        },
+             );
+            }
+           },
+          ),
+         if(isLoading) // Show loading indicator when isLoading is true
+            Center(child: CircularProgressIndicator()),
+        ],
       ),
     );
   }
