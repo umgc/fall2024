@@ -6,6 +6,7 @@ import 'package:learninglens_app/Views/view_submissions.dart';
 import 'package:learninglens_app/main.dart';
 import 'essay_generation.dart';
 import 'quiz_generator.dart';
+import 'view_submissions.dart';
 //import 'course.dart'; // Import the Courses page when available
 
 class TeacherDashboard extends StatelessWidget {

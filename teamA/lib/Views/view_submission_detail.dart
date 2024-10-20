@@ -90,9 +90,12 @@ class SubmissionDetailState extends State<SubmissionDetail> {
     print('Results: $results');
     if (mounted) {
       if (results) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Grades updated successfully!')),
+        final snackBar = SnackBar(
+          content: Text('Grades updated successfully!'),
+          duration: Duration(seconds: 2),
         );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        await Future.delayed(snackBar.duration);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -115,6 +118,20 @@ class SubmissionDetailState extends State<SubmissionDetail> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Submission Details'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SubmissionList(
+                  assignmentId: widget.submission.assignmentId,
+                  courseId: widget.courseId,
+                ),
+              ),
+            );
+          },
+        ),
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
@@ -229,6 +246,8 @@ class SubmissionDetailState extends State<SubmissionDetail> {
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onPrimaryContainer,
                 ),
+                softWrap: true,
+                overflow: TextOverflow.visible,
               ),
             ),
           ),
@@ -244,6 +263,8 @@ class SubmissionDetailState extends State<SubmissionDetail> {
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
                     ),
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
                   ),
                 ),
               ),
@@ -258,6 +279,8 @@ class SubmissionDetailState extends State<SubmissionDetail> {
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onPrimaryContainer,
                 ),
+                softWrap: true,
+                overflow: TextOverflow.visible,
               ),
             ),
           ),
@@ -270,18 +293,20 @@ class SubmissionDetailState extends State<SubmissionDetail> {
       tableRows.add(
         TableRow(
           children: [
-            // Criterion description
             TableCell(
               child: Padding(
                 padding: EdgeInsets.all(8.0),
-                child: Text(criterion.description),
+                child: Text(
+                  criterion.description,
+                  softWrap: true,
+                  overflow: TextOverflow.visible,
+                ),
               ),
             ),
-            // Level definitions (clickable cells)
             ...criterion.levels.map((level) {
-              bool isSelected = selectedLevels[criterion.id] ==
-                  level.id; // Check if level is selected
+              bool isSelected = selectedLevels[criterion.id] == level.id;
               return TableCell(
+                verticalAlignment: TableCellVerticalAlignment.fill,
                 child: InkWell(
                   onTap: () {
                     setState(() {
@@ -289,19 +314,22 @@ class SubmissionDetailState extends State<SubmissionDetail> {
                     });
                   },
                   child: Container(
-                    padding: EdgeInsets.all(8.0),
                     color: isSelected
-                        ? Colors.blue.withOpacity(0.5)
+                        ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
                         : Colors.transparent,
+                    padding: EdgeInsets.all(8.0),
                     child: Align(
-                      alignment: Alignment.center,
-                      child: Text(level.description),
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        level.description,
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                      ),
                     ),
                   ),
                 ),
               );
-            }).toList(),
-            // Editable remark field
+            }),
             TableCell(
               child: Padding(
                 padding: EdgeInsets.all(8.0),
@@ -312,11 +340,10 @@ class SubmissionDetailState extends State<SubmissionDetail> {
                   },
                   decoration: InputDecoration(
                     hintText: 'Enter remark',
-                    border:
-                        OutlineInputBorder(), // Optional: adds a border around the field
+                    border: OutlineInputBorder(),
                   ),
-                  minLines: 1, // Minimum number of lines to show
-                  maxLines: 5, // Maximum number of lines to show
+                  minLines: 4,
+                  maxLines: 6,
                 ),
               ),
             ),
@@ -327,7 +354,6 @@ class SubmissionDetailState extends State<SubmissionDetail> {
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        // Set a minWidth (e.g., 600px), but make sure it's less than or equal to the available maxWidth
         double minWidth = 800;
         double tableWidth = max(minWidth, constraints.maxWidth);
 
@@ -336,13 +362,20 @@ class SubmissionDetailState extends State<SubmissionDetail> {
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal, // Enable horizontal scrolling
             child: ConstrainedBox(
-              constraints:
-                  BoxConstraints(minWidth: tableWidth), // Safely set minWidth
+              constraints: BoxConstraints(minWidth: tableWidth),
               child: Table(
                 border: TableBorder.all(
                     color: Colors.black,
                     width: 1.0), // Outer border for the table
-                defaultColumnWidth: IntrinsicColumnWidth(),
+                columnWidths: {
+                  0: FlexColumnWidth(.5), // Criteria column
+                  for (int i = 1;
+                      i <= rubric!.criteria.first.levels.length;
+                      i++)
+                    i: FlexColumnWidth(1), // Score columns
+                  rubric!.criteria.first.levels.length + 1:
+                      FlexColumnWidth(1.8), // Remarks column
+                },
                 children: tableRows,
               ),
             ),
