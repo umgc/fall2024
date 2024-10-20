@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intelligrade/ui/assignment_details_page.dart';
 import 'package:intelligrade/ui/assignment_form.dart';
-import 'package:intelligrade/ui/essay_edit_page.dart';
-import 'package:intelligrade/ui/setting_page.dart';
 import 'package:intelligrade/ui/dashboard_page.dart';
+import 'package:intelligrade/ui/essay_edit_page.dart';
 import 'package:intelligrade/ui/grading_page.dart';
 import 'package:intelligrade/ui/login_page.dart';
+import 'package:intelligrade/ui/setting_page.dart';
 import 'package:intelligrade/ui/view_assignments_page.dart';
+
+import 'ui/login_page.dart';
+import 'ui/setting_page.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
