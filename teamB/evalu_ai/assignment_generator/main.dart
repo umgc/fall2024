@@ -1,7 +1,5 @@
-
-
-
 //Assignment Generator
+//Import necessary packages 
 import 'dart:convert';
 import 'dart:core';
 
@@ -9,13 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
+// Entry point of the application
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: "assets/.env");
   final apiService = ApiService(dotenv.env['PERPLEXITY_API_KEY'] ?? '');
   runApp(AssignmentApp(apiService: apiService));
 }
-
+// Main application widget
 class AssignmentApp extends StatelessWidget {
   final ApiService apiService;
 
@@ -30,7 +30,7 @@ class AssignmentApp extends StatelessWidget {
     );
   }
 }
-
+// Service class for API interactions
 class ApiService {
   final String baseUrl = 'https://api.perplexity.ai/chat/completions';
   final String apiKey;
@@ -40,7 +40,7 @@ class ApiService {
       throw Exception('API key not found in .env file');
     }
   }
-
+// Method to generate assignments
   Future<List<Assignment>> generateAssignments(String prompt) async {
     try {
       final response = await http.post(
@@ -75,7 +75,7 @@ class ApiService {
           ],
         }),
       );
-
+// Check for successful response
       if (response.statusCode != 200) {
         throw Exception('API Error: ${response.statusCode} - ${response.body}');
       }
@@ -93,6 +93,7 @@ class ApiService {
         throw Exception('Invalid response format: expected JSON array');
       }
 
+// Generate Assignment objects from JSON
       return List.generate(assignmentsJson.length, (i) {
         final json = assignmentsJson[i];
         json['name'] = 'Question ${i + 1}';
@@ -103,7 +104,7 @@ class ApiService {
       throw Exception('Failed to generate assignments: $e');
     }
   }
-
+// Method to extract JSON from content
   String extractJsonFromContent(String content) {
     final codeBlockRegex = RegExp(r'```(?:json)?\s*([\s\S]*?)\s*```');
     final match = codeBlockRegex.firstMatch(content);
@@ -111,8 +112,10 @@ class ApiService {
   }
 }
 
+// Enum for assignment types
 enum AssignmentType { multipleChoice, trueFalse, shortAnswer, essay, code }
 
+// Assignment model class
 class Assignment {
   final String name;
   final String question;
@@ -130,6 +133,7 @@ class Assignment {
     this.courseId,
   });
 
+// Factory method to create Assignment from JSON
   factory Assignment.fromJson(Map<String, dynamic> json) {
     return Assignment(
       name: json['name'] ?? 'Untitled Assignment',
@@ -140,7 +144,7 @@ class Assignment {
       courseId: json['courseId'],
     );
   }
-
+// Method to parse assignment type from string
   static AssignmentType _parseAssignmentType(String? type) {
     switch (type?.toLowerCase()) {
       case 'multiplechoice':
@@ -158,7 +162,7 @@ class Assignment {
     }
   }
 }
-
+// Main widget for generating assignments
 class AssignmentGenerator extends StatefulWidget {
   final ApiService apiService;
 
@@ -168,6 +172,7 @@ class AssignmentGenerator extends StatefulWidget {
   _AssignmentGeneratorState createState() => _AssignmentGeneratorState();
 }
 
+// State for AssignmentGenerator
 class _AssignmentGeneratorState extends State<AssignmentGenerator> {
   final TextEditingController _promptController = TextEditingController();
   final Map<int, TextEditingController> _answerControllers = {};
