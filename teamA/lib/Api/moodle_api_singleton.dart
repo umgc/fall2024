@@ -125,7 +125,7 @@ class MoodleApiSingleton {
       throw HttpException(response.body);
     }
 
-    List<dynamic>? decodedJson = (jsonDecode(response.body) as Map<String,List>)['quizzes'];
+    List<dynamic>? decodedJson = (jsonDecode(response.body) as Map<String,dynamic>)['quizzes'];
     if (decodedJson == null){
       return [];
     }
@@ -154,7 +154,7 @@ class MoodleApiSingleton {
       throw HttpException(response.body);
     }
 
-    List<dynamic>? decodedJson = (jsonDecode(response.body) as Map<String,List>)['courses'];
+    List<dynamic>? decodedJson = (jsonDecode(response.body) as Map<String,dynamic>)['courses'];
     if (decodedJson == null){
       return [];
     }
