@@ -9,7 +9,7 @@ import 'dart:convert';
 class SubmissionList extends StatefulWidget {
   final int assignmentId;
   final String courseId;
-   static var apiKey = dotenv.env['perplexity_apikey'] ?? '';
+  static var apiKey = dotenv.env['perplexity_apikey'] ?? '';
   SubmissionList({
     required this.assignmentId,
     required this.courseId,
@@ -31,6 +31,16 @@ class SubmissionListState extends State<SubmissionList> {
   @override
   void initState() {
     super.initState();
+    _fetchData();
+  }
+
+//needed to refresh the submissions if a grade gets updated on the detail page
+  void _fetchData() {
+    setState(() {
+      futureSubmissionsWithGrades =
+          api.getSubmissionsWithGrades(widget.assignmentId);
+      futureParticipants = api.getCourseParticipants(widget.courseId);
+    });
   }
 
   @override
@@ -45,12 +55,12 @@ class SubmissionListState extends State<SubmissionList> {
           //     Icons.edit, // Icon for Edit Questions button
           //     color: Theme.of(context).colorScheme.onPrimaryContainer,
           //   ),
-                          
+
           //       onPressed: () {
           //         Navigator.of(context).push(MaterialPageRoute(
           //             builder: (context) => RubricScreen()));
           //       },
-                
+
           //     ),
         ],
       ),
@@ -58,6 +68,7 @@ class SubmissionListState extends State<SubmissionList> {
         future: futureParticipants,
         builder: (BuildContext context,
             AsyncSnapshot<List<Participant>> participantSnapshot) {
+          print("Rebuilding FutureBuilder with new data..."); // Debug log
           if (participantSnapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (participantSnapshot.hasError) {
@@ -200,32 +211,42 @@ class SubmissionListState extends State<SubmissionList> {
                                               'notgraded')
                                         ElevatedButton(
                                           onPressed: () async {
-                                              try
-                                              {
-                                                // TODO: Add Loading indicator
-                                                setState(() {
-                                                  isLoading = true;
-                                                });
-                                                // Fetch submission and context ID
-                                                var submissionText =submissionWithGrade.submission.onlineText;
-                                                int? contextId = await MoodleApiSingleton().getContextId(widget.assignmentId, widget.courseId);
+                                            try {
+                                              // TODO: Add Loading indicator
+                                              setState(() {
+                                                isLoading = true;
+                                              });
+                                              // Fetch submission and context ID
+                                              var submissionText =
+                                                  submissionWithGrade
+                                                      .submission.onlineText;
+                                              int? contextId =
+                                                  await MoodleApiSingleton()
+                                                      .getContextId(
+                                                          widget.assignmentId,
+                                                          widget.courseId);
 
-                                                // Fetch rubric
-                                                var fetchedRubric;
-                                                if (contextId != null) 
-                                                {
-                                                  fetchedRubric = await MoodleApiSingleton().getRubric(widget.assignmentId.toString());
-                                                  if (fetchedRubric == null) 
-                                                  {
-                                                    print('Failed to fetch rubric.');
-                                                    return;
-                                                  }
-                                                  // Ensure the rubric is serialized to JSON format
-                                                  fetchedRubric = jsonEncode(fetchedRubric?.toJson() ?? {});
+                                              // Fetch rubric
+                                              var fetchedRubric;
+                                              if (contextId != null) {
+                                                fetchedRubric =
+                                                    await MoodleApiSingleton()
+                                                        .getRubric(widget
+                                                            .assignmentId
+                                                            .toString());
+                                                if (fetchedRubric == null) {
+                                                  print(
+                                                      'Failed to fetch rubric.');
+                                                  return;
                                                 }
-                                                
-                                                // Create prompt to send to LLM for grading
-                                                String queryPrompt = '''
+                                                // Ensure the rubric is serialized to JSON format
+                                                fetchedRubric = jsonEncode(
+                                                    fetchedRubric?.toJson() ??
+                                                        {});
+                                              }
+
+                                              // Create prompt to send to LLM for grading
+                                              String queryPrompt = '''
                                                   I am building a program that generates essay rubric assignments that teachers can distribute to students
                                                   who can then submit their responses to be graded. Here is an example format of a rubric roughly:
                                                   [
@@ -306,38 +327,49 @@ class SubmissionListState extends State<SubmissionList> {
                                                   }
                                                 ''';
 
-                                                // Initialize the LLM API with your Perplexity API key
-                           
-                                                final llmApi = LlmApi(SubmissionList.apiKey);
+                                              // Initialize the LLM API with your Perplexity API key
 
-                                                // Retrieve response in the format of a graded JSON rubric
-                                                String gradedResponse = await llmApi.postToLlm(queryPrompt);
-                                                gradedResponse = gradedResponse.replaceAll('```json', '').replaceAll('```', '').trim();
-                                                var results = await MoodleApiSingleton().setRubricGrades(widget.assignmentId, participant.id, gradedResponse);
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) => SubmissionDetail(
-                                                      participant: participant,
-                                                      submission: submissionWithGrade.submission,
-                                                      courseId: widget.courseId,
-                                                    ),
+                                              final llmApi =
+                                                  LlmApi(SubmissionList.apiKey);
+
+                                              // Retrieve response in the format of a graded JSON rubric
+                                              String gradedResponse =
+                                                  await llmApi
+                                                      .postToLlm(queryPrompt);
+                                              gradedResponse = gradedResponse
+                                                  .replaceAll('```json', '')
+                                                  .replaceAll('```', '')
+                                                  .trim();
+                                              var results =
+                                                  await MoodleApiSingleton()
+                                                      .setRubricGrades(
+                                                          widget.assignmentId,
+                                                          participant.id,
+                                                          gradedResponse);
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      SubmissionDetail(
+                                                    participant: participant,
+                                                    submission:
+                                                        submissionWithGrade
+                                                            .submission,
+                                                    courseId: widget.courseId,
                                                   ),
-                                                );
-                                                print('Results: $results');
-                                                print("debug line");
-                                              }
-                                              catch (e)
-                                              {
-                                                print('An error occurred: $e');
-                                              }
-                                              finally 
-                                              {
-                                                // Hide loading indicator
-                                                setState(() {
-                                                  isLoading = false; // Update your loading state
-                                                });
-                                              }
+                                                ),
+                                              );
+                                              print('Results: $results');
+                                              print("debug line");
+                                            } catch (e) {
+                                              print('An error occurred: $e');
+                                            } finally {
+                                              // Hide loading indicator
+                                              setState(() {
+                                                isLoading =
+                                                    false; // Update your loading state
+                                              });
+                                            }
                                           },
                                           child: Text('Grade'),
                                         ),

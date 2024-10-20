@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:learninglens_app/Api/moodle_api_singleton.dart';
-import 'package:learninglens_app/Views/essay_edit_page.dart';
 import 'package:learninglens_app/Views/essay_generation.dart';
 import 'package:learninglens_app/Views/quiz_generator.dart';
-import 'package:learninglens_app/Views/send_essay_to_moodle.dart';
 import 'package:learninglens_app/Views/view_quiz.dart';
 import 'package:learninglens_app/Views/view_submissions.dart';
 import "Controller/beans.dart";
