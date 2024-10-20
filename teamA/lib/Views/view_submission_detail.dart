@@ -90,9 +90,10 @@ class SubmissionDetailState extends State<SubmissionDetail> {
     print('Results: $results');
     if (mounted) {
       if (results) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Grades updated successfully!')),
-        );
+        final snackBar = SnackBar(content: Text('Grades updated successfully!'),
+        duration: Duration(seconds: 2),);
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        await Future.delayed(snackBar.duration);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -115,7 +116,20 @@ class SubmissionDetailState extends State<SubmissionDetail> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Submission Details'),
-      ),
+        leading: IconButton(
+    icon: Icon(Icons.arrow_back),
+    onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SubmissionList(
+              assignmentId: widget.submission.assignmentId,
+              courseId: widget.courseId,
+            ),
+          ),
+        );
+    },
+      ),),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : Padding(
