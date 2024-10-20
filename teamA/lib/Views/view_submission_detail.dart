@@ -66,7 +66,7 @@ class SubmissionDetailState extends State<SubmissionDetail> {
   }
 
   // Save updated submission scores and remarks as JSON
-  void saveSubmissionScores() {
+  void saveSubmissionScores() async {
     List<Map<String, dynamic>> updatedScores = [];
     selectedLevels.forEach((criterionid, levelid) {
       updatedScores.add({
@@ -79,6 +79,8 @@ class SubmissionDetailState extends State<SubmissionDetail> {
     String jsonScores = jsonEncode(updatedScores);
     print('Updated Submission Scores and Remarks: $jsonScores');
     // Handle further actions like saving to a database or API here.
+    var results = await MoodleApiSingleton().setRubricGrades(widget.submission.assignmentId, widget.participant.id, jsonScores);
+    print('Results: $results');
   }
 
   @override

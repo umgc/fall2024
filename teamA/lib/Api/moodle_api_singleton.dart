@@ -273,6 +273,56 @@ Future<SubmissionStatus?> getSubmissionStatus(int assignmentId, int userId) asyn
     }
   }
 
+
+  // ********************************************************************************************************************
+  // Set rubric grades for an assignment.
+  // ********************************************************************************************************************
+
+  Future<List<dynamic>> setRubricGrades(int assignmentId, int userId, String jsonGrades) async {
+    if (_userToken == null) throw StateError('User not logged in to Moodle');
+    try {
+      final response = await http.post(
+        Uri.parse(moodleURL + serverUrl),
+        body: {
+          'wstoken': _userToken,
+          'wsfunction': 'local_learninglens_write_rubric_grades',
+          'moodlewsrestformat': 'json',
+          'assignmentid': assignmentId.toString(),
+          'userid': userId.toString(),
+          'rubricgrades': jsonGrades,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+
+        // Debug: Print the entire grades JSON response
+        print('Grades Response Data: ${json.encode(data)}');
+
+        final List<dynamic> responseData = json.decode(response.body);
+        if (responseData.isNotEmpty &&
+            responseData.first is Map<String, dynamic>) {
+          // Map<String, dynamic> rubricData = responseData.first;
+          print('Response: $responseData');
+          return responseData;
+        } else {
+          print('Failed to load grades. Status code: ${response.statusCode}');
+          return [];
+        }
+      } else {
+        print('Failed to load grades. Status code: ${response.statusCode}');
+        return [];
+      }
+    } catch (e, stackTrace) {
+      print('Error fetching grades: $e');
+      print('StackTrace: $stackTrace');
+      return [];
+    }
+  }
+
+
+
+
   // ********************************************************************************************************************
   // Get rubric grades for an assignment.
   // ********************************************************************************************************************
