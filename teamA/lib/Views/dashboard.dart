@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:learninglens_app/Views/assessments_view.dart';
 import 'package:learninglens_app/Views/course_list.dart';
 import 'package:learninglens_app/Views/edit_questions.dart';
+import 'package:learninglens_app/Views/view_submissions.dart';
 import 'package:learninglens_app/main.dart';
 import 'essay_generation.dart';
 import 'quiz_generator.dart';
@@ -50,7 +51,7 @@ class TeacherDashboard extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => EditQuestions(''),
+                    builder: (context) => SubmissionList(assignmentId: 52, courseId: '4'),
                   ),
                 );
               })
