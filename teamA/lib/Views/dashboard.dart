@@ -51,11 +51,7 @@ class TeacherDashboard extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-<<<<<<< HEAD
                     builder: (context) => SubmissionList(assignmentId: 52, courseId: '4'),
-=======
-                    builder: (context) => EditQuestions(''),
->>>>>>> Oct_18_Clean
                   ),
                 );
               })
