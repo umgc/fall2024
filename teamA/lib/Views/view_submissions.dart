@@ -306,7 +306,7 @@ class SubmissionListState extends State<SubmissionList> {
                                                 ''';
 
                                                 // Initialize the LLM API with your Perplexity API key
-                                                String apiKey = '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';
+                           
                                                 final llmApi = LlmApi(apiKey);
 
                                                 // Retrieve response in the format of a graded JSON rubric
