@@ -255,7 +255,7 @@ class _AssignmentGeneratorState extends State<AssignmentGenerator> {
       ),
     );
   }
-
+// Method to build input widgets for assignments based on type
   Widget _buildAssignmentInput(Assignment assignment, int index) {
     switch (assignment.type) {
       case AssignmentType.multipleChoice:
@@ -329,7 +329,7 @@ class _AssignmentGeneratorState extends State<AssignmentGenerator> {
         );
     }
   }
-
+// Method to build navigation buttons for assignments
   Widget _buildNavigationButtons() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -353,7 +353,7 @@ class _AssignmentGeneratorState extends State<AssignmentGenerator> {
       ],
     );
   }
-
+// Method to cancel assignments and reset the state
   void _cancelAssignments() {
     setState(() {
       _promptController.clear();
@@ -364,7 +364,7 @@ class _AssignmentGeneratorState extends State<AssignmentGenerator> {
       assignmentsGenerated = false;
     });
   }
-
+// Method to generate assignments based on user prompt
   Future<void> _generateAssignments() async {
     setState(() {
       //assignments.add("New Assignment ${assignments.length + 1}" as Assignment);
@@ -373,6 +373,7 @@ class _AssignmentGeneratorState extends State<AssignmentGenerator> {
     });
 
     try {
+      // Call API to generate assignments
       final generatedAssignments = await widget.apiService.generateAssignments(_promptController.text);
       setState(() {
         assignments = generatedAssignments;
@@ -388,7 +389,7 @@ class _AssignmentGeneratorState extends State<AssignmentGenerator> {
       });
     }
   }
-
+// Method to upload assignments to Moodle
   Future<void> _uploadToMoodle() async {
     if (selectedCourseId == null) {
       setState(() {
@@ -403,6 +404,13 @@ class _AssignmentGeneratorState extends State<AssignmentGenerator> {
     });
 
     try {
+      // Simulating upload logic
+      for (var assignment in assignments) {
+        print('Uploading assignment: ${assignment.name}');
+        print('Question: ${assignment.question}');
+        print('Type: ${assignment.type}');
+        //print('Answer: ${assignment.answer}');
+      }
       // Implement Moodle upload logic here
       await Future.delayed(const Duration(seconds: 2)); // Simulating upload
       ScaffoldMessenger.of(context).showSnackBar(
