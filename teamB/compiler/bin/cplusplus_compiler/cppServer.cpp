@@ -1,41 +1,84 @@
-#include <httplib.h>    // For HTTP server functionality
-#include <iostream>     // For input/output operations
-#include "CppCompiler.cpp"  // Include the C++ compiler logic
+#include "httplib.h"
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <filesystem>
+#include "cppFunctions.h"
 
-// Handles the POST request for compiling C++ files
-void compileCppHandler(const httplib::Request &req, httplib::Response &res) {
-    // Extract the contents of the 'testFile' and 'studentFile' from the form data
-    std::string testFileContent = req.get_file_value("testFile").content;
-    std::string studentFileContent = req.get_file_value("studentFile").content;
-
-    // Write the test file content to /app/bin/test.cpp
-    std::ofstream testFile("/app/bin/test.cpp");
-    testFile << testFileContent;
-    testFile.close();
-
-    // Write the student file content to /app/bin/student.cpp
-    std::ofstream studentFile("/app/bin/student.cpp");
-    studentFile << studentFileContent;
-    studentFile.close();
-
-    // Call processCppRequest to compile and execute the C++ files, and get the result
-    std::string result = processCppRequest("/app/bin/test.cpp", "/app/bin/student.cpp");
-
-    // Set the result as the response content, specifying "text/plain" as the content type
-    res.set_content(result, "text/plain");
-}
+using namespace std;
+namespace fs = std::filesystem;
 
 int main() {
-    httplib::Server svr;  // Create an instance of the httplib server
+    httplib::Server svr;
 
-    // Define the POST endpoint /compile/cpp and associate it with compileCppHandler
-    svr.Post("/compile/cpp", compileCppHandler);
+    svr.Post("/compile/cpp", [&](const httplib::Request& req, httplib::Response& res) {
+        // Ensure that the request is multipart/form-data
+        if (!req.is_multipart_form_data()) {
+            res.status = 400;
+            res.set_content("Invalid form data.", "text/plain");
+            return;
+        }
 
-    // Print a message to the console indicating that the server is running on port 8080
-    std::cout << "Server listening on port 8080..." << std::endl;
+        string uploadDir = "uploads_cpp";
+        if (fs::exists(uploadDir)) {
+            fs::remove_all(uploadDir);
+        }
+        fs::create_directory(uploadDir);
 
-    // Start the server, binding it to address 0.0.0.0 and port 8080
-    svr.listen("0.0.0.0", 8080);
+        string mainTestFilePath;
+        vector<string> submissionFiles;
+        vector<string> zipFiles;
 
-    return 0;
+        // Iterate through uploaded files
+        for (const auto& file : req.files) {
+            const auto& fileName = file.second.filename;
+            const auto& fileContent = file.second.content;
+            string filePath = uploadDir + "/" + fileName;
+
+            ofstream outFile(filePath, ios::binary);
+            outFile.write(fileContent.data(), fileContent.size());
+            outFile.close();
+
+            if (fileName.find(".zip") != string::npos) {
+                zipFiles.push_back(filePath);
+            }
+            else {
+                submissionFiles.push_back(filePath);
+            }
+        }
+
+        string unzipDir = uploadDir + "/unzipped";
+        fs::create_directory(unzipDir);
+
+        for (const string& zipFile : zipFiles) {
+            unzipFile(zipFile, unzipDir);
+        }
+
+        // Check all files and locate _main.cpp (the master test file)
+        for (const auto& entry : fs::directory_iterator(unzipDir)) {
+            const string filePath = entry.path().string();
+            if (filePath.find("_main.cpp") != string::npos) {
+                mainTestFilePath = filePath;
+            }
+            else {
+                submissionFiles.push_back(filePath);
+            }
+        }
+
+        // Ensure a main test file is present
+        if (mainTestFilePath.empty()) {
+            res.status = 400;
+            res.set_content("Main test file (_main.cpp) missing.", "text/plain");
+            return;
+        }
+
+        // Compile and run the files using cppCompiler.cpp
+        string result = compileAndRun(unzipDir);
+
+        // Return the test results (number of correct tests and expected vs actual output)
+        res.set_content(result, "text/plain");
+        });
+
+    cout << "Server listening on port 8000..." << endl;
+    svr.listen("0.0.0.0", 8000);
 }
