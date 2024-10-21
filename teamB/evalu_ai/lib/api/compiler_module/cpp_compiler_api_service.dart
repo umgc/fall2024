@@ -11,7 +11,7 @@ class FileNameAndBytes {
 
 // Static class to access the C++ compiler service.
 class CompilerApiService {
-  static const baseUrl = 'http://<your-server-ip>:8000';
+  static const baseUrl = 'http://18.222.224.35:8000';
   static const compileUrl = '$baseUrl/compile/cpp';
 
   // Submits student files and instructor test file to the C++ compiler.
