@@ -7,9 +7,9 @@ import 'package:clearassistapp/src/utils/permission_manager.dart';
 import 'package:clearassistapp/ui/home_screen_new_user.dart';
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
-import 'registration_screen.dart';
+//import 'registration_screen.dart';
 import 'home_screen.dart';
-import 'home_screen_content-new-user.dart';
+//import 'home_screen_content-new-user.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

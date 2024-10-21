@@ -95,8 +95,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       children: [
                         TextFormField(
                           controller: _firstNameController,
-                          decoration:
-                              const InputDecoration(labelText: 'First Name'),
+                          decoration: const InputDecoration(
+                            labelText: 'First Name',
+                            labelStyle: TextStyle(color: Colors.black),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                          style: TextStyle(color: Colors.black),
+                          cursorColor: Colors.black,
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Please enter your first name';
@@ -106,8 +112,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         ),
                         TextFormField(
                           controller: _lastNameController,
-                          decoration:
-                              const InputDecoration(labelText: 'Last Name'),
+                          decoration: const InputDecoration(
+                            labelText: 'Last Name',
+                            labelStyle: TextStyle(color: Colors.black),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                          style: TextStyle(color: Colors.black),
+                          cursorColor: Colors.black,
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Please enter your last name';
@@ -117,8 +129,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         ),
                         TextFormField(
                           controller: _emailController,
-                          decoration:
-                              const InputDecoration(labelText: 'Email Address'),
+                          decoration: const InputDecoration(
+                            labelText: 'Email Address',
+                            labelStyle: TextStyle(color: Colors.black),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                          style: TextStyle(color: Colors.black),
+                          cursorColor: Colors.black,
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Please enter your email';
