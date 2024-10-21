@@ -38,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         leading: null,
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent, // Transparent background for the app bar
+        backgroundColor: Colors.black.withAlpha(80), // Transparent background for the app bar
         elevation: 0, // Remove shadow
         centerTitle: true,
         title: CustomTitle(),

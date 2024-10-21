@@ -158,7 +158,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
 
       final content = chatCompletion.choices.first.message.content?.first.text ?? "";
 
-      response = 'Cora: $content';
+      response = 'Cara: $content';
     } on RequestFailedException catch (e) {
       _showAlert("API Request Error", e.message);
       response = "";
@@ -237,8 +237,8 @@ class _AssistantScreenState extends State<AssistantScreen> {
       return false;
     } else {
       OpenAI.apiKey = apiKeyEnv;
-      String userName = "User"; // Default user name
-      String prompt = "You are an assistant for $userName, who has memory loss.";
+      String userName = "User";
+      String prompt = "You are an assistant for $userName, who has memory loss. Do not output markdown.";
       if (widget.conversation != null) {
         String transcript = await getTranscript();
         if (transcript.isNotEmpty) {
@@ -246,10 +246,13 @@ class _AssistantScreenState extends State<AssistantScreen> {
           "\n$userName wants to talk about the following conversation: \n$transcript";
         }
       }
+      String testString = "{\"reminders\": [  {\"title\": \"Doctor's Appointment\", \"date\": \"2024-10-22\", \"time\": \"10:00 AM\"},  {\"title\": \"Grocery Shopping\", \"date\": \"2024-10-21\", \"time\": \"2:00 PM\", \"completed\": false}],\"tasks\": [  {\"task\": \"Take Medication\", \"due_date\": \"2024-10-21\", \"completed\": false}],\"contacts\": {  \"daughter\": {\"name\": \"Sarah\", \"phone\": \"+1-555-123-4567\"},  \"doctor\": {\"name\": \"Dr. Smith\", \"phone\": \"+1-555-987-6543\"}},\"other_info\": {  \"location\": \"Home\", \"last_activity\": \"Watched TV\"}}";
+      prompt +=
+      "\n$userName's device has this information saved for you to recall: \n$testString";
       setState(() {
         this.prompt = prompt;
       });
-      _handleUserMessage("Say hello.", false);
+      _handleUserMessage("Say hello to the user and comment about upcoming reminders or contact info.", false);
       return true;
     }
   }
@@ -258,8 +261,8 @@ class _AssistantScreenState extends State<AssistantScreen> {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text(title),
-          content: Text(message),
+          title: Text(title, style: TextStyle(color: Colors.black)),
+          content: Text(message, style: TextStyle(color: Colors.black)),
           actions: <Widget>[
             TextButton(
               child: const Text('OK'),
@@ -346,7 +349,7 @@ class ChatMessage extends StatelessWidget {
             leading: isUserMessage ? null : virtualAssistantIcon,
             minLeadingWidth: 25,
             title: Text(
-              isUserMessage ? "User:" : "CogniOpen Remote Assistant (Cora):",
+              isUserMessage ? "User:" : "ClearAssist Remote Assistant (Cara):",
               style: titleStyle,
             ),
             subtitle: Text(
