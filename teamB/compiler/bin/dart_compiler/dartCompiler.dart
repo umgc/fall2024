@@ -22,9 +22,9 @@ class DartCompiler {
       var testResults = await Process.run('dart', [testFileName]);
 
       if(testResults.exitCode != 0) {
-        results = results + studentFiles[i].keys.first.split('_')[0] + ': ' + testResults.stderr + '\n';
+        results = '${results + studentFiles[i].keys.first.split('_')[0] + ': ' + testResults.stderr}\n';
       } else {
-        results = results + studentFiles[i].keys.first.split('_')[0] + ': ' + testResults.stdout + '\n';
+        results = '${results + studentFiles[i].keys.first.split('_')[0] + ': ' + testResults.stdout}\n';
       }
     }
 

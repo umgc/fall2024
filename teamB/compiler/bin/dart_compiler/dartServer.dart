@@ -83,7 +83,7 @@ Future<Response> _compilerHandler(Request req) async {
   }
 
   // Run compiler and return results
-  final compiler = new DartCompiler();
+  final compiler = DartCompiler();
   final output = await compiler.getOutput(testFile.join('\n'), studentFiles, fileName);
 
   return Response.ok(output);

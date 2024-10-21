@@ -227,7 +227,7 @@ class Button extends StatelessWidget {
   final String filters = "";
   final VoidCallback? onPressed;
 
-  Button._(this.type, this.text, {this.onPressed});
+  const Button._(this.type, this.text, {this.onPressed});
 
   factory Button(String type, {VoidCallback? onPressed}) {
     if (type == "assessment") {
@@ -262,12 +262,12 @@ class TextBox extends StatelessWidget {
   final TextEditingController controller;
 
   const TextBox({
-    Key? key,
+    super.key,
     required this.label,
     required this.icon,
     required this.secondaryIcon,
     required this.controller,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -294,10 +294,10 @@ class PointScaleDropdown extends StatelessWidget {
   final ValueChanged<int?> onChanged;
 
   const PointScaleDropdown({
-    Key? key,
+    super.key,
     required this.selectedPointScale,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   void _handleValueChanged(int? newValue) {
     // Additional Logic
@@ -326,10 +326,10 @@ class GradeLevelDropdown extends StatelessWidget {
   final ValueChanged<String?> onChanged;
 
   const GradeLevelDropdown({
-    Key? key,
+    super.key,
     required this.selectedGradeLevel,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   void _handleTextChanged(String? newValue) {
     // Additional Logic

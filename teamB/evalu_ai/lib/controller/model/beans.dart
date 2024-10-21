@@ -179,6 +179,8 @@ class Quiz {
     return quiz;
   }
 
+
+
   String toXmlString() {
     final builder = XmlBuilder();
     builder.element(XmlConsts.quiz, nest: () {
@@ -194,13 +196,11 @@ class Quiz {
         builder.element(XmlConsts.description, nest: description);
       }
 
-      // Insert a "category" type question using the description as the category name
+            // Insert a "category" type question using the description as the category name
       if (description != null) {
-        builder.element(XmlConsts.question,
-            attributes: {XmlConsts.type: 'category'}, nest: () {
+        builder.element(XmlConsts.question, attributes: {XmlConsts.type: 'category'}, nest: () {
           builder.element(XmlConsts.category, nest: () {
-            builder.element(XmlConsts.text,
-                nest: '\$course\$/Top/$description');
+            builder.element(XmlConsts.text, nest: '\$course\$/Top/$description');
           });
         });
       }
@@ -219,7 +219,10 @@ class Quiz {
     return builder.buildDocument().toXmlString(pretty: true);
   }
 
-  bool isNew() {
+
+
+
+  bool isNew(){
     return id == null;
   }
 
@@ -253,8 +256,7 @@ class Question {
           isFavorite: isFavorite ?? this.isFavorite);
 
   String name; // question name - required.
-  String
-      type; // question type (multichoice, truefalse, shortanswer, essay) - required.
+  String type; // question type (multichoice, truefalse, shortanswer, essay) - required.
   String questionText; // question text - required.
   String? generalFeedback;
   String? defaultGrade;
@@ -495,6 +497,7 @@ class AssignmentForm {
   int trueFalseCount;
   int shortAnswerCount;
   int multipleChoiceCount;
+  int questionCount;
   String? codingLanguage;
   String title;
 
@@ -508,6 +511,7 @@ class AssignmentForm {
       required this.shortAnswerCount,
       required this.multipleChoiceCount,
       required this.maximumGrade,
+      required this.questionCount,
       this.assignmentCount,
       this.gradingCriteria,
       this.codingLanguage});

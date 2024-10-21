@@ -21,13 +21,13 @@ class LlmApi {
   LlmApi(this.apiKey);
 
   Router get router {
-    final _router = Router();
+    final router = Router();
 
-    _router.get('/', _rootHandler);
-    _router.get('/<message>', _echoHandler);
-    _router.post('/api/', _apiHandler);
+    router.get('/', _rootHandler);
+    router.get('/<message>', _echoHandler);
+    router.post('/api/', _apiHandler);
 
-    return _router;
+    return router;
   }
 
   Future<Response> _apiHandler(Request request) async {

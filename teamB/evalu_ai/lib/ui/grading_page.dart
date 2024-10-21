@@ -1,7 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intelligrade/ui/header.dart';
 
 import 'package:intelligrade/controller/main_controller.dart';
 import 'package:intelligrade/controller/model/beans.dart';
@@ -19,7 +18,7 @@ class GradingPage extends StatefulWidget {
 class _GradingPageState extends State<GradingPage> {
 
   Course? _selectedCourse;
-  String? _selectedExam;
+  Assignment? _selectedAssignment;
   String? _selectedLanguage;
   List<FileNameAndBytes> _studentFiles = [];
   FileNameAndBytes? _gradingFile;
@@ -39,7 +38,7 @@ class _GradingPageState extends State<GradingPage> {
   ]; // Example student list
 
   List<Course> courses = [];
-  final List<Quiz?> _exams = GradingPage.controller.listAllAssessments();
+  Iterable<Assignment> _assignments = [];
 
   bool readyForUpload() {
     return _gradingFile != null && _studentFiles.isNotEmpty;
@@ -53,8 +52,19 @@ class _GradingPageState extends State<GradingPage> {
     }
     if (!readyForUpload()) return 'Invalid files';
     String output;
+    print(_selectedLanguage);
     try {
-      output = await MainController().compileCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      if (_selectedLanguage == "JavaScript") {
+        output = await MainController().compileJavascriptCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      } else if (_selectedLanguage == "SQL") {
+        output = await MainController().compileSqlCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      } else if (_selectedLanguage == "Python") {
+        output = await MainController().compilePythonCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      } else if (_selectedLanguage == "Dart") {
+        output = await MainController().compileCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      } else {
+        output = "Please select a Programming Language";
+      }
       return output;
     } catch (e) {
       return e.toString();
@@ -148,27 +158,31 @@ class _GradingPageState extends State<GradingPage> {
                 );
               }).toList(),
               onChanged: (value) async {
-                setState(() {
-                  _selectedCourse = value;
+                MainController().getCourseAssignments(value!.id).then((result) {
+                  Iterable<Assignment> codeAssignments = result.where((assignment) => assignment.name.contains("Code"));
+                  _assignments = codeAssignments;
+                  setState((){
+                    _selectedCourse = value;
+                  });
                 });
               },
             ),
             const SizedBox(height: 20),
-            DropdownButtonFormField<String>(
+            DropdownButtonFormField<Assignment>(
               decoration: const InputDecoration(
                 labelText: 'Select Assessment',
                 border: OutlineInputBorder(),
               ),
-              value: _selectedExam,
-              items: _exams.map((exam) {
-                return DropdownMenuItem<String>(
-                  value: exam?.name,
-                  child: Text(exam.toString())
+              value: _selectedAssignment,
+              items: _assignments.map((assignment) {
+                return DropdownMenuItem (
+                  value: assignment,
+                  child: Text(assignment.name)
                 );
               }).toList(),
               onChanged: (value) {
                 setState(() {
-                  _selectedExam = value;
+                  _selectedAssignment = value;
                 });
               },
             ),

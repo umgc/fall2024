@@ -5,7 +5,7 @@ import 'send_essay_to_moodle.dart'; // Import for JSON encoding
 
 class EssayEditor extends StatefulWidget {
   final dynamic jsonData;
-  const EssayEditor(this.jsonData);
+  const EssayEditor(this.jsonData, {super.key});
   @override
   EssayEditorState createState() => EssayEditorState(); // Public State class
 }

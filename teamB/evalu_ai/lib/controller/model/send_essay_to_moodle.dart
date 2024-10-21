@@ -9,7 +9,7 @@ import 'dart:convert';
 class EssayAssignmentSettings extends StatefulWidget {
   final String updatedJson;
 
-  EssayAssignmentSettings(this.updatedJson);
+  const EssayAssignmentSettings(this.updatedJson, {super.key});
 
   @override
   EssayAssignmentSettingsState createState() => EssayAssignmentSettingsState();

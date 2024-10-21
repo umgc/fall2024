@@ -27,12 +27,6 @@ class _GradingPageState extends State<GradingPage> {
   // Uint8List? _gradingFileBytes;
   // List<Uint8List> _studentFileBytesList = [];
 
-  final List<String> _exams = [
-    'Exam 1',
-    'Exam 2',
-    'Exam 3'
-  ]; // Example exam list
-
   final List<String> _students = [
     'Bill Gates',
     'Steve Jobs',
@@ -40,6 +34,7 @@ class _GradingPageState extends State<GradingPage> {
   ]; // Example student list
 
   List<Course> courses = [];
+  List<Quiz> exams = [];
 
   bool readyForUpload() {
     return _gradingFile != null && _studentFiles.isNotEmpty;

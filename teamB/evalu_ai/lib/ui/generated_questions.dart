@@ -7,7 +7,7 @@ import 'package:intelligrade/api/llm/openai_api.dart';
 class GeneratedQuestionsPage extends StatefulWidget {
   final List<String> generatedQuestions;
 
-  const GeneratedQuestionsPage({Key? key, required this.generatedQuestions}) : super(key: key);
+  const GeneratedQuestionsPage({super.key, required this.generatedQuestions});
 
   @override
   // ignore: library_private_types_in_public_api

@@ -6,9 +6,9 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
 const currentDir = __dirname;
-const uploadDir = path.join(currentDir, 'uploads_js');
+const uploadDir = path.join(currentDir, 'uploads_python');
 
-async function processJSRequest(req, res) {
+async function processPythonRequest(req, res) {
     const bb = busboy({ headers: req.headers });
     const unitTestFile = {};
     const filePromises = [];
@@ -25,7 +25,7 @@ async function processJSRequest(req, res) {
         const savePath = path.join(uploadDir, filename);
         const writeStream = fs.createWriteStream(savePath);
 
-        if (filename.endsWith('_test.js')) {
+        if (filename.endsWith('_test.py')) {
           unitTestFile.filename = filename;
           unitTestFile.path = savePath;
         }
@@ -84,7 +84,7 @@ async function processUploadedFiles(files, unitTestFile) {
   let finalResponse = "";
 
   for (const file of files) {
-      if (file.filename.endsWith('_test.js')) {
+      if (file.filename.endsWith('_test.py')) {
           console.log(`Skipping Unit Case File: ${file.filename}`);
       } else {
           console.log(`Processing submission: ${file.filename}`);
@@ -97,10 +97,8 @@ async function processUploadedFiles(files, unitTestFile) {
 }
 
 async function runTest(testFile, unitTestPath) {
-  console.log(`node ${unitTestPath} ${testFile}`);
-  const { stdout } = await exec(`node ${unitTestPath} ${testFile}`);
+  const { stdout } = await exec(`python3 ${unitTestPath} ${testFile}`);
   return stdout;
 }
 
-module.exports = processJSRequest;
-
+module.exports = processPythonRequest;
