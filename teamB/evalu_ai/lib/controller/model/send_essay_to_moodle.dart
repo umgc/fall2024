@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
+import '/controller/model/beans.dart';
 import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
+import '/controller/model/essay_editor.dart';
+import 'dart:convert';
 
 class EssayAssignmentSettings extends StatefulWidget {
   final String updatedJson;
@@ -12,6 +15,9 @@ class EssayAssignmentSettings extends StatefulWidget {
 }
 
 class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
+  // Global key for the form
+  final _formKey = GlobalKey<FormState>();
+
   // Date selection variables for "Allow submissions from"
   String selectedDaySubmission = '01';
   String selectedMonthSubmission = 'January';
@@ -26,17 +32,9 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   String selectedHourDue = '00';
   String selectedMinuteDue = '00';
 
-  // Date selection variables for "Remind me to grade by"
-  String selectedDayRemind = '01';
-  String selectedMonthRemind = 'January';
-  String selectedYearRemind = '2024';
-  String selectedHourRemind = '00';
-  String selectedMinuteRemind = '00';
-
   // Checkbox states
   bool isSubmissionEnabled = true;
   bool isDueDateEnabled = true;
-  bool isRemindEnabled = true;
 
   List<String> days =
       List.generate(31, (index) => (index + 1).toString().padLeft(2, '0'));
@@ -60,11 +58,169 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   List<String> minutes =
       List.generate(60, (index) => index.toString().padLeft(2, '0'));
 
-  TextEditingController _courseNameController = TextEditingController();
+  // TextEditingController _courseNameController = TextEditingController();
   TextEditingController _assignmentNameController = TextEditingController();
 
   // Quill Editor controller
-  quill.QuillController _quillController = quill.QuillController.basic();
+  final quill.QuillController _quillController = quill.QuillController.basic();
+
+  // List of courses fetched from the controller
+  List<Course> courses = [];
+  String selectedCourse = 'Select a course';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchCourses(); // Fetch courses on page load
+    populateHeadersAndRows();
+  }
+
+// Fetch courses from the controller
+  Future<void> fetchCourses() async {
+    try {
+      List<Course>? courseList = MoodleApiSingleton().moodleCourses;
+      setState(() {
+        courses = courseList ?? [];
+        // Don't auto-select any course here, leave it to the user to select.
+        selectedCourse = 'Select a course';
+      });
+    } catch (e) {
+      debugPrint('Error fetching courses: $e');
+      setState(() {
+        selectedCourse = 'No courses available'; // Handle the empty case
+      });
+    }
+  }
+
+  // Headers and Rows for Rubric Display
+  List headers = [];
+  List rows = [];
+
+  // Function to populate headers and rows for rubric display
+  void populateHeadersAndRows() {
+    try {
+      Map<String, dynamic> jsonData = jsonDecode(widget.updatedJson);
+
+      List<dynamic> levels =
+          List<dynamic>.from(jsonData['criteria'][0]['levels'] as List);
+      headers = [
+        {"title": 'Criteria', 'index': 1, 'key': 'name'},
+      ];
+
+      for (int i = 0; i < levels.length; i++) {
+        headers.add({
+          "title": '${levels[i]['score']}', // The score (5, 3, 1) as headers
+          'index': i + 2,
+          'key': 'level_$i'
+        });
+      }
+
+      rows = (jsonData['criteria'] ?? []).map((criterion) {
+        Map<String, dynamic> row = {
+          "name": criterion['description'],
+        };
+
+        for (int i = 0; i < (criterion['levels'] as List).length; i++) {
+          row['level_$i'] = (criterion['levels'] as List)[i]['definition'];
+        }
+
+        return row;
+      }).toList();
+    } catch (e) {
+      debugPrint('Error parsing rubric JSON: $e');
+    }
+
+    setState(() {});
+  }
+
+// Dropdown to display courses with "Select a course" as the default option
+  DropdownButtonFormField<String> _buildCourseDropdown() {
+    return DropdownButtonFormField<String>(
+      value: selectedCourse == 'Select a course'
+          ? null
+          : selectedCourse, // Set initial value to null if 'Select a course'
+      decoration: InputDecoration(
+        labelText: 'Course name',
+        border: OutlineInputBorder(),
+      ),
+      validator: (value) {
+        if (value == null || value == 'Select a course') {
+          return 'Please select a course';
+        }
+        return null;
+      },
+      onChanged: (String? newValue) {
+        setState(() {
+          selectedCourse = newValue!;
+        });
+        debugPrint('Selected course: $selectedCourse');
+      },
+      items: [
+        DropdownMenuItem<String>(
+          value: 'Select a course',
+          child: Text('Select a course'),
+        ),
+        ...courses.map<DropdownMenuItem<String>>((Course course) {
+          return DropdownMenuItem<String>(
+            value: course.fullName,
+            child: Text(course.fullName),
+          );
+        }).toList(),
+      ],
+      isExpanded: true,
+    );
+  }
+
+  // Custom Widget to build rubric table without editable package
+  Widget buildRubricTable() {
+    return Table(
+      border: TableBorder.all(),
+      children: [
+        TableRow(children: [
+          _buildTableCell('Criteria'),
+          for (var header in headers.skip(1)) _buildTableCell(header['title']),
+        ]),
+        for (var row in rows)
+          TableRow(children: [
+            _buildTableCell(row['name']),
+            for (var i = 0; i < headers.length - 1; i++)
+              _buildTableCell(row['level_$i']),
+          ]),
+      ],
+    );
+  }
+
+  Widget _buildTableCell(String text) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Text(
+        text,
+        style: TextStyle(fontWeight: FontWeight.bold),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  // Function to validate if the availability date selections are not default values
+  bool _validateAvailabilityDates() {
+    if (selectedDaySubmission == '01' &&
+        selectedMonthSubmission == 'January' &&
+        selectedYearSubmission == '2024' &&
+        selectedHourSubmission == '00' &&
+        selectedMinuteSubmission == '00') {
+      return false; // If the default date for submission is selected, return false
+    }
+
+    if (selectedDayDue == '01' &&
+        selectedMonthDue == 'January' &&
+        selectedYearDue == '2024' &&
+        selectedHourDue == '00' &&
+        selectedMinuteDue == '00') {
+      return false; // If the default due date is selected, return false
+    }
+
+    return true; // If both dates have been customized, validation passes
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,236 +235,236 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(14.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Page Title Centered Below the AppBar
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 14.0),
-                child: Text(
-                  'Send Essay to Moodle',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
+        child: Form(
+          key: _formKey, // Assigning the global form key
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 14.0),
+                  child: Text(
+                    'Send Essay to Moodle',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-
-            // Course Name
-            SectionTitle(title: 'General'),
-            TextField(
-              controller: _courseNameController,
-              decoration: InputDecoration(
-                labelText: 'Course name',
-                border: OutlineInputBorder(),
+              SizedBox(height: 20),
+              SectionTitle(title: 'General'),
+              _buildCourseDropdown(),
+              SizedBox(height: 12),
+              TextFormField(
+                controller: _assignmentNameController,
+                decoration: InputDecoration(
+                  labelText: 'Assignment name',
+                  border: OutlineInputBorder(),
+                ),
+                // Adding validator to ensure assignment name is not empty
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter an assignment name';
+                  }
+                  return null;
+                },
               ),
-            ),
-            SizedBox(height: 12),
-
-            // Assignment Name
-            TextField(
-              controller: _assignmentNameController,
-              decoration: InputDecoration(
-                labelText: 'Assignment name',
-                border: OutlineInputBorder(),
+              SizedBox(height: 12),
+              SectionTitle(title: 'Rubric'),
+              buildRubricTable(),
+              SizedBox(height: 20),
+              SectionTitle(title: 'Description'),
+              Container(
+                height: 250,
+                padding: EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Column(
+                  children: [
+                    quill.QuillToolbar.simple(controller: _quillController),
+                    Expanded(
+                      child: quill.QuillEditor(
+                        controller: _quillController,
+                        scrollController: ScrollController(),
+                        focusNode: FocusNode(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 12),
-
-            // Description with Quill Rich Text Editor
-            SectionTitle(title: 'Description'),
-            Container(
-              height: 250, // Increased height for better usability
-              padding: EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Column(
+              SizedBox(height: 20),
+              SectionTitle(title: 'Availability'),
+              SizedBox(height: 14),
+              Row(
                 children: [
-                  quill.QuillToolbar.simple(
-                    controller: _quillController,
+                  Checkbox(
+                    value: isSubmissionEnabled,
+                    onChanged: (value) {
+                      setState(() {
+                        isSubmissionEnabled = value!;
+                      });
+                    },
                   ),
+                  Text('Enable'),
+                  SizedBox(width: 10),
                   Expanded(
-                    child: quill.QuillEditor(
-                      controller: _quillController,
-                      scrollController: ScrollController(),
-                      focusNode: FocusNode(),
+                    child: _buildDropdown(
+                      'Allow submissions from',
+                      selectedDaySubmission,
+                      selectedMonthSubmission,
+                      selectedYearSubmission,
+                      selectedHourSubmission,
+                      selectedMinuteSubmission,
+                      isSubmissionEnabled,
+                      (String? newValue) {
+                        setState(() {
+                          selectedDaySubmission = newValue!;
+                        });
+                      },
+                      (String? newValue) {
+                        setState(() {
+                          selectedMonthSubmission = newValue!;
+                        });
+                      },
+                      (String? newValue) {
+                        setState(() {
+                          selectedYearSubmission = newValue!;
+                        });
+                      },
+                      (String? newValue) {
+                        setState(() {
+                          selectedHourSubmission = newValue!;
+                        });
+                      },
+                      (String? newValue) {
+                        setState(() {
+                          selectedMinuteSubmission = newValue!;
+                        });
+                      },
                     ),
                   ),
                 ],
               ),
-            ),
+              SizedBox(height: 14),
+              Row(
+                children: [
+                  Checkbox(
+                    value: isDueDateEnabled,
+                    onChanged: (value) {
+                      setState(() {
+                        isDueDateEnabled = value!;
+                      });
+                    },
+                  ),
+                  Text('Enable'),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: _buildDropdown(
+                      'Due date',
+                      selectedDayDue,
+                      selectedMonthDue,
+                      selectedYearDue,
+                      selectedHourDue,
+                      selectedMinuteDue,
+                      isDueDateEnabled,
+                      (String? newValue) {
+                        setState(() {
+                          selectedDayDue = newValue!;
+                        });
+                      },
+                      (String? newValue) {
+                        setState(() {
+                          selectedMonthDue = newValue!;
+                        });
+                      },
+                      (String? newValue) {
+                        setState(() {
+                          selectedYearDue = newValue!;
+                        });
+                      },
+                      (String? newValue) {
+                        setState(() {
+                          selectedHourDue = newValue!;
+                        });
+                      },
+                      (String? newValue) {
+                        setState(() {
+                          selectedMinuteDue = newValue!;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 14),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      // Validate the form before submitting
+                      if (_formKey.currentState!.validate() &&
+                          _quillController.document
+                              .toPlainText()
+                              .trim()
+                              .isNotEmpty &&
+                          _validateAvailabilityDates()) {
+                        var api = MoodleApiSingleton();
+                        bool? token = api.isLoggedIn();
 
-            SizedBox(height: 20),
+                        if (token) {
+                          String courseId = courses
+                              .firstWhere(
+                                  (course) => course.fullName == selectedCourse)
+                              .id
+                              .toString();
+                          String assignmentName =
+                              _assignmentNameController.text;
+                          String description =
+                              _quillController.document.toPlainText();
+                          String dueDate =
+                              '$selectedDayDue $selectedMonthDue $selectedYearDue $selectedHourDue:$selectedMinuteDue';
+                          String allowSubmissionFrom =
+                              '$selectedDaySubmission $selectedMonthSubmission $selectedYearSubmission $selectedHourSubmission:$selectedMinuteSubmission';
 
-            // Availability
-            SectionTitle(title: 'Availability'),
-            SizedBox(height: 14),
-
-            // Allow submissions from
-            Row(
-              children: [
-                Checkbox(
-                  value: isSubmissionEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      isSubmissionEnabled = value!;
-                    });
-                  },
-                ),
-                Text('Enable'),
-                SizedBox(width: 10),
-                _buildDropdown(
-                    'Allow submissions from',
-                    selectedDaySubmission,
-                    selectedMonthSubmission,
-                    selectedYearSubmission,
-                    selectedHourSubmission,
-                    selectedMinuteSubmission,
-                    isSubmissionEnabled, (String? newValue) {
-                  setState(() {
-                    selectedDaySubmission = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedMonthSubmission = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedYearSubmission = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedHourSubmission = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedMinuteSubmission = newValue!;
-                  });
-                }),
-              ],
-            ),
-            SizedBox(height: 14),
-
-            // Due date
-            Row(
-              children: [
-                Checkbox(
-                  value: isDueDateEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      isDueDateEnabled = value!;
-                    });
-                  },
-                ),
-                Text('Enable'),
-                SizedBox(width: 10),
-                _buildDropdown(
-                    'Due date',
-                    selectedDayDue,
-                    selectedMonthDue,
-                    selectedYearDue,
-                    selectedHourDue,
-                    selectedMinuteDue,
-                    isDueDateEnabled, (String? newValue) {
-                  setState(() {
-                    selectedDayDue = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedMonthDue = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedYearDue = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedHourDue = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedMinuteDue = newValue!;
-                  });
-                }),
-              ],
-            ),
-            SizedBox(height: 14),
-
-            // Remind me to grade by
-            Row(
-              children: [
-                Checkbox(
-                  value: isRemindEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      isRemindEnabled = value!;
-                    });
-                  },
-                ),
-                Text('Enable'),
-                SizedBox(width: 10),
-                _buildDropdown(
-                    'Remind me to grade by',
-                    selectedDayRemind,
-                    selectedMonthRemind,
-                    selectedYearRemind,
-                    selectedHourRemind,
-                    selectedMinuteRemind,
-                    isRemindEnabled, (String? newValue) {
-                  setState(() {
-                    selectedDayRemind = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedMonthRemind = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedYearRemind = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedHourRemind = newValue!;
-                  });
-                }, (String? newValue) {
-                  setState(() {
-                    selectedMinuteRemind = newValue!;
-                  });
-                }),
-              ],
-            ),
-            SizedBox(height: 20),
-
-            // Two Buttons at the Bottom
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    var result = await MoodleApiSingleton().createAssignnment(
-                        '2',
-                        '2',
-                        'Sunday Assignment',
-                        '2024-10-6',
-                        '2024-10-14',
-                        widget.updatedJson,
-                        'This is the description');
-                    print(result);
-                  },
-                  child: Text('Send to Moodle'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    // Handle Go Back to Edit Assignment action
-                  },
-                  child: Text('Go back to edit assignment'),
-                ),
-              ],
-            ),
-          ],
+                          await api.createAssignment(
+                            courseId,
+                            '1', // Section ID
+                            assignmentName,
+                            allowSubmissionFrom,
+                            dueDate,
+                            widget.updatedJson,
+                            description,
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text('Failed to retrieve user token.')));
+                        }
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(
+                                'Please fill out all fields and ensure a course, description, and valid availability dates are selected.')));
+                      }
+                    },
+                    child: Text('Send to Moodle'),
+                  ),
+                  /*
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => EssayEditPage(),
+                        ),
+                      );
+                    },
+                    child: Text('Go Back to Edit Essay'),
+                  ),
+                  */
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -332,17 +488,15 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label),
-        Row(
+        Wrap(
+          spacing: 8.0, // Space between dropdowns
+          runSpacing: 8.0, // Space between rows when wrapping
           children: [
             _buildDropdownButton(days, selectedDay, onDayChanged, isEnabled),
-            SizedBox(width: 8),
             _buildDropdownButton(
                 months, selectedMonth, onMonthChanged, isEnabled),
-            SizedBox(width: 8),
             _buildDropdownButton(years, selectedYear, onYearChanged, isEnabled),
-            SizedBox(width: 8),
             _buildDropdownButton(hours, selectedHour, onHourChanged, isEnabled),
-            SizedBox(width: 8),
             _buildDropdownButton(
                 minutes, selectedMinute, onMinuteChanged, isEnabled),
           ],
@@ -354,16 +508,17 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   // Dropdown Button Builder
   Widget _buildDropdownButton(List<String> items, String selectedValue,
       ValueChanged<String?> onChanged, bool isEnabled) {
-    return DropdownButton<String>(
-      value: selectedValue,
-      onChanged:
-          isEnabled ? onChanged : null, // Disable dropdown if not enabled
-      items: items.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
+    return Flexible(
+      child: DropdownButton<String>(
+        value: selectedValue,
+        onChanged: isEnabled ? onChanged : null,
+        items: items.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+      ),
     );
   }
 
