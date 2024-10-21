@@ -117,21 +117,8 @@ class SubmissionDetailState extends State<SubmissionDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         title: Text('Submission Details'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => SubmissionList(
-                  assignmentId: widget.submission.assignmentId,
-                  courseId: widget.courseId,
-                ),
-              ),
-            );
-          },
-        ),
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
