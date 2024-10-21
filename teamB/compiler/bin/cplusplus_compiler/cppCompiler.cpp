@@ -1,46 +1,96 @@
-#include <array>    // For std::array, used for storing command output
-#include <cstdio>   // For FILE, popen, pclose
-#include <iostream> // For std::string, std::cout
-#include <fstream>  // For file handling (not currently used in this snippet)
-#include <cstdlib>  // For system-related functions like popen
-#include <vector>   // For std::vector (not used in this snippet)
-#include <string>   // For std::string, handling text
+#include <zip.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <cstring>
+#include <filesystem>
+#include "cppFunctions.h"
 
-#ifdef _WIN32
-    // Use _popen and _pclose for Windows compatibility
-    #define popen _popen
-    #define pclose _pclose
-#endif
+namespace fs = std::filesystem;
 
-// Runs a system command and returns its output as a string
-std::string runCommand(const std::string &command) {
-    std::string result;
-    std::array<char, 128> buffer; // Buffer to store command output
-    FILE *pipe = popen(command.c_str(), "r"); // Execute command and open pipe for reading output
-    if (!pipe) return "popen failed!"; // Return an error if popen fails
+/**
+ * @brief Unzips a zip file into a specified directory using libzip.
+ */
+void unzipFile(const std::string& zipFilePath, const std::string& extractDir) {
+    int error;
+    zip* z = zip_open(zipFilePath.c_str(), ZIP_RDONLY, &error);
 
-    // Read output from the command into the result string
-    while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
-        result += buffer.data(); // Append command output to result
+    if (!z) {
+        char buf[1024];
+        zip_error_to_str(buf, sizeof(buf), error, errno);
+        std::cerr << "Error opening zip file: " << buf << std::endl;
+        return;
     }
-    pclose(pipe); // Close the pipe after command execution
-    return result; // Return the collected output
+
+    zip_int64_t numEntries = zip_get_num_entries(z, 0);
+
+    for (zip_uint64_t i = 0; i < numEntries; i++) {
+        const char* name = zip_get_name(z, i, 0);
+        if (!name) {
+            std::cerr << "Error reading zip entry name: " << zip_strerror(z) << std::endl;
+            continue;
+        }
+
+        std::string filePath = extractDir + "/" + name;
+
+        if (name[strlen(name) - 1] == '/') {
+            fs::create_directories(filePath);
+            continue;
+        }
+
+        fs::create_directories(fs::path(filePath).parent_path());
+
+        zip_file* zf = zip_fopen_index(z, i, 0);
+        if (!zf) {
+            std::cerr << "Error opening zip entry: " << zip_strerror(z) << std::endl;
+            continue;
+        }
+
+        std::ofstream outFile(filePath, std::ios::binary);
+        char buffer[4096];
+        zip_int64_t bytesRead;
+        while ((bytesRead = zip_fread(zf, buffer, sizeof(buffer))) > 0) {
+            outFile.write(buffer, bytesRead);
+        }
+
+        zip_fclose(zf);
+        outFile.close();
+        std::cout << "Extracted: " << filePath << std::endl;
+    }
+
+    zip_close(z);
 }
 
-// Compiles two C++ files (test and student) and executes the compiled program
-std::string processCppRequest(const std::string &testFilePath, const std::string &studentFilePath) {
-    // Command to compile the test file and student file into an executable
-    std::string compileCommand = "g++ " + testFilePath + " " + studentFilePath + " -o /app/bin/program";
-    
-    // Run the compile command and capture the output (if any)
-    std::string compileResult = runCommand(compileCommand);
+/**
+ * @brief Compiles and runs both student submissions and master test files.
+ *
+ * This function compiles both the student submission and the master test file.
+ * After execution, it captures the output and compares it with expected values.
+ *
+ * @param projectDir The directory where both the student files and test files are located.
+ * @return A string representing the number of correct test cases and expected/actual outputs.
+ */
+std::string compileAndRun(const std::string& projectDir) {
+    std::string executablePath = projectDir + "/output_executable";
 
-    // If there's output from the compile command, it likely indicates a compilation error
-    if (!compileResult.empty()) {
-        return "Compilation Error: " + compileResult;
+    // Compile the C++ files (student submissions and test file)
+    std::string compileCommand = "g++ " + projectDir + "/*.cpp -o " + executablePath;
+    int compileStatus = system(compileCommand.c_str());
+    if (compileStatus != 0) {
+        return "Compilation failed!";
     }
 
-    // If compilation is successful, execute the compiled program and return its output
-    std::string executionResult = runCommand("/app/bin/program");
-    return executionResult; // Return the output of the executed program
+    // Execute the compiled test file and capture output
+    std::string command = executablePath + " > " + projectDir + "/test_output.txt";
+    int runStatus = system(command.c_str());
+    if (runStatus != 0) {
+        return "Execution failed!";
+    }
+
+    // Read the test results
+    std::ifstream outputFile(projectDir + "/test_output.txt");
+    std::string output((std::istreambuf_iterator<char>(outputFile)), std::istreambuf_iterator<char>());
+
+    // Return the test results (number of correct tests and expected vs actual output)
+    return output;
 }
