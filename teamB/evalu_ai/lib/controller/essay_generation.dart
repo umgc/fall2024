@@ -21,6 +21,9 @@ class EssayGeneration extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<EssayGeneration> {
+  //See if button has been pressed or not
+  bool _isLoading = false; // To track loading state
+
   //Holds values for user input fields
   int _selectedPointScale = 3; // Default value
   String _selectedGradeLevel =
@@ -56,7 +59,7 @@ class _MyHomePageState extends State<EssayGeneration> {
 
   //Function to query Perplexity to generate a rubric
   Future<dynamic> genRubricFromAi(String inputs) async {
-    String apiKey = '';
+    String apiKey = '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';
     LlmApi myLLM = LlmApi(apiKey);
     String queryPrompt = '''
 I am building a program that creates rubrics when provided with assignment information. I will provide you with the following information about the assignment that needs a rubric:
@@ -180,19 +183,30 @@ Additional Customization: ${_additionalCustomizationController.text}
                   const SizedBox(height: 16),
 
                   // Generate Essay Button
-                  Button(
-                    'essay',
-                    onPressed: () {
-                      final result = getSelectedResponses();
-                      genRubricFromAi(result).then((dynamic results) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EssayEditor(results),
-                          ),
-                        );
-                      });
-                    },
+                  ElevatedButton(
+                    onPressed: _isLoading
+                        ? null // Disable button when loading
+                        : () {
+                            setState(() {
+                              _isLoading = true; // Start loading
+                            });
+
+                            final result = getSelectedResponses();
+                            genRubricFromAi(result).then((dynamic results) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EssayEditor(results),
+                                ),
+                              );
+                            }).whenComplete(() {
+                              setState(() {
+                                _isLoading = false; // End loading
+                              });
+                            });
+                          },
+                    child: Text(
+                        _isLoading ? 'Generating Essay...' : 'Generate Essay'),
                   ),
                 ],
               ),
