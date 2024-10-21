@@ -1,0 +1,2 @@
+
+Checking out a commit allows you to view your repository in a previous state without needing to code. This is just a test.

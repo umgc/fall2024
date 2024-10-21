@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/build" />
+      <excludeFolder url="file://$MODULE_DIR$/dart_ai_interface/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/dart_ai_interface/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/dart_ai_interface/build" />
+      <excludeFolder url="file://$MODULE_DIR$/dart_ai_test_app/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/dart_ai_test_app/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/dart_ai_test_app/build" />
+      <excludeFolder url="file://$MODULE_DIR$/evalu_ai/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/evalu_ai/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/evalu_ai/build" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
