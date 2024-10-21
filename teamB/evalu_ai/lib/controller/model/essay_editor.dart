@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:editable/editable.dart';
 import 'dart:convert';
-
 import 'send_essay_to_moodle.dart'; // Import for JSON encoding
 
 class EssayEditor extends StatefulWidget {
@@ -14,7 +13,6 @@ class EssayEditor extends StatefulWidget {
 class EssayEditorState extends State<EssayEditor> {
   // JSON data to be used
   late dynamic jsonData;
-  late String essayPrompt;
 
   // Convert JSON to rows compatible with Editable
   List rows = [];
@@ -29,7 +27,7 @@ class EssayEditorState extends State<EssayEditor> {
     populateHeadersAndRows();
   }
 
-  // Function to dynamically populate headers and rows based on JSON data
+// Function to dynamically populate headers and rows based on JSON data
   void populateHeadersAndRows() {
     // Step 1: Build headers dynamically based on the number of levels in the first criterion
     List<dynamic> levels =
@@ -49,7 +47,7 @@ class EssayEditorState extends State<EssayEditor> {
     // Step 2: Build rows by mapping each criterion and its levels dynamically
     rows = (jsonData['criteria'] ?? []).map((criterion) {
       Map<String, dynamic> row = {
-        "name": criterion['description'] ?? '',
+        "name": criterion['description'],
       };
 
       for (int i = 0; i < (criterion['levels'] as List).length; i++) {

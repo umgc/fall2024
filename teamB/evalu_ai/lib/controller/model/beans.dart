@@ -2,8 +2,7 @@ import 'package:xml/xml.dart';
 import 'dart:typed_data';
 
 // Tags and attributes used in Moodle XML. Useful for preventing typos.
-class XmlConsts 
-{
+class XmlConsts {
   // Quiz tags
   static const quiz = 'quiz';
   static const question = 'question';
@@ -45,8 +44,7 @@ class XmlConsts
 
 // A generated rubric containing criteria for an essay prompt.
 // Commented out as the only other instance of Rubric being used is the other one.
-class Rubric 
-{
+class Rubric {
   String title;
   String subject;
   String gradeLevel;
@@ -62,24 +60,28 @@ class Rubric
   });
 
   // Factory constructor to create a Rubric from XML
-  factory Rubric.fromXmlString(String xmlStr) 
-  {
+  factory Rubric.fromXmlString(String xmlStr) {
     final document = XmlDocument.parse(xmlStr);
     final rubricElement = document.getElement(XmlConsts.rubric);
 
     return Rubric(
-      title: rubricElement?.getElement(XmlConsts.title)?.innerText ?? 'Untitled',
-      subject: rubricElement?.getElement(XmlConsts.subject)?.innerText ?? 'Unknown',
-      gradeLevel: rubricElement?.getElement(XmlConsts.gradeLevel)?.innerText ?? 'Unknown',
-      maxPoints: int.parse(rubricElement?.getElement(XmlConsts.maxPoints)?.innerText ?? '0'),
+      title:
+          rubricElement?.getElement(XmlConsts.title)?.innerText ?? 'Untitled',
+      subject:
+          rubricElement?.getElement(XmlConsts.subject)?.innerText ?? 'Unknown',
+      gradeLevel: rubricElement?.getElement(XmlConsts.gradeLevel)?.innerText ??
+          'Unknown',
+      maxPoints: int.parse(
+          rubricElement?.getElement(XmlConsts.maxPoints)?.innerText ?? '0'),
       criteriaList: rubricElement
-          ?.findElements(XmlConsts.criteria)
-          .map((e) => RubricCriteria.fromXml(e))
-          .toList() ?? [],
+              ?.findElements(XmlConsts.criteria)
+              .map((e) => RubricCriteria.fromXml(e))
+              .toList() ??
+          [],
     );
   }
 
-    // Convert the Rubric object to an XML string
+  // Convert the Rubric object to an XML string
   String toXmlString() {
     final builder = XmlBuilder();
     builder.element(XmlConsts.rubric, nest: () {
@@ -102,8 +104,7 @@ class Rubric
 }
 
 // Specific Rubric Criteria
-class RubricCriteria 
-{
+class RubricCriteria {
   String description;
   int points;
   String feedback;
@@ -115,18 +116,19 @@ class RubricCriteria
   });
 
   // Factory constructor to create criteria from XML
-  factory RubricCriteria.fromXml(XmlElement criteriaElement) 
-  {
+  factory RubricCriteria.fromXml(XmlElement criteriaElement) {
     return RubricCriteria(
-      description: criteriaElement.getElement(XmlConsts.description)?.innerText ?? 'Unknown',
-      points: int.parse(criteriaElement.getElement(XmlConsts.points)?.innerText ?? '0'),
+      description:
+          criteriaElement.getElement(XmlConsts.description)?.innerText ??
+              'Unknown',
+      points: int.parse(
+          criteriaElement.getElement(XmlConsts.points)?.innerText ?? '0'),
       feedback: criteriaElement.getElement(XmlConsts.feedback)?.innerText ?? '',
     );
   }
 
   // Convert the criteria to XML format
-  void toXml(XmlBuilder builder) 
-  {
+  void toXml(XmlBuilder builder) {
     builder.element(XmlConsts.description, nest: description);
     builder.element(XmlConsts.points, nest: points.toString());
     builder.element(XmlConsts.feedback, nest: feedback);
@@ -139,7 +141,6 @@ class RubricCriteria
     return builder.buildFragment().toXmlString();
   }
 }
-
 
 // A Moodle quiz containing a list of questions.
 class Quiz {
@@ -241,9 +242,18 @@ class Quiz {
 
 // Abstract class that represents a single question.
 class Question {
-
-  Question copyWith({String? name, List? answerList, String? type, String? questionText, bool? isFavorite}) =>
-      Question(name: this.name, answerList: this.answerList,type: this.type, questionText: this.questionText, isFavorite: isFavorite ?? this.isFavorite);
+  Question copyWith(
+          {String? name,
+          List? answerList,
+          String? type,
+          String? questionText,
+          bool? isFavorite}) =>
+      Question(
+          name: this.name,
+          answerList: this.answerList,
+          type: this.type,
+          questionText: this.questionText,
+          isFavorite: isFavorite ?? this.isFavorite);
 
   String name; // question name - required.
   String type; // question type (multichoice, truefalse, shortanswer, essay) - required.
@@ -291,15 +301,23 @@ class Question {
               ?.innerText ??
           'UNKNOWN',
       generalFeedback: questionElement
-              .getElement(XmlConsts.generalfeedback)
-              ?.getElement(XmlConsts.text)
-              ?.innerText,
-      defaultGrade: questionElement.getElement(XmlConsts.defaultgrade)?.innerText,
-      responseFormat: questionElement.getElement(XmlConsts.responseformat)?.innerText,
-      responseRequired: questionElement.getElement(XmlConsts.responserequired)?.innerText,
-      attachmentsRequired: questionElement.getElement(XmlConsts.attachmentsrequired)?.innerText,
-      responseTemplate: questionElement.getElement(XmlConsts.responsetemplate)?.innerText,
-      graderInfo: questionElement.getElement(XmlConsts.graderinfo)?.getElement(XmlConsts.text)?.innerText,
+          .getElement(XmlConsts.generalfeedback)
+          ?.getElement(XmlConsts.text)
+          ?.innerText,
+      defaultGrade:
+          questionElement.getElement(XmlConsts.defaultgrade)?.innerText,
+      responseFormat:
+          questionElement.getElement(XmlConsts.responseformat)?.innerText,
+      responseRequired:
+          questionElement.getElement(XmlConsts.responserequired)?.innerText,
+      attachmentsRequired:
+          questionElement.getElement(XmlConsts.attachmentsrequired)?.innerText,
+      responseTemplate:
+          questionElement.getElement(XmlConsts.responsetemplate)?.innerText,
+      graderInfo: questionElement
+          .getElement(XmlConsts.graderinfo)
+          ?.getElement(XmlConsts.text)
+          ?.innerText,
     );
 
     for (XmlElement answerElement
@@ -313,8 +331,9 @@ class Question {
     name = newname;
   }
 
-void buildXml(XmlBuilder builder) {
-    builder.element(XmlConsts.question, attributes: {XmlConsts.type: type}, nest: () {
+  void buildXml(XmlBuilder builder) {
+    builder.element(XmlConsts.question, attributes: {XmlConsts.type: type},
+        nest: () {
       builder.element(XmlConsts.name, nest: () {
         builder.element(XmlConsts.text, nest: name);
       });
@@ -342,7 +361,8 @@ void buildXml(XmlBuilder builder) {
       }
 
       if (attachmentsRequired != null) {
-        builder.element(XmlConsts.attachmentsrequired, nest: attachmentsRequired);
+        builder.element(XmlConsts.attachmentsrequired,
+            nest: attachmentsRequired);
       }
 
       if (responseTemplate != null) {
@@ -361,9 +381,6 @@ void buildXml(XmlBuilder builder) {
       }
     });
   }
-
-
-
 
   @override
   String toString() {
@@ -401,7 +418,8 @@ class Answer {
   }
 
   void buildXml(XmlBuilder builder) {
-    builder.element(XmlConsts.answer, attributes: {XmlConsts.fraction: fraction}, nest: () {
+    builder.element(XmlConsts.answer,
+        attributes: {XmlConsts.fraction: fraction}, nest: () {
       builder.element(XmlConsts.text, nest: answerText);
       if (feedbackText != null) {
         builder.element(XmlConsts.feedback, nest: () {
@@ -449,7 +467,7 @@ class Course {
   }
 
   @override
-  String toString(){
+  String toString() {
     return "$shortName ($fullName) $id";
   }
 }
@@ -521,7 +539,8 @@ class Assignment {
   final DateTime? cutoffDate;
   final bool isDraft;
   final int maxAttempts;
-  final int gradingStatus; // Can use an enum to represent status like "graded", "notgraded"
+  final int
+      gradingStatus; // Can use an enum to represent status like "graded", "notgraded"
   final int courseId;
 
   final List<SubmissionWithGrade>? submissionsWithGrades;
@@ -550,7 +569,8 @@ class Assignment {
           ? DateTime.fromMillisecondsSinceEpoch(json['duedate'] * 1000)
           : null,
       allowsubmissionsfromdate: json['allowsubmissionsfromdate'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(json['allowsubmissionsfromdate'] * 1000)
+          ? DateTime.fromMillisecondsSinceEpoch(
+              json['allowsubmissionsfromdate'] * 1000)
           : null,
       cutoffDate: json['cutoffdate'] != null
           ? DateTime.fromMillisecondsSinceEpoch(json['cutoffdate'] * 1000)
@@ -559,11 +579,10 @@ class Assignment {
       maxAttempts: json['maxattempts'] ?? 0,
       gradingStatus: json['gradingstatus'] ?? 0,
       courseId: json['course'] ?? 0,
-
     );
   }
 
-  bool isNew(){
+  bool isNew() {
     return id == null;
   }
 
@@ -574,13 +593,13 @@ class Assignment {
       'name': name,
       'description': description,
       'duedate': dueDate?.millisecondsSinceEpoch,
-      'allowsubmissionsfromdate': allowsubmissionsfromdate?.millisecondsSinceEpoch,
+      'allowsubmissionsfromdate':
+          allowsubmissionsfromdate?.millisecondsSinceEpoch,
       'cutoffdate': cutoffDate?.millisecondsSinceEpoch,
       'submissiondrafts': isDraft ? 1 : 0,
       'maxattempts': maxAttempts,
       'gradingstatus': gradingStatus,
       'course': courseId,
-
     };
   }
 }
@@ -620,7 +639,7 @@ class Submission {
     // ignore: avoid_print
     print('Processing submission: ${json.toString()}');
     int assignmentId = json['assignmentid'] ?? 0;
-     Map<String, dynamic> submission = json['submission'] ?? {};
+    Map<String, dynamic> submission = json['submission'] ?? {};
 
     if (submission['plugins'] != null && submission['plugins'] is List) {
       for (var plugin in submission['plugins']) {
@@ -665,22 +684,23 @@ class Submission {
     }
 
     return Submission(
-      id: submission['id'] ?? 0,
-      userid: submission['userid'] ?? 0,
-      status: submission['status'] ?? '',
-      submissionTime: submission['timecreated'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(submission['timecreated'] * 1000)
-          : DateTime.fromMillisecondsSinceEpoch(0),
-      modificationTime: submission['timemodified'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(submission['timemodified'] * 1000)
-          : null,
-      attemptNumber: submission['attemptnumber'] ?? 0,
-      groupId: submission['groupid'] ?? 0,
-      gradingStatus: submission['gradingstatus'] ?? '',
-      onlineText: onlineText,
-      comments: comments,
-      assignmentId: assignmentId
-    );
+        id: submission['id'] ?? 0,
+        userid: submission['userid'] ?? 0,
+        status: submission['status'] ?? '',
+        submissionTime: submission['timecreated'] != null
+            ? DateTime.fromMillisecondsSinceEpoch(
+                submission['timecreated'] * 1000)
+            : DateTime.fromMillisecondsSinceEpoch(0),
+        modificationTime: submission['timemodified'] != null
+            ? DateTime.fromMillisecondsSinceEpoch(
+                submission['timemodified'] * 1000)
+            : null,
+        attemptNumber: submission['attemptnumber'] ?? 0,
+        groupId: submission['groupid'] ?? 0,
+        gradingStatus: submission['gradingstatus'] ?? '',
+        onlineText: onlineText,
+        comments: comments,
+        assignmentId: assignmentId);
   }
 }
 
@@ -739,8 +759,7 @@ class MoodleRubric {
     );
   }
 
-  Map<String, dynamic> toJson() 
-  {
+  Map<String, dynamic> toJson() {
     return {
       'title': title,
       'criteria': criteria.map((c) => c.toJson()).toList(),
@@ -753,13 +772,12 @@ class MoodleRubricCriteria {
   final String description;
   final List<Level> levels;
 
-  MoodleRubricCriteria({required this.id, required this.description, required this.levels});
+  MoodleRubricCriteria(
+      {required this.id, required this.description, required this.levels});
 
-  factory MoodleRubricCriteria.fromJson(Map<String, dynamic> json) 
-  {
-    var levelsList = (json['levels'] as List)
-        .map((l) => Level.fromJson(l))
-        .toList();
+  factory MoodleRubricCriteria.fromJson(Map<String, dynamic> json) {
+    var levelsList =
+        (json['levels'] as List).map((l) => Level.fromJson(l)).toList();
 
     return MoodleRubricCriteria(
       id: json['id'] ?? 0,
@@ -768,8 +786,7 @@ class MoodleRubricCriteria {
     );
   }
 
-  Map<String, dynamic> toJson() 
-  {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'description': description,
@@ -785,8 +802,7 @@ class Level {
 
   Level({required this.id, required this.description, required this.score});
 
-  factory Level.fromJson(Map<String, dynamic> json) 
-  {
+  factory Level.fromJson(Map<String, dynamic> json) {
     return Level(
       id: json['id'] ?? 0,
       description: json['definition'] ?? '',
@@ -794,20 +810,19 @@ class Level {
     );
   }
 
-   Map<String, dynamic> toJson() 
-   {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'description': description,
       'score': score,
     };
-   }
+  }
 }
 
 class Grade {
   final int id;
   final int userid;
-  final double grade;  // Convert from string in the JSON
+  final double grade; // Convert from string in the JSON
   final int grader;
   final DateTime timecreated;
   final DateTime timemodified;
@@ -829,8 +844,10 @@ class Grade {
       // Parsing the grade as a double from a string
       grade: json['grade'] != null ? double.parse(json['grade']) : 0.0,
       grader: json['grader'] ?? 0,
-      timecreated: DateTime.fromMillisecondsSinceEpoch(json['timecreated'] * 1000),
-      timemodified: DateTime.fromMillisecondsSinceEpoch(json['timemodified'] * 1000),
+      timecreated:
+          DateTime.fromMillisecondsSinceEpoch(json['timecreated'] * 1000),
+      timemodified:
+          DateTime.fromMillisecondsSinceEpoch(json['timemodified'] * 1000),
     );
   }
 }
