@@ -722,11 +722,8 @@ class MoodleApiSingleton {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        print('1');
         for (var section in data) {
-          print('2 $section');
           for (var module in section['modules']) {
-            print('3');
             if (module['instance'] == assignmentId &&
                 module['modname'] == 'assign') {
               // Get the contextid of the assignment instance 13

@@ -588,8 +588,8 @@ class _ViewAssignmentsPage extends State<ViewAssignmentsPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => SubmissionList(
-                                    assignmentId: 55,
-                                    courseId: '1',
+                                    assignmentId: 73,
+                                    courseId: '2',
                                   ),
                                 ),
                               );

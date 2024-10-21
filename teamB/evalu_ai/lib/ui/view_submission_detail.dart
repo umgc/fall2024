@@ -118,21 +118,8 @@ class SubmissionDetailState extends State<SubmissionDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         title: Text('Submission Details'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => SubmissionList(
-                  assignmentId: widget.submission.assignmentId,
-                  courseId: widget.courseId,
-                ),
-              ),
-            );
-          },
-        ),
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
@@ -173,7 +160,9 @@ class SubmissionDetailState extends State<SubmissionDetail> {
                     SizedBox(height: 8),
                     widget.submission.onlineText.isNotEmpty
                         ? Text(
-                            widget.submission.onlineText,
+                            widget.submission.onlineText
+                                .replaceAll('<p>', '')
+                                .replaceAll('</p>', ''),
                             style: TextStyle(fontSize: 16),
                           )
                         : Text(
