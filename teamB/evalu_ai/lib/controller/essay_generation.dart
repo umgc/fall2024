@@ -5,8 +5,6 @@ import 'package:intelligrade/api/llm/llm_api.dart';
 import 'package:intelligrade/controller/model/assignment_submissions.dart';
 import 'package:intelligrade/controller/model/essay_editor.dart';
 
-import 'model/blank_test.dart';
-
 // Required Components:
 // 2 Dropdowns: 1 for the Grade Level and 1 for the Point Scale
 // 3 Text Boxes: Standard/Objective, Assignment Description, Additional Customization for Rubric (Optional)
@@ -210,17 +208,6 @@ Additional Customization: ${_additionalCustomizationController.text}
                           },
                     child: Text(
                         _isLoading ? 'Generating Essay...' : 'Generate Essay'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => FirstPage(),
-                        ),
-                      );
-                    },
-                    child: Text('test'),
                   ),
                 ],
               ),
