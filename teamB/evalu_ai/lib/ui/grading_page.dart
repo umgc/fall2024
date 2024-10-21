@@ -38,7 +38,7 @@ class _GradingPageState extends State<GradingPage> {
   ]; // Example student list
 
   List<Course> courses = [];
-  List<Assignment> _assignments = [];
+  Iterable<Assignment> _assignments = [];
 
   bool readyForUpload() {
     return _gradingFile != null && _studentFiles.isNotEmpty;
@@ -52,8 +52,19 @@ class _GradingPageState extends State<GradingPage> {
     }
     if (!readyForUpload()) return 'Invalid files';
     String output;
+    print(_selectedLanguage);
     try {
-      output = await MainController().compileCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      if (_selectedLanguage == "JavaScript") {
+        output = await MainController().compileJavascriptCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      } else if (_selectedLanguage == "SQL") {
+        output = await MainController().compileSqlCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      } else if (_selectedLanguage == "Python") {
+        output = await MainController().compilePythonCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      } else if (_selectedLanguage == "Dart") {
+        output = await MainController().compileCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      } else {
+        output = "Please select a Programming Language";
+      }
       return output;
     } catch (e) {
       return e.toString();
@@ -148,7 +159,8 @@ class _GradingPageState extends State<GradingPage> {
               }).toList(),
               onChanged: (value) async {
                 MainController().getCourseAssignments(value!.id).then((result) {
-                  _assignments = result;
+                  Iterable<Assignment> codeAssignments = result.where((assignment) => assignment.name.contains("Code"));
+                  _assignments = codeAssignments;
                   setState((){
                     _selectedCourse = value;
                   });

@@ -1,5 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:intelligrade/api/compiler_module/compiler_api_service.dart';
+import 'package:intelligrade/api/compiler_module/javascript_api_service.dart';
+import 'package:intelligrade/api/compiler_module/python_api_service.dart';
+import 'package:intelligrade/api/compiler_module/sql_api_service.dart';
 import 'package:intelligrade/api/llm/llm_api.dart';
 import 'package:intelligrade/api/llm/prompt_engine.dart';
 import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
@@ -249,6 +252,18 @@ class MainController {
 
   Future<String> compileCodeAndGetOutput(List<FileNameAndBytes> files) async {
     return await CompilerApiService.compileAndGrade(files);
+  }
+
+  Future<String> compileJavascriptCodeAndGetOutput(List<FileNameAndBytes> files) async {
+    return await JavascriptCompilerApiService.compileAndGrade(files);
+  }
+
+  Future<String> compileSqlCodeAndGetOutput(List<FileNameAndBytes> files) async {
+    return await SqlCompilerApiService.compileAndGrade(files);
+  }
+
+  Future<String> compilePythonCodeAndGetOutput(List<FileNameAndBytes> files) async {
+    return await PythonCompilerApiService.compileAndGrade(files);
   }
 
   Future<bool> loginToMoodle(String username, String password) async {

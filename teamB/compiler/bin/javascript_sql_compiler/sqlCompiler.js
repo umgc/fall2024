@@ -69,9 +69,14 @@ async function processSQLRequest(req, res) {
         uploadedFiles,
         unitTestFile
       );
+      const contentLength = Buffer.byteLength(finalResponse, 'utf8');
 
-      res.writeHead(200, { Connection: "close" });
-      res.end(finalResponse);
+      res.statusCode = 200;
+      res.setHeader('Content-Length', contentLength);
+      res.setHeader('Content-Type', 'text/plain');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.write(finalResponse);
+      res.end();
     } catch (error) {
       console.error("Error processing files:", error);
       res.writeHead(500, { Connection: "close" });

@@ -6,7 +6,7 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
 const currentDir = __dirname;
-const uploadDir = path.join(currentDir, 'uploads_py');
+const uploadDir = path.join(currentDir, 'uploads_python');
 
 async function processPythonRequest(req, res) {
     const bb = busboy({ headers: req.headers });
@@ -60,9 +60,14 @@ async function processPythonRequest(req, res) {
 
             // Process the uploaded files
             const finalResponse = await processUploadedFiles(uploadedFiles, unitTestFile);
+            const contentLength = Buffer.byteLength(finalResponse, 'utf8');
 
-            res.writeHead(200, { 'Connection': 'close' });
-            res.end(finalResponse);
+            res.statusCode = 200;
+            res.setHeader('Content-Length', contentLength);
+            res.setHeader('Content-Type', 'text/plain');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            res.write(finalResponse);
+            res.end();
         } catch (error) {
             console.error('Error processing files:', error);
             res.writeHead(500, { 'Connection': 'close' });
