@@ -34,7 +34,7 @@ class SubmissionListState extends State<SubmissionList> {
     _fetchData();
   }
 
-//needed to refresh the submissions if a grade gets updated on the detail page
+  //needed to refresh the submissions if a grade gets updated on the detail page
   void _fetchData() {
     setState(() {
       futureSubmissionsWithGrades =
@@ -47,7 +47,7 @@ class SubmissionListState extends State<SubmissionList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         title: Text("View Submissions"),
         actions: [],
       ),
@@ -114,140 +114,152 @@ class SubmissionListState extends State<SubmissionList> {
                               width: MediaQuery.of(context).size.width < 450
                                   ? double.infinity
                                   : 450,
-                              child: Card(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .secondaryContainer, // Card background color
+                                  border: Border.all(
+                                    color: Theme.of(context).colorScheme.onSecondaryContainer, // Border color
+                                    width: 2.0, // Border width
+                                  ),
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
                                 margin: EdgeInsets.symmetric(
                                     vertical: 8, horizontal: 16),
-                                child: ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: Theme.of(context)
-                                        .colorScheme
-                                        .primaryContainer,
-                                    child: Text(
-                                      participant.fullname
-                                          .substring(0, 1)
-                                          .toUpperCase(),
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimaryContainer,
+                                child: Card(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .secondaryContainer,
+                                  elevation: 0, // Optional: Remove card shadow if needed
+                                  child: ListTile(
+                                    leading: CircleAvatar(
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondary,
+                                      child: Text(
+                                        participant.fullname
+                                            .substring(0, 1)
+                                            .toUpperCase(),
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondaryContainer,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  title: Text(participant
-                                      .fullname), // Display the full name
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      if (submissionWithGrade != null)
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                                'Grade Status: ${submissionWithGrade.submission.gradingStatus}'),
-                                            Text(
-                                                'Status: ${submissionWithGrade.submission.status}'),
-                                            Text(
-                                                'Submitted on: ${submissionWithGrade.submission.submissionTime.toLocal()}'),
-                                            Text(
-                                                'Grade: ${submissionWithGrade.grade != null ? submissionWithGrade.grade!.grade.toString() : "Not graded yet"}'),
-                                            SizedBox(height: 4),
-                                            Text(
-                                              'Content: ${submissionWithGrade.submission.onlineText.isNotEmpty ? "Available" : "No content provided."}',
-                                              style: TextStyle(
-                                                fontStyle: submissionWithGrade
-                                                        .submission
-                                                        .onlineText
-                                                        .isNotEmpty
-                                                    ? FontStyle.normal
-                                                    : FontStyle.italic,
-                                              ),
-                                            ),
-                                            SizedBox(height: 4),
-                                            Text(
-                                              'Comments: ${submissionWithGrade.submission.comments.isNotEmpty ? "Available" : "No comments."}',
-                                              style: TextStyle(
-                                                fontStyle: submissionWithGrade
-                                                        .submission
-                                                        .comments
-                                                        .isNotEmpty
-                                                    ? FontStyle.normal
-                                                    : FontStyle.italic,
-                                              ),
-                                            ),
-                                          ],
-                                        )
-                                      else
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            SizedBox(height: 52),
-                                            Text('No Submission',
+                                    title: Text(participant.fullname),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        if (submissionWithGrade != null)
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                  'Grade Status: ${submissionWithGrade.submission.gradingStatus}'),
+                                              Text(
+                                                  'Status: ${submissionWithGrade.submission.status}'),
+                                              Text(
+                                                  'Submitted on: ${submissionWithGrade.submission.submissionTime.toLocal()}'),
+                                              Text(
+                                                  'Grade: ${submissionWithGrade.grade != null ? submissionWithGrade.grade!.grade.toString() : "Not graded yet"}'),
+                                              SizedBox(height: 4),
+                                              Text(
+                                                'Content: ${submissionWithGrade.submission.onlineText.isNotEmpty ? "Available" : "No content provided."}',
                                                 style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 16,
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .error)),
-                                            SizedBox(height: 84),
-                                          ],
-                                        ),
-                                      SizedBox(
-                                          height:
-                                              8), // Add spacing before the button
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          if (submissionWithGrade != null &&
-                                              submissionWithGrade.submission
-                                                      .gradingStatus ==
-                                                  'notgraded')
-                                                  isLoading
-                                                  ? CircularProgressIndicator()
-                                            :ElevatedButton(
-                                              onPressed: () async {
-                                                try {
-                                                  // TODO: Add Loading indicator
-                                                  setState(() {
-                                                    isLoading = true;
-                                                  });
-                                                  // Fetch submission and context ID
-                                                  var submissionText =
-                                                      submissionWithGrade
+                                                  fontStyle: submissionWithGrade
                                                           .submission
-                                                          .onlineText;
-                                                  int? contextId =
-                                                      await MoodleApiSingleton()
-                                                          .getContextId(
-                                                              widget
-                                                                  .assignmentId,
-                                                              widget.courseId);
+                                                          .onlineText
+                                                          .isNotEmpty
+                                                      ? FontStyle.normal
+                                                      : FontStyle.italic,
+                                                ),
+                                              ),
+                                              SizedBox(height: 4),
+                                              Text(
+                                                'Comments: ${submissionWithGrade.submission.comments.isNotEmpty ? "Available" : "No comments."}',
+                                                style: TextStyle(
+                                                  fontStyle: submissionWithGrade
+                                                          .submission
+                                                          .comments
+                                                          .isNotEmpty
+                                                      ? FontStyle.normal
+                                                      : FontStyle.italic,
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        else
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(height: 52),
+                                              Text('No Submission',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 16,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .error)),
+                                              SizedBox(height: 84),
+                                            ],
+                                          ),
+                                        SizedBox(height: 8),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            if (submissionWithGrade != null &&
+                                                submissionWithGrade.submission
+                                                        .gradingStatus ==
+                                                    'notgraded')
+                                              isLoading
+                                                  ? CircularProgressIndicator()
+                                                  : ElevatedButton(
+                                                      onPressed: () async {
+                                                        try {
+                                                          setState(() {
+                                                            isLoading = true;
+                                                          });
+                                                          var submissionText =
+                                                              submissionWithGrade
+                                                                  .submission
+                                                                  .onlineText;
+                                                          int? contextId =
+                                                              await MoodleApiSingleton()
+                                                                  .getContextId(
+                                                                      widget
+                                                                          .assignmentId,
+                                                                      widget
+                                                                          .courseId);
 
-                                                  // Fetch rubric
-                                                  var fetchedRubric;
-                                                  if (contextId != null) {
-                                                    fetchedRubric =
-                                                        await MoodleApiSingleton()
-                                                            .getRubric(widget
-                                                                .assignmentId
-                                                                .toString());
-                                                    if (fetchedRubric == null) {
-                                                      print(
-                                                          'Failed to fetch rubric.');
-                                                      return;
-                                                    }
-                                                    // Ensure the rubric is serialized to JSON format
-                                                    fetchedRubric = jsonEncode(
-                                                        fetchedRubric
-                                                                ?.toJson() ??
-                                                            {});
-                                                  }
+                                                          var fetchedRubric;
+                                                          if (contextId !=
+                                                              null) {
+                                                            fetchedRubric =
+                                                                await MoodleApiSingleton()
+                                                                    .getRubric(widget
+                                                                        .assignmentId
+                                                                        .toString());
+                                                            if (fetchedRubric ==
+                                                                null) {
+                                                              print(
+                                                                  'Failed to fetch rubric.');
+                                                              return;
+                                                            }
+                                                            fetchedRubric = jsonEncode(
+                                                                fetchedRubric
+                                                                        ?.toJson() ??
+                                                                    {});
+                                                          }
 
-                                                  // Create prompt to send to LLM for grading
-                                                  String queryPrompt = '''
+                                                          String queryPrompt =
+                                                              '''
                                                   I am building a program that generates essay rubric assignments that teachers can distribute to students
                                                   who can then submit their responses to be graded. Here is an example format of a rubric roughly:
                                                   [
@@ -308,51 +320,69 @@ class SubmissionListState extends State<SubmissionList> {
 
                                                   You must reply with a representation of the rubric in JSON format that matches this example format, 
                                                   obviously put your generated scores in and be specific with the remarks on the scoring and give specific examples from the 
-                                                  submitted assignment that were either good or bad depending on the score given. Also cut out anything that is not
-                                                  the json response. No extraneous comments outside that: 
-                                                  {
-                                                      "criterionid": 52,
-                                                      "criterion_description": "Content",
-                                                      "levelid": 157,
-                                                      "level_description": "Poor",
-                                                      "score": 1,
-                                                      "remark": "Done with mirrors."
-                                                  },
-                                                  {
-                                                      "criterionid": 53,
-                                                      "criterion_description": "Clarity",
-                                                      "levelid": 160,
-                                                      "level_description": "Unclear",
-                                                      "score": 1,
-                                                      "remark": "Rocks."
-                                                  }
+                                                  submitted assignment that were either good or bad depending on the score given.
                                                 ''';
 
-                                                  // Initialize the LLM API with the Perplexity API key
-                                                  final perplexityApiKey = dotenv
-                                                              .env[
-                                                          'perplexity_apikey'] ??
-                                                      '';
-                                                  final llmApi =
-                                                      LlmApi(perplexityApiKey);
+                                                          final perplexityApiKey =
+                                                              dotenv.env[
+                                                                  'perplexity_apikey'] ??
+                                                                  '';
+                                                          final llmApi = LlmApi(
+                                                              perplexityApiKey);
 
-                                                  // Retrieve response in the format of a graded JSON rubric
-                                                  String gradedResponse =
-                                                      await llmApi.postToLlm(
-                                                          queryPrompt);
-                                                  gradedResponse =
-                                                      gradedResponse
-                                                          .replaceAll(
-                                                              '```json', '')
-                                                          .replaceAll('```', '')
-                                                          .trim();
-                                                  var results =
-                                                      await MoodleApiSingleton()
-                                                          .setRubricGrades(
-                                                              widget
-                                                                  .assignmentId,
-                                                              participant.id,
-                                                              gradedResponse);
+                                                          String gradedResponse =
+                                                              await llmApi.postToLlm(
+                                                                  queryPrompt);
+                                                          gradedResponse =
+                                                              gradedResponse
+                                                                  .replaceAll(
+                                                                      '```json',
+                                                                      '')
+                                                                  .replaceAll(
+                                                                      '```',
+                                                                      '')
+                                                                  .trim();
+                                                          var results =
+                                                              await MoodleApiSingleton()
+                                                                  .setRubricGrades(
+                                                                      widget
+                                                                          .assignmentId,
+                                                                      participant
+                                                                          .id,
+                                                                      gradedResponse);
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  SubmissionDetail(
+                                                                participant:
+                                                                    participant,
+                                                                submission:
+                                                                    submissionWithGrade
+                                                                        .submission,
+                                                                courseId: widget
+                                                                    .courseId,
+                                                              ),
+                                                            ),
+                                                          );
+                                                          print(
+                                                              'Results: $results');
+                                                        } catch (e) {
+                                                          print(
+                                                              'An error occurred: $e');
+                                                        } finally {
+                                                          setState(() {
+                                                            isLoading =
+                                                                false;
+                                                          });
+                                                        }
+                                                      },
+                                                      child: Text('Grade'),
+                                                    ),
+                                            SizedBox(width: 8),
+                                            if (submissionWithGrade != null)
+                                              ElevatedButton(
+                                                onPressed: () {
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
@@ -368,46 +398,15 @@ class SubmissionListState extends State<SubmissionList> {
                                                       ),
                                                     ),
                                                   );
-                                                  print('Results: $results');
-                                                  print("debug line");
-                                                } catch (e) {
-                                                  print(
-                                                      'An error occurred: $e');
-                                                } finally {
-                                                  // Hide loading indicator
-                                                  setState(() {
-                                                    isLoading =
-                                                        false; // Update your loading state
-                                                  });
-                                                }
-                                              },
-                                              child: Text('Grade'),
-                                            ),
-                                          SizedBox(width: 8),
-                                          if (submissionWithGrade != null)
-                                            ElevatedButton(
-                                              onPressed: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        SubmissionDetail(
-                                                      participant: participant,
-                                                      submission:
-                                                          submissionWithGrade
-                                                              .submission,
-                                                      courseId: widget.courseId,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              child: Text('View Details'),
-                                            ),
-                                        ],
-                                      ),
-                                    ],
+                                                },
+                                                child: Text('View Details'),
+                                              ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    isThreeLine: true,
                                   ),
-                                  isThreeLine: true,
                                 ),
                               ),
                             );
@@ -420,8 +419,6 @@ class SubmissionListState extends State<SubmissionList> {
               }
             },
           ),
-          // if (isLoading) // Show loading indicator when isLoading is true
-          //   Center(child: CircularProgressIndicator()),
         ],
       ),
     );

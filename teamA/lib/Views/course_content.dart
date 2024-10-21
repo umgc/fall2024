@@ -30,26 +30,85 @@ class _CourseState extends State<ViewCourseContents> {
     courseName = widget.theCourse.fullName;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(title: Text('Navigator is //todo')),
-        body: SingleChildScrollView(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Text(
-              courseName,
-              style: TextStyle(fontSize: 64),
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+    title: Text('$courseName Content')),
+    body: SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start, // Keeps everything left-aligned
+        children: [
+          // Background for "Quizzes"
+          Container(
+            width: double.infinity,
+            color: Theme.of(context).colorScheme.secondary,
+            padding: const EdgeInsets.all(8.0), // Padding inside the container
+            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Space around the container
+            child: Text(
+              "Quizzes",
+              style: TextStyle(
+                fontSize: 32, 
+                color: Theme.of(context).colorScheme.onSecondary, // Text color set for contrast
+              ),
             ),
-            // ContentCarousel('assessment', MainController().selectedCourse?.quizzes),
-            // ContentCarousel('essay', MainController().selectedCourse?.essays),
-            ContentCarousel('assessment', widget.theCourse.quizzes, courseId: widget.theCourse.id),
-            ContentCarousel('essay', widget.theCourse.essays, courseId: widget.theCourse.id),
-            Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [CreateButton('assessment'), CreateButton('essay')])
-          ],
-        )));
-  }
+          ),
+          ContentCarousel(
+            'assessment', 
+            widget.theCourse.quizzes,
+            courseId: widget.theCourse.id,
+          ),
+          
+          // Background for "Essays"
+          Container(
+            width: double.infinity,
+            color: Theme.of(context).colorScheme.secondary,
+            padding: const EdgeInsets.all(8.0),
+            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            child: Text(
+              "Essays",
+              style: TextStyle(
+                fontSize: 32, 
+                color: Theme.of(context).colorScheme.onSecondary,
+              ),
+            ),
+          ),
+          ContentCarousel(
+            'essay', 
+            widget.theCourse.essays,
+            courseId: widget.theCourse.id,
+          ),
+          
+          // Responsive layout for the buttons
+          LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth < 600) {
+                // Stack buttons vertically for narrow screens
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    CreateButton('assessment'),
+                    SizedBox(height: 8.0), // Space between buttons
+                    CreateButton('essay'),
+                  ],
+                );
+              } else {
+                // Show buttons in a row for wide screens
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    CreateButton('assessment'),
+                    CreateButton('essay'),
+                  ],
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+
 }
