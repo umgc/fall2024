@@ -2,7 +2,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:learninglens_app/Api/llm/prompt_engine.dart';
-import '../Controller/beans.dart';
+import 'package:learninglens_app/Controller/beans.dart';
 import 'edit_questions.dart';
 import 'package:llm_api_modules/openai_api.dart';
 import 'package:llm_api_modules/claudeai_api.dart';
@@ -167,12 +167,11 @@ class SubmitButton extends StatelessWidget {
 
       final aiModel;
       if (selectedLLM == 'ChatGPT') {
-        aiModel = OpenAiLLM(openapikey);
+        aiModel = OpenAiLLM(openApiKey);
       } else if (selectedLLM == 'CLAUDE') {
-        aiModel = ClaudeAiAPI(claudapikey);
+        aiModel = ClaudeAiAPI(claudApiKey);
       } else {
-        aiModel = OpenAiLLM(''); // Awaiting perplexity implementation
-        //aiModel = PerplexityAPI(String.fromEnvironment('perplexity_apikey'));
+        aiModel = OpenAiLLM(perplexityApiKey); 
       }
       var result = await aiModel.postToLlm(PromptEngine.generatePrompt(af));
       if (result.isNotEmpty) {
