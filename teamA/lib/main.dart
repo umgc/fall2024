@@ -1,21 +1,18 @@
-import 'dart:convert';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:learninglens_app/Views/assessments_view.dart';
-import 'Api/moodle_api_singleton.dart';
-import 'Controller/main_controller.dart';
 import 'Views/login_page.dart';
 import 'Views/dashboard.dart';
-import 'Views/essay_edit_page.dart';
-import 'Views/course_content.dart';
 import 'Views/send_essay_to_moodle.dart';
 import 'Views/essay_generation.dart';
 import 'Views/quiz_generator.dart';
 import 'Views/edit_questions.dart';
 
-void main() {
-  runApp(MyApp());
+
+void main() async{
+  await dotenv.load();
+  runApp(LoginApp());
 }
 
 //click and drag for intuitiveness
@@ -43,11 +40,11 @@ class MyApp extends StatelessWidget {
       scrollBehavior: CustomScrollBehavior(),
       routes: {
         'LoginPage': (context) => LoginApp(),
-        '/EssayEditPage': (context) => EssayEditPage(),
-        '/Content': (context) => ViewCourseContents(),
+        // '/EssayEditPage': (context) => EssayEditPage(jsonData),
+        // '/Content': (context) => ViewCourseContents(),
         '/EssayGenerationPage': (context) => EssayGeneration(title: 'Essay Generation'),
-        '/QuizGenerationPage': (context) => CreateAssessment('Tester'),
-        '/EditQuestions': (context) => EditQuestions(),
+        '/QuizGenerationPage': (context) => CreateAssessment(),
+        '/EditQuestions': (context) => EditQuestions(''),
         // '/create': (context) => const CreatePage(),
         '/dashboard': (context) => TeacherDashboard(),
         '/send_essay_to_moodle': (context) => EssayAssignmentSettings(''),
@@ -80,26 +77,26 @@ class _DevLaunch extends State {
                   MaterialPageRoute(builder: (context) => LoginApp()),
                 );
               }),
-          ElevatedButton(
-              child: const Text('Open Edit Essay'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => EssayEditPage()),
-                );
-              }),
-          ElevatedButton(
-              child: const Text('Open Contents Carousel'),
-              onPressed: () async {
-                if (MoodleApiSingleton().isLoggedIn()){
-                  MainController().selectCourse(0);
-                }
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ViewCourseContents()),
-                );
-              }),
+          // ElevatedButton(
+          //     child: const Text('Open Edit Essay'),
+          //     onPressed: () {
+          //       Navigator.push(
+          //         context,
+          //         MaterialPageRoute(builder: (context) => EssayEditPage(jsonData)),
+          //       );
+          //     }),
+          // ElevatedButton(
+          //     child: const Text('Open Contents Carousel'),
+          //     onPressed: () async {
+          //       if (MoodleApiSingleton().isLoggedIn()){
+          //         MainController().selectCourse(0);
+          //       }
+          //       Navigator.push(
+          //         context,
+          //         MaterialPageRoute(
+          //             builder: (context) => ViewCourseContents()),
+          //       );
+          //     }),
           ElevatedButton(
               child: const Text('Open Essay Generation'),
               onPressed: () {
@@ -133,14 +130,14 @@ class _DevLaunch extends State {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => CreateAssessment('Tester')));
+                      builder: (context) => CreateAssessment()));
             },
           ),
           ElevatedButton(
             child: const Text('Edit Questions'),
             onPressed: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => EditQuestions()));
+                  MaterialPageRoute(builder: (context) => EditQuestions('')));
             },
           ),
           ElevatedButton(

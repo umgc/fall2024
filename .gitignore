@@ -34,8 +34,8 @@ macos/
 web/
 windows/
 Flutter/
-teamA/linux/*
-teamA/macos/*
-teamA/windows/*
+teama/linux/*
+teama/macos/*
+teama/windows/*
 teama/assets/api-keys.json
 teama/android/
