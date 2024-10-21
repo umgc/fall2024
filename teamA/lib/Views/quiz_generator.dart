@@ -140,8 +140,9 @@ class SubmitButton extends StatelessWidget {
   final Map<String, TextEditingController> fields;
   final GlobalKey<FormState> formKey;
   final BuildContext context;
-  final openapikey = dotenv.env['openai_apikey']?? 'default_openai_api_key';
-  final claudapikey = dotenv.env['claudeai_apikey']?? 'default_claud_api_key';
+  final openApiKey = dotenv.env['openai_apikey']?? 'default_openai_api_key';
+  final claudApiKey = dotenv.env['claudeai_apikey']?? 'default_claude_api_key';
+  final String perplexityApiKey = dotenv.env['perplexity_apikey']?? 'default_perplexity_api_key';
   SubmitButton._(this.selectedSubject,
                  this.selectedLLM,
                  this.fields,
