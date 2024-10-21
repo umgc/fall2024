@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/Views/course_content.dart';
 import '../Controller/beans.dart'; // Assuming this contains the Course class
 import '../main.dart';
 import '../Api/moodle_api_singleton.dart';
@@ -71,6 +72,10 @@ class CourseList extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () {
                         // Button onPressed Action (e.g., navigate to course details)
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ViewCourseContents(course)),
+                    );
                       },
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(Color(0xFF6A5A99)),

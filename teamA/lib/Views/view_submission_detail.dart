@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/Views/view_submissions.dart';
 import '../Controller/beans.dart';
 import '../Api/moodle_api_singleton.dart';
 import 'dart:math';
-import '../Api/llm_api.dart';
 
 class SubmissionDetail extends StatefulWidget {
   final Participant participant;
@@ -26,7 +26,8 @@ class SubmissionDetailState extends State<SubmissionDetail> {
   String errorMessage = '';
   Map<int, int> selectedLevels = {}; // Map to store selected levels
   Map<int, String> remarks = {}; // Map to store remarks
-  Map<int, TextEditingController> remarkControllers = {}; // Controllers for each remark
+  Map<int, TextEditingController> remarkControllers =
+      {}; // Controllers for each remark
 
   @override
   void initState() {
@@ -35,10 +36,13 @@ class SubmissionDetailState extends State<SubmissionDetail> {
   }
 
   Future<void> fetchRubric() async {
-    int? contextId = await MoodleApiSingleton().getContextId(widget.submission.assignmentId, widget.courseId);
+    int? contextId = await MoodleApiSingleton()
+        .getContextId(widget.submission.assignmentId, widget.courseId);
     if (contextId != null) {
-      var fetchedRubric = await MoodleApiSingleton().getRubric(widget.submission.assignmentId.toString());
-      var submissionScores = await MoodleApiSingleton().getRubricGrades(widget.submission.assignmentId, widget.participant.id);
+      var fetchedRubric = await MoodleApiSingleton()
+          .getRubric(widget.submission.assignmentId.toString());
+      var submissionScores = await MoodleApiSingleton().getRubricGrades(
+          widget.submission.assignmentId, widget.participant.id);
 
       setState(() {
         rubric = fetchedRubric;
@@ -47,7 +51,8 @@ class SubmissionDetailState extends State<SubmissionDetail> {
         for (var score in scores!) {
           selectedLevels[score['criterionid']] = score['levelid'];
           remarks[score['criterionid']] = score['remark'] ?? '';
-          remarkControllers[score['criterionid']] = TextEditingController(text: remarks[score['criterionid']]);
+          remarkControllers[score['criterionid']] =
+              TextEditingController(text: remarks[score['criterionid']]);
         }
         isLoading = false;
       });
@@ -66,7 +71,7 @@ class SubmissionDetailState extends State<SubmissionDetail> {
   }
 
   // Save updated submission scores and remarks as JSON
-  void saveSubmissionScores() {
+  void saveSubmissionScores() async {
     List<Map<String, dynamic>> updatedScores = [];
     selectedLevels.forEach((criterionid, levelid) {
       updatedScores.add({
@@ -79,6 +84,33 @@ class SubmissionDetailState extends State<SubmissionDetail> {
     String jsonScores = jsonEncode(updatedScores);
     print('Updated Submission Scores and Remarks: $jsonScores');
     // Handle further actions like saving to a database or API here.
+    // SubmissionListState? submissionListState = context.findAncestorStateOfType<SubmissionListState>();
+    bool results = await MoodleApiSingleton().setRubricGrades(
+        widget.submission.assignmentId, widget.participant.id, jsonScores);
+    print('Results: $results');
+    if (mounted) {
+      if (results) {
+        final snackBar = SnackBar(
+          content: Text('Grades updated successfully!'),
+          duration: Duration(seconds: 2),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        await Future.delayed(snackBar.duration);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SubmissionList(
+              assignmentId: widget.submission.assignmentId,
+              courseId: widget.courseId,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update grades.')),
+        );
+      }
+    }
   }
 
   @override
@@ -86,6 +118,20 @@ class SubmissionDetailState extends State<SubmissionDetail> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Submission Details'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SubmissionList(
+                  assignmentId: widget.submission.assignmentId,
+                  courseId: widget.courseId,
+                ),
+              ),
+            );
+          },
+        ),
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
@@ -178,10 +224,9 @@ class SubmissionDetailState extends State<SubmissionDetail> {
   }
 
 // Interactive rubric table with dynamic width expansion
-Widget buildInteractiveRubricTable() {
-  if (rubric == null) return Container(); // No rubric, return an empty container
-
-  List<TableRow> tableRows = [];
+  Widget buildInteractiveRubricTable() {
+    if (rubric == null)
+      return Container(); // No rubric, return an empty container
 
   // First row: Header row with scores and remarks
   tableRows.add(
@@ -235,57 +280,58 @@ Widget buildInteractiveRubricTable() {
     ),
   );
 
-  // Add rows for each criterion
-  for (var criterion in rubric!.criteria) {
+    // First row: Header row with scores and remarks
     tableRows.add(
       TableRow(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.primaryContainer,
+        ),
         children: [
           // Criterion description
           TableCell(
             child: Padding(
               padding: EdgeInsets.all(8.0),
-              child: Text(criterion.description),
+              child: Text(
+                'Criteria',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
+                softWrap: true,
+                overflow: TextOverflow.visible,
+              ),
             ),
           ),
-          // Level definitions (clickable cells)
-          ...criterion.levels.map((level) {
-            bool isSelected =
-                selectedLevels[criterion.id] == level.id; // Check if level is selected
+          ...rubric!.criteria.first.levels.map((level) {
             return TableCell(
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    selectedLevels[criterion.id] = level.id;
-                  });
-                },
-                child: Container(
-                  padding: EdgeInsets.all(8.0),
-                  color: isSelected
-                      ? Colors.blue.withOpacity(0.5)
-                      : Colors.transparent,
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: Text(level.description),
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    '${level.score} pts',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
                   ),
                 ),
               ),
             );
           }).toList(),
-          // Editable remark field
           TableCell(
             child: Padding(
               padding: EdgeInsets.all(8.0),
-              child: TextField(
-                controller: remarkControllers[criterion.id],
-                onChanged: (text) {
-                  remarks[criterion.id] = text;
-                },
-                decoration: InputDecoration(
-                  hintText: 'Enter remark',
-                  border: OutlineInputBorder(), // Optional: adds a border around the field
+              child: Text(
+                'Remarks',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
                 ),
-                minLines: 1, // Minimum number of lines to show
-                maxLines: 5, // Maximum number of lines to show
+                softWrap: true,
+                overflow: TextOverflow.visible,
               ),
             ),
           ),
@@ -294,29 +340,100 @@ Widget buildInteractiveRubricTable() {
     );
   }
 
-  return LayoutBuilder(
-    builder: (BuildContext context, BoxConstraints constraints) {
-      // Set a minWidth (e.g., 600px), but make sure it's less than or equal to the available maxWidth
-      double minWidth = 800;
-      double tableWidth = max(minWidth, constraints.maxWidth);
-
-      return SingleChildScrollView(
-        scrollDirection: Axis.vertical, // Enable vertical scrolling
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal, // Enable horizontal scrolling
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minWidth: tableWidth), // Safely set minWidth
-            child: Table(
-              border: TableBorder.all(
-                  color: Colors.black, width: 1.0), // Outer border for the table
-              defaultColumnWidth: IntrinsicColumnWidth(),
-              children: tableRows,
+    // Add rows for each criterion
+    for (var criterion in rubric!.criteria) {
+      tableRows.add(
+        TableRow(
+          children: [
+            TableCell(
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  criterion.description,
+                  softWrap: true,
+                  overflow: TextOverflow.visible,
+                ),
+              ),
             ),
-          ),
+            ...criterion.levels.map((level) {
+              bool isSelected = selectedLevels[criterion.id] == level.id;
+              return TableCell(
+                verticalAlignment: TableCellVerticalAlignment.fill,
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      selectedLevels[criterion.id] = level.id;
+                    });
+                  },
+                  child: Container(
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
+                        : Colors.transparent,
+                    padding: EdgeInsets.all(8.0),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        level.description,
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+            TableCell(
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: remarkControllers[criterion.id],
+                  onChanged: (text) {
+                    remarks[criterion.id] = text;
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'Enter remark',
+                    border: OutlineInputBorder(),
+                  ),
+                  minLines: 4,
+                  maxLines: 6,
+                ),
+              ),
+            ),
+          ],
         ),
       );
-    },
-  );
-}
+    }
 
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        double minWidth = 800;
+        double tableWidth = max(minWidth, constraints.maxWidth);
+
+        return SingleChildScrollView(
+          scrollDirection: Axis.vertical, // Enable vertical scrolling
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal, // Enable horizontal scrolling
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minWidth: tableWidth),
+              child: Table(
+                border: TableBorder.all(
+                    color: Colors.black,
+                    width: 1.0), // Outer border for the table
+                columnWidths: {
+                  0: FlexColumnWidth(.5), // Criteria column
+                  for (int i = 1;
+                      i <= rubric!.criteria.first.levels.length;
+                      i++)
+                    i: FlexColumnWidth(1), // Score columns
+                  rubric!.criteria.first.levels.length + 1:
+                      FlexColumnWidth(1.8), // Remarks column
+                },
+                children: tableRows,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }

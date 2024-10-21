@@ -2,20 +2,17 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:learninglens_app/Views/assessments_view.dart';
-import 'Api/moodle_api_singleton.dart';
-import 'Controller/main_controller.dart';
 import 'Views/login_page.dart';
 import 'Views/dashboard.dart';
-import 'Views/essay_edit_page.dart';
-import 'Views/course_content.dart';
 import 'Views/send_essay_to_moodle.dart';
 import 'Views/essay_generation.dart';
 import 'Views/quiz_generator.dart';
 import 'Views/edit_questions.dart';
 
+
 void main() async{
   await dotenv.load();
-  runApp(MyApp());
+  runApp(LoginApp());
 }
 
 //click and drag for intuitiveness
@@ -44,7 +41,7 @@ class MyApp extends StatelessWidget {
       routes: {
         'LoginPage': (context) => LoginApp(),
         // '/EssayEditPage': (context) => EssayEditPage(jsonData),
-        '/Content': (context) => ViewCourseContents(),
+        // '/Content': (context) => ViewCourseContents(),
         '/EssayGenerationPage': (context) => EssayGeneration(title: 'Essay Generation'),
         '/QuizGenerationPage': (context) => CreateAssessment(),
         '/EditQuestions': (context) => EditQuestions(''),
@@ -88,18 +85,18 @@ class _DevLaunch extends State {
           //         MaterialPageRoute(builder: (context) => EssayEditPage(jsonData)),
           //       );
           //     }),
-          ElevatedButton(
-              child: const Text('Open Contents Carousel'),
-              onPressed: () async {
-                if (MoodleApiSingleton().isLoggedIn()){
-                  MainController().selectCourse(0);
-                }
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ViewCourseContents()),
-                );
-              }),
+          // ElevatedButton(
+          //     child: const Text('Open Contents Carousel'),
+          //     onPressed: () async {
+          //       if (MoodleApiSingleton().isLoggedIn()){
+          //         MainController().selectCourse(0);
+          //       }
+          //       Navigator.push(
+          //         context,
+          //         MaterialPageRoute(
+          //             builder: (context) => ViewCourseContents()),
+          //       );
+          //     }),
           ElevatedButton(
               child: const Text('Open Essay Generation'),
               onPressed: () {

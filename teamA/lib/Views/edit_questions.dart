@@ -1,3 +1,4 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:learninglens_app/Views/send_quiz_to_moodle.dart';
 
 import '../Api/moodle_api_singleton.dart';
@@ -19,8 +20,8 @@ class EditQuestions extends StatefulWidget {
 class EditQuestionsState extends State<EditQuestions> {
   late Quiz myQuiz;
   final TextEditingController _textController = TextEditingController();
-  static const apikey = String.fromEnvironment('openai_apikey');
-  final openai = OpenAiLLM(apikey);
+  var apikey = dotenv.env['openai_apikey'];
+  late OpenAiLLM openai;
   bool _isLoading = false;
 
   String subject = CreateAssessment.descriptionController.text;
@@ -31,6 +32,12 @@ class EditQuestionsState extends State<EditQuestions> {
   void initState() {
     super.initState();
     myQuiz = Quiz.fromXmlString(widget.questionXML);
+    if (apikey != null) {
+      openai = OpenAiLLM(apikey!);
+    } else {
+      // Handle the case where the API key is null
+      throw Exception('API key is not set in the environment variables');
+    }
     myQuiz.name = CreateAssessment.nameController.text;
     myQuiz.description = CreateAssessment.descriptionController.text;
 
@@ -233,7 +240,6 @@ class EditQuestionsState extends State<EditQuestions> {
                 },
                 child: const Text('Create Assignment'),
               ),
-
             ],
           )
         ],
