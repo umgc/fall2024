@@ -1,152 +1,172 @@
 import 'dart:convert';
-
-import 'package:editable/editable.dart';
 import 'package:flutter/material.dart';
 
-import '/controller/model/beans.dart';
-import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
-
 class EssayGrader extends StatefulWidget {
-  final dynamic rubric;
-  final String submission;
+  final String gradeJson;
 
-  EssayGrader(this.rubric, this.submission);
+  EssayGrader(this.gradeJson);
+
   @override
-  EssayGraderState createState() => EssayGraderState(); // Public State class
+  EssayGraderState createState() => EssayGraderState();
 }
 
 class EssayGraderState extends State<EssayGrader> {
-  // JSON data to be used
-  late dynamic rubric;
-  late dynamic essaySubmission;
-
-  // Convert JSON to rows compatible with Editable
-  List rows = [];
-
-  // Headers or Columns
   List headers = [];
+  List rows = [];
 
   @override
   void initState() {
     super.initState();
-    rubric = widget.rubric;
-    populateHeadersAndRows();
+    populateHeadersAndRows(); // Populate table with data from GradeJSON
   }
 
-  // Function to dynamically populate headers and rows based on JSON data
+  // Function to populate headers and rows for rubric display
   void populateHeadersAndRows() {
-    // Step 1: Build headers dynamically based on the number of levels in the first criterion
-    List<dynamic> levels =
-        List<dynamic>.from(rubric['criteria']![0]['levels'] as List);
-    headers = [
-      {"title": 'Criteria', 'index': 1, 'key': 'name'},
-    ];
+    try {
+      Map<String, dynamic> jsonData = jsonDecode(widget.gradeJson);
+      List<dynamic> rubricCriteria = jsonData['rubric_criteria'];
 
-    for (int i = 0; i < levels.length; i++) {
-      headers.add({
-        "title": '${levels[i]['score']}',
-        'index': i + 2,
-        'key': 'level_$i'
-      });
-    }
+      // Define headers: Criterion Description, Levels, Remarks
+      headers = [
+        {"title": 'Criteria', 'index': 1, 'key': 'name'}, // Criteria header
+      ];
 
-    // Step 2: Build rows by mapping each criterion and its levels dynamically
-    rows = (rubric['criteria'] ?? []).map((criterion) {
-      Map<String, dynamic> row = {
-        "name": criterion['description'] ?? '',
-      };
-
-      for (int i = 0; i < (criterion['levels'] as List).length; i++) {
-        row['level_$i'] = (criterion['levels'] as List)[i]['definition'];
+      // Check levels and add level score headers
+      if (rubricCriteria.isNotEmpty && rubricCriteria[0]['levels'] != null) {
+        List<dynamic> levels = rubricCriteria[0]['levels'];
+        for (int i = 0; i < levels.length; i++) {
+          headers.add({
+            "title": 'Score ${levels[i]['score']}', // Score as header title
+            'index': i + 2,
+            'key': 'level_$i',
+          });
+        }
       }
 
-      return row;
-    }).toList();
-
-    setState(
-        () {}); // Ensure the UI is updated after populating headers and rows
-  }
-
-  /// Create a Key for EditableState
-  final _editableKey = GlobalKey<EditableState>();
-
-  /// Merge edits into the original jsonData and return updated JSON
-  String getUpdatedJson() {
-    List editedRows = _editableKey.currentState!.editedRows;
-
-    // Apply the edits to the original jsonData
-    for (var editedRow in editedRows) {
-      int rowIndex = editedRow['row'];
-      var originalCriterion = rubric['criteria']?[rowIndex];
-
-      // For each edited level, update the corresponding level in the original data
-      editedRow.forEach((key, value) {
-        if (key != 'row' && key.startsWith('level_')) {
-          int levelIndex = int.parse(key.split('_')[1]);
-          (originalCriterion as Map<String, dynamic>)['levels']?[levelIndex]
-              ['definition'] = value;
-        }
+      // Add Remarks column
+      headers.add({
+        "title": 'Remarks', // Remarks column
+        'index': headers.length + 1,
+        'key': 'remarks',
       });
+
+      // Populate rows with criteria descriptions, level details, and remarks
+      rows = rubricCriteria.map((criterion) {
+        Map<String, dynamic> row = {
+          "name": criterion['description'], // Criterion description
+        };
+
+        // Loop through levels and add score and definition
+        List<dynamic> levels = criterion['levels'];
+        for (int i = 0; i < levels.length; i++) {
+          bool isChosen = levels[i]['chosen'] == true;
+          row['level_$i'] = {
+            'definition': levels[i]['definition'],
+            'chosen': isChosen
+          };
+        }
+
+        // Add remarks
+        row['remarks'] = criterion['remarks'] ?? '';
+
+        return row;
+      }).toList();
+    } catch (e) {
+      debugPrint('Error parsing grade JSON: $e');
     }
 
-    // Convert the updated jsonData back to the required format and return it
-    Map<String, dynamic> updatedData = {"criteria": rubric['criteria']};
-    return jsonEncode(updatedData); // Return the JSON as a string
+    setState(() {});
+  }
+
+  // Custom Widget to build rubric table
+  Widget buildRubricTable() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Table(
+        defaultColumnWidth: IntrinsicColumnWidth(),
+        border: TableBorder.all(),
+        children: [
+          // Build headers (without borders)
+          TableRow(children: [
+            for (var header in headers)
+              _buildTableCell(header['title'],
+                  isHeader: true, hasBorder: false),
+          ]),
+          // Build rows
+          for (var row in rows)
+            TableRow(children: [
+              _buildTableCell(row['name'],
+                  hasBorder: false), // Criterion Description (no border)
+              for (int i = 0; i < headers.length - 2; i++)
+                _buildTableCell(
+                  row['level_$i']['definition'], // Level Definition
+                  isChosen: row['level_$i']
+                      ['chosen'], // Check if level is chosen
+                  isScoreColumn: true, // Only apply borders for score columns
+                ),
+              _buildTableCell(row['remarks'],
+                  hasBorder: false), // Remarks (no border)
+            ]),
+        ],
+      ),
+    );
+  }
+
+  // Custom TableCell builder with optional green border if chosen is true for score columns only
+  Widget _buildTableCell(String text,
+      {bool isChosen = false,
+      bool isHeader = false,
+      bool isScoreColumn = false,
+      bool hasBorder = true}) {
+    return Container(
+      decoration: BoxDecoration(
+        border: hasBorder && isScoreColumn
+            ? Border.all(
+                color: isChosen
+                    ? Colors.green
+                    : Colors.black, // Green border if chosen, black otherwise
+                width: 2.0,
+              )
+            : Border.all(
+                color: Colors
+                    .transparent), // No border for non-score columns and headers
+      ),
+      alignment: Alignment.center, // Center align text
+      padding: const EdgeInsets.all(8.0),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
+        ),
+        textAlign: TextAlign.center,
+        overflow: TextOverflow.visible, // Allow text to expand
+        softWrap: true, // Enable text wrapping
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Edit Essay Rubric"),
-        actions: <Widget>[
-          ElevatedButton(
-            child: const Text('Finish and Assign'),
-            onPressed: () {
-              String updatedJson = getUpdatedJson();
-
-              /* **Add Button Logic**
-
-              // Navigate to the Essay Assignment Settings page with the updated JSON
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => EssayAssignmentSettings(updatedJson)));
-              print(
-                  updatedJson); // You can now see the updated JSON in the console
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text('Navigate to the Essay Assignment Page')));
-                  */
-            },
-          ),
-        ],
+        title: Text('Essay Grader'),
       ),
-      body: Row(
-        children: [
-          Expanded(
-            child: Editable(
-              key: _editableKey,
-              tdEditableMaxLines: 100,
-              trHeight: 100,
-              columnRatio: .9 / headers.length, // sets width of each column
-              columns: headers,
-              rows: rows,
-              showCreateButton: false,
-              tdStyle: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          scrollDirection:
+              Axis.horizontal, // Allow horizontal scrolling for wide tables
+          child: Column(
+            children: [
+              Text(
+                'Rubric',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              showSaveIcon: true,
-              onRowSaved: (value) {
-                print('rowsaved $value');
-              },
-              borderColor: Theme.of(context).colorScheme.primaryContainer,
-              onSubmitted: (value) {
-                print(
-                    'onsubmitted: $value'); // You can grab this data to store anywhere
-              },
-            ),
+              SizedBox(height: 20),
+              buildRubricTable(), // Display the rubric table here
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
