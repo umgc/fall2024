@@ -4,7 +4,6 @@
 // Edited by: Ben Sutter
 // Refactored for Settings Screen with matching app style
 
-import 'package:clearassistapp/ui/reusable/custom_title.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'home_screen_content.dart';
 import 'assistant_screen.dart';
 import 'gallery_screen.dart';
+import 'login_screen.dart'; // Import the login screen for navigation
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -25,45 +26,47 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Callback for changing the selected index
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == 4) {
+      // If logout icon is tapped, show the logout dialog
+      _showLogoutDialog(context);
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true, // Extend the body behind the bottom navigation bar
-      extendBodyBehindAppBar: true, // Extend the body behind the app bar
+      extendBody: true,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         leading: null,
         automaticallyImplyLeading: false,
-        backgroundColor:
-            Colors.transparent, // Transparent background for the app bar
-        elevation: 0, // Remove shadow
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         centerTitle: true,
         title: CustomTitle(),
       ),
       body: Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/images/background.jpg"),
-              fit: BoxFit.cover,
-            ),
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/background.jpg"),
+            fit: BoxFit.cover,
           ),
-          child: SafeArea(
-            child: PageStorage(
-              bucket: PageStorageBucket(), // Store the state of the pages
-              child: _widgetOptions[_selectedIndex], // Show the selected screen
-            ),
-          )),
+        ),
+        child: SafeArea(
+          child: PageStorage(
+            bucket: PageStorageBucket(),
+            child: _widgetOptions[_selectedIndex],
+          ),
+        ),
+      ),
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
-          // Background color for the BottomNavigationBar
           canvasColor: Colors.transparent,
-          // Active icon/text color
           primaryColor: Colors.white,
-          // Inactive icon/text color
           textTheme: Theme.of(context).textTheme.copyWith(
                 bodyMedium: TextStyle(color: Colors.white),
                 bodySmall: TextStyle(color: Colors.white),
@@ -74,15 +77,14 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
-          currentIndex: _selectedIndex, // Set the current index
-          onTap: _onItemTapped, // Handle tab switching
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
           selectedLabelStyle: TextStyle(color: Colors.white),
           unselectedLabelStyle: TextStyle(color: Colors.white),
           selectedItemColor: Colors.white,
           unselectedItemColor: Colors.white,
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              backgroundColor: Color(0x00ffffff),
               icon: Icon(Icons.home, color: Colors.white),
               label: 'Home',
             ),
@@ -98,9 +100,63 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icon(Icons.settings, color: Colors.white),
               label: 'Settings',
             ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.logout, color: Colors.white), // Logout icon
+              label: 'Logout',
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  // Logout dialog method
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white, // Customize the background color
+          shape: RoundedRectangleBorder(
+            borderRadius:
+                BorderRadius.all(Radius.circular(20.0)), // Rounded corners
+          ),
+          title: Text(
+            'Logout',
+            style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold), // Customize the title color
+          ),
+          content: Text(
+            'Are you sure you want to logout?',
+            style: TextStyle(
+                color: Colors.black), // Customize the content text color
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'No',
+                style: TextStyle(
+                    color: Colors.deepPurple), // Customize button text color
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: Text(
+                'Yes',
+                style: TextStyle(
+                    color: Colors.deepPurple), // Customize button text color
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                Navigator.pushReplacementNamed(context, '/loginScreen');
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
