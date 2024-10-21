@@ -5,7 +5,7 @@ import '../Api/moodle/moodle_api_singleton.dart';
 class EssayAssignmentSettings extends StatefulWidget {
   final String updatedJson;
 
-  EssayAssignmentSettings(this.updatedJson);
+  const EssayAssignmentSettings(this.updatedJson, {super.key});
 
   @override
   EssayAssignmentSettingsState createState() => EssayAssignmentSettingsState();
@@ -60,11 +60,11 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   List<String> minutes =
       List.generate(60, (index) => index.toString().padLeft(2, '0'));
 
-  TextEditingController _courseNameController = TextEditingController();
-  TextEditingController _assignmentNameController = TextEditingController();
+  final TextEditingController _courseNameController = TextEditingController();
+  final TextEditingController _assignmentNameController = TextEditingController();
 
   // Quill Editor controller
-  quill.QuillController _quillController = quill.QuillController.basic();
+  final quill.QuillController _quillController = quill.QuillController.basic();
 
   @override
   Widget build(BuildContext context) {

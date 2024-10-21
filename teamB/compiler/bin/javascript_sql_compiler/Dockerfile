@@ -10,6 +10,11 @@ COPY package*.json ./
 # Install the application dependencies
 RUN npm install
 
+# Update package list and install Python3 and pip (Python package manager) 
+RUN apt-get update && apt-get install -y \
+    python3 \
+    oython-pip
+
 # Copy the rest of the application code to the container
 COPY . .
 

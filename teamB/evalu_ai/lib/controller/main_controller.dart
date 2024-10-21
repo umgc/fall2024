@@ -277,11 +277,33 @@ class MainController {
     var moodleApi = MoodleApiSingleton();
     try {
       List<Course> courses = (await moodleApi.getCourses()).cast<Course>();
-      // if (courses.isNotEmpty) {
-      //   courses.removeAt(
-      //       0); // first course is always "Moodle" - no need to show it
-      // }
       return courses;
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      return [];
+    }
+  }
+
+  Future<List<Quiz>> getCourseQuizzes(int courseID) async {
+    var moodleApi = MoodleApiSingleton();
+    try {
+      List<Quiz> quizzes = (await moodleApi.getQuizzes(courseID)).cast<Quiz>();
+      return quizzes;
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      return [];
+    }
+  }
+
+  Future<List<Assignment>> getCourseAssignments(int courseID) async {
+    var moodleApi = MoodleApiSingleton();
+    try {
+      List<Assignment> assignment = (await moodleApi.getAssignments(courseID)).cast<Assignment>();
+      return assignment;
     } catch (e) {
       if (kDebugMode) {
         print(e);

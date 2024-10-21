@@ -326,7 +326,7 @@ class _AssignmentGeneratorState extends State<AssignmentGenerator> {
                   });
                 },
               );
-            }).toList(),
+            }),
             // Display the correct answer in green if it exists
             if (assignment.correctAnswer != null)
               Text(
