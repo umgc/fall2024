@@ -4,16 +4,16 @@ import 'package:intelligrade/ui/custom_navigation_bar.dart';
 import 'package:intelligrade/controller/main_controller.dart';
 import 'package:intelligrade/controller/essay_generation.dart'; // Import the target page
 
-class EssayEditPage extends StatefulWidget {
-  const EssayEditPage({super.key});
+class GenerateEssayPage extends StatefulWidget {
+  const GenerateEssayPage({super.key});
 
   static MainController controller = MainController();
 
   @override
-  _EssayEditPage createState() => _EssayEditPage();
+  _GenerateEssayPage createState() => _GenerateEssayPage();
 }
 
-class _EssayEditPage extends State<EssayEditPage> {
+class _GenerateEssayPage extends State<GenerateEssayPage> {
   @override
   void initState() {
     super.initState();
