@@ -38,7 +38,6 @@ class _GenerateEssayPage extends State<GenerateEssayPage> {
               ),
               child: CustomNavigationBar(selectedIndex: selectedIndex),
             ),
-            // Replace the button with the EssayGeneration page
             Expanded(
               child: EssayGeneration(
                 title:
