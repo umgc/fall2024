@@ -22,12 +22,6 @@ async function processJSRequest(req, res) {
         const { filename, encoding, mimeType } = info;
         console.log(`File [${name}]: Filename: ${filename}, Encoding: ${encoding}, MimeType: ${mimeType}`);
 
-        if (mimeType !== 'application/javascript') {
-            hasInvalidFile = true;
-            file.resume(); // Discard this file
-            return;
-        }
-
         const savePath = path.join(uploadDir, filename);
         const writeStream = fs.createWriteStream(savePath);
 
@@ -66,9 +60,14 @@ async function processJSRequest(req, res) {
 
             // Process the uploaded files
             const finalResponse = await processUploadedFiles(uploadedFiles, unitTestFile);
+            const contentLength = Buffer.byteLength(finalResponse, 'utf8');
 
-            res.writeHead(200, { 'Connection': 'close' });
-            res.end(finalResponse);
+            res.statusCode = 200;
+            res.setHeader('Content-Length', contentLength);
+            res.setHeader('Content-Type', 'text/plain');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            res.write(finalResponse);
+            res.end();
         } catch (error) {
             console.error('Error processing files:', error);
             res.writeHead(500, { 'Connection': 'close' });
@@ -98,6 +97,7 @@ async function processUploadedFiles(files, unitTestFile) {
 }
 
 async function runTest(testFile, unitTestPath) {
+  console.log(`node ${unitTestPath} ${testFile}`);
   const { stdout } = await exec(`node ${unitTestPath} ${testFile}`);
   return stdout;
 }

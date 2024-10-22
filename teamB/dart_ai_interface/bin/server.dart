@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 
-import '../lib/llm_api.dart';
+import 'package:dart_ai_interface/llm_api.dart';
 // import 'package:dart_ai_interface/llm_api.dart';
 import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intelligrade/ui/assignment_form.dart';
-import 'package:intelligrade/ui/essay_edit_page.dart';
-import 'package:intelligrade/ui/setting_page.dart';
 import 'package:intelligrade/ui/dashboard_page.dart';
-import 'package:intelligrade/ui/grading_page.dart';
+import 'package:intelligrade/ui/generate_essay_page.dart';
 import 'package:intelligrade/ui/login_page.dart';
+import 'package:intelligrade/ui/setting_page.dart';
 import 'package:intelligrade/ui/view_assignments_page.dart';
+import 'package:intelligrade/ui/code_compiler.dart';
+import 'ui/grade_essay_page.dart';
+
+
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
@@ -34,12 +37,13 @@ class MyApp extends StatelessWidget {
           home: const LoginPage(),
           routes: {
             '/login': (context) => const LoginPage(),
-            '/grading': (context) => const GradingPage(),
             '/create': (context) => const CreateAssignmentScreen(), //CreatePage(),
             '/dashboard': (context) => const DashBoardPage(savedAssignments: [],),
             '/viewAssignments': (context) => const ViewAssignmentsPage(),
             '/assignemntDetails': (context) => const AssignmentDetailsPage(assignment: {},),
-            '/editEssay': (context) => const EssayEditPage(),
+            '/generateEssay': (context) => const GenerateEssayPage(),
+            '/gradeEssay': (context) => const GradeEssayPage(),
+            '/compileCode': (context) => const CodeCompilerPage(),
             '/settings': (context) =>
                 Setting(themeModeNotifier: _themeModeNotifier)
           },

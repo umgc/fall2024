@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:intelligrade/ui/header.dart';
 import 'package:intelligrade/ui/custom_navigation_bar.dart';
+import 'package:intelligrade/ui/grading_page.dart'; // Import the target page
 import 'package:intelligrade/controller/main_controller.dart';
-import 'package:intelligrade/controller/essay_generation.dart'; // Import the target page
 
-class EssayEditPage extends StatefulWidget {
-  const EssayEditPage({super.key});
+class CodeCompilerPage extends StatefulWidget {
+  const CodeCompilerPage({super.key});
 
   static MainController controller = MainController();
 
   @override
-  _EssayEditPage createState() => _EssayEditPage();
+  _CodeCompilerPage createState() => _CodeCompilerPage();
 }
 
-class _EssayEditPage extends State<EssayEditPage> {
+class _CodeCompilerPage extends State<CodeCompilerPage> {
   @override
   void initState() {
     super.initState();
@@ -24,7 +24,7 @@ class _EssayEditPage extends State<EssayEditPage> {
     final int selectedIndex =
         ModalRoute.of(context)?.settings.arguments as int? ?? 0;
     return Scaffold(
-      appBar: const AppHeader(title: "Edit Essay"),
+      appBar: const AppHeader(title: "Compile Code"),
       body: LayoutBuilder(builder: (context, constraints) {
         return Row(
           children: [
@@ -40,9 +40,9 @@ class _EssayEditPage extends State<EssayEditPage> {
             ),
             // Replace the button with the EssayGeneration page
             Expanded(
-              child: EssayGeneration(
+              child: GradingPage(
                 title:
-                    'Create an Essay Assignment', // Pass the required parameters
+                    'Compile Code Submissions', // Pass the required parameters
               ),
             ),
           ],

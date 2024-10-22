@@ -43,14 +43,24 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
           index: 2,
         ),
         _buildListTile(
-          title: 'Edit Essay',
+          title: 'Generate Essay',
           icon: Icons.edit_note,
           index: 3,
         ),
         _buildListTile(
+          title: 'Grade Essay',
+          icon: Icons.edit_document,
+          index: 4,
+        ),
+        _buildListTile(
+          title: 'Compile Code',
+          icon: Icons.code,
+          index: 5,
+        ),
+        _buildListTile(
           title: 'Chatbot Assistance',
           icon: Icons.chat_outlined,
-          index: 4,
+          index: 6,
         ),
       ],
     );
@@ -97,10 +107,18 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
                 arguments: index);
             break;
           case 3:
-            Navigator.pushReplacementNamed(context, '/editEssay',
+            Navigator.pushReplacementNamed(context, '/generateEssay',
                 arguments: index);
             break;
           case 4:
+            Navigator.pushReplacementNamed(context, '/gradeEssay',
+                arguments: index);
+            break;
+          case 5:
+            Navigator.pushReplacementNamed(context, '/compileCode',
+                arguments: index);
+            break;
+          case 6:
             // Add navigation logic for Chatbot Assistance here
             break;
         }

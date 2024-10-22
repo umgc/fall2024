@@ -1,9 +1,9 @@
 {
   "name": "javascript_compiler",
   "version": "1.0.0",
-  "main": "javascriptCompiler.js",
+  "main": "javascriptServer.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node javascriptServer.js"
   },
   "keywords": [],
   "author": "",

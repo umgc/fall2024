@@ -1,13 +1,14 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intelligrade/ui/header.dart';
+import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
 
-import '../controller/main_controller.dart';
-import '../controller/model/beans.dart';
+import 'package:intelligrade/controller/main_controller.dart';
+import 'package:intelligrade/controller/model/beans.dart';
 
 class GradingPage extends StatefulWidget {
-  const GradingPage({super.key});
+  const GradingPage({super.key, required this.title});
+  final String title;
 
   static MainController controller = MainController();
 
@@ -18,8 +19,10 @@ class GradingPage extends StatefulWidget {
 class _GradingPageState extends State<GradingPage> {
 
   Course? _selectedCourse;
-  String? _selectedExam;
-  String? _selectedStudent;
+  Assignment? _selectedAssignment;
+  String? _selectedLanguage;
+  Participant? _selectedParticipant;
+  Submission? _selectedSubmission; 
   List<FileNameAndBytes> _studentFiles = [];
   FileNameAndBytes? _gradingFile;
   // List<String> _studentFileNamesDisplay = []; // names to display
@@ -27,19 +30,22 @@ class _GradingPageState extends State<GradingPage> {
   // Uint8List? _gradingFileBytes;
   // List<Uint8List> _studentFileBytesList = [];
 
-  final List<String> _exams = [
-    'Exam 1',
-    'Exam 2',
-    'Exam 3'
-  ]; // Example exam list
-
-  final List<String> _students = [
-    'Bill Gates',
-    'Steve Jobs',
-    'Linus Torvalds'
+  final List<String> _programmingLanguage = [
+    'C#', 
+    'C++', 
+    'Dart', 
+    'Java', 
+    'JavaScript', 
+    'Python', 
+    'SQL'
   ]; // Example student list
 
   List<Course> courses = [];
+  Iterable<Assignment> _assignments = [];
+  List<Participant> _students = [];
+  Iterable<Submission> _submissions = [];
+
+  double? _finalGrade;
 
   bool readyForUpload() {
     return _gradingFile != null && _studentFiles.isNotEmpty;
@@ -53,8 +59,39 @@ class _GradingPageState extends State<GradingPage> {
     }
     if (!readyForUpload()) return 'Invalid files';
     String output;
+    print(_selectedLanguage);
     try {
-      output = await MainController().compileCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      if (_selectedLanguage == "JavaScript") {
+        output = await MainController().compileJavascriptCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      } else if (_selectedLanguage == "SQL") {
+        output = await MainController().compileSqlCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      } else if (_selectedLanguage == "Python") {
+        output = await MainController().compilePythonCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      } else if (_selectedLanguage == "Dart") {
+        output = await MainController().compileCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      } else if (_selectedLanguage == "C#") {
+        output = await MainController().compileCSharpCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      } else if (_selectedLanguage == "C++") {
+        output = await MainController().compileCPlusPlusCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      } else {
+        output = "Please select a Programming Language";
+      }
+
+      RegExp pattern = RegExp(r'(\d+)/(\d+)\s+tests\s+passed');
+      RegExpMatch? match = pattern.firstMatch(output);
+
+      if (match != null) {
+        // Save the numerator and denominator to variables
+        int numerator = int.parse(match.group(1)!);
+        int denominator = int.parse(match.group(2)!);
+
+        double percentage = (numerator / denominator) * 100;
+        _finalGrade = percentage;
+      } else {
+        print('No match found');
+        _finalGrade = 0;
+      }
+
       return output;
     } catch (e) {
       return e.toString();
@@ -73,8 +110,8 @@ class _GradingPageState extends State<GradingPage> {
                 children: [
                   const SizedBox(height: 20),
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 20.0),
-                    child: Text(output ?? 'NO DATA'),
+                    padding: const EdgeInsets.only(bottom: 10.0),
+                    child: Text(output),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton (
@@ -82,7 +119,77 @@ class _GradingPageState extends State<GradingPage> {
                       Navigator.of(context).pop();
                     },
                     child: const Text('Close'),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton (
+                    onPressed: () async {
+                      bool gradeRes = await MoodleApiSingleton().putGrade(_selectedAssignment!.id.toString(), 
+                        _selectedParticipant!.id.toString(),
+                        _finalGrade.toString());
+                      Navigator.of(context).pop();
+                      if (gradeRes) {
+                         _showGradeSuccess();
+                      } else {
+                        _showGradeFailure();
+                      }
+                    },
+                    child: const Text('Submit Grade to Moodle'),
                   )
+                ]
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showGradeSuccess() {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Grade Successfully Submitted to Moodle!'),
+          content: SingleChildScrollView(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  ElevatedButton (
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Close'),
+                  ),
+                ]
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+    void _showGradeFailure() {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Failed to Submit Grade to Moodle'),
+          content: SingleChildScrollView(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10.0),
+                    child: Text("Please Try Again."),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton (
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Close'),
+                  ),
                 ]
             ),
           ),
@@ -96,6 +203,9 @@ class _GradingPageState extends State<GradingPage> {
     super.initState();
     MainController().getCourses().then((result) {
       courses = result;
+      for (var item in courses) {
+        print(item.fullName);
+      }
       setState((){});
     });
   }
@@ -123,8 +233,9 @@ class _GradingPageState extends State<GradingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppHeader(
-        title: 'Compile and Grade Code',
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(widget.title),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -140,50 +251,98 @@ class _GradingPageState extends State<GradingPage> {
               items: courses.map((course) {
                 return DropdownMenuItem(
                   value: course,
-                  child: Text(course.shortName),
+                  child: Text(course.fullName),
+                );
+              }).toList(),
+              onChanged: (value) async {
+                String? courseIDString = value?.id!.toString();
+                MoodleApiSingleton().getCourseParticipants(courseIDString!).then((result) {
+                  _students = result;
+                });
+                MainController().getCourseAssignments(value!.id).then((result) {
+                  Iterable<Assignment> codeAssignments = result.where((assignment) => assignment.name.contains("Code"));
+                  _assignments = codeAssignments;
+                  setState((){
+                    _selectedCourse = value;
+                  });
+                });
+              },
+            ),
+            const SizedBox(height: 20),
+            DropdownButtonFormField<Assignment>(
+              decoration: const InputDecoration(
+                labelText: 'Select Code Assignment',
+                border: OutlineInputBorder(),
+              ),
+              value: _selectedAssignment,
+              items: _assignments.map((assignment) {
+                return DropdownMenuItem (
+                  value: assignment,
+                  child: Text(assignment.name)
                 );
               }).toList(),
               onChanged: (value) {
                 setState(() {
-                  _selectedCourse = value;
+                  _selectedAssignment = value;
                 });
               },
             ),
             const SizedBox(height: 20),
             DropdownButtonFormField<String>(
               decoration: const InputDecoration(
-                labelText: 'Select Quiz',
+                labelText: 'Select Programming Language',
                 border: OutlineInputBorder(),
               ),
-              value: _selectedExam,
-              items: _exams.map((exam) {
+              value: _selectedLanguage,
+              items: _programmingLanguage.map((lang) {
                 return DropdownMenuItem<String>(
-                  value: exam,
-                  child: Text(exam),
+                  value: lang,
+                  child: Text(lang),
                 );
               }).toList(),
               onChanged: (value) {
                 setState(() {
-                  _selectedExam = value;
+                  _selectedLanguage = value;
                 });
               },
             ),
             const SizedBox(height: 20),
-            DropdownButtonFormField<String>(
+            DropdownButtonFormField<Participant>(
               decoration: const InputDecoration(
                 labelText: 'Select Student',
                 border: OutlineInputBorder(),
               ),
-              value: _selectedStudent,
+              value: _selectedParticipant,
               items: _students.map((student) {
-                return DropdownMenuItem<String>(
+                return DropdownMenuItem (
                   value: student,
-                  child: Text(student),
+                  child: Text(student.fullname),
+                );
+              }).toList(),
+              onChanged: (value) async {
+                int? assignmentID = _selectedAssignment!.id;
+                _submissions = await MoodleApiSingleton().getAssignmentSubmissions(assignmentID!);
+                setState(() {
+                  _selectedParticipant = value;
+                });
+              },
+            ),
+            const SizedBox(height: 20),
+            DropdownButtonFormField<Submission>(
+              decoration: const InputDecoration(
+                labelText: 'Select Student Submission Attempt',
+                border: OutlineInputBorder(),
+              ),
+              value: _selectedSubmission,
+              items: _submissions.map((submission) {
+                return DropdownMenuItem (
+                  value: submission,
+                  child: Text("Attempt #${submission.attemptNumber + 1}"),
                 );
               }).toList(),
               onChanged: (value) {
                 setState(() {
-                  _selectedStudent = value;
+                  _selectedSubmission = value;
                 });
               },
             ),

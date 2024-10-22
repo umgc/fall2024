@@ -13,7 +13,6 @@ async function validateSQLFile(filePath, fileName) {
         // This regex splits on semicolons that are not within quotes
         const statements = sqlContent.split(';');
 
-
         let validStatements = 0;
         let totalStatements = 0;
 
@@ -28,16 +27,15 @@ async function validateSQLFile(filePath, fileName) {
                     // console.log(`Parsed AST:`, JSON.stringify(ast, null, 2));
                     validStatements++;
                 } catch (error) {
-                    console.error(`Error in statement ${totalStatements}:`, error.message);
-                    console.error(`Problematic statement: ${stmt}`);
+                    console.log(`Invalid Statement ${totalStatements}:`, stmt);
                 }
             }
         }
 
-        console.log(`${fileName}: Validated ${validStatements} out of ${totalStatements} statements.`);
+        console.log(`${passed}/${testCases} tests passed.`);
         return validStatements === totalStatements;
     } catch (error) {
-        console.log(`${fileName}: Validated 0 statements. Error with student submission: ${error}`);
+        console.log(`${passed}/${testCases} tests passed. Error with student submission: ${error}`);
     }
 }
 

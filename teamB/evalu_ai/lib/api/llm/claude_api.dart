@@ -25,6 +25,7 @@ class ClaudeAiAPI {
     return ({
       'anthropic-version': '2023-06-01',
       'content-type': 'application/json',
+      'Anthropic-dangerous-direct-browser-access': 'true',
       'x-api-key': claudeAiKey,
     });
   }
@@ -39,6 +40,7 @@ class ClaudeAiAPI {
     if (httpPackageResponse.statusCode != 200) {
       print('Failed to retrieve the http package!');
       print('statusCode :  ${httpPackageResponse.statusCode}');
+      print('Full Response :  $httpPackageResponse');
       return "";
     }
 

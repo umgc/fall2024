@@ -1,5 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:intelligrade/api/compiler_module/compiler_api_service.dart';
+import 'package:intelligrade/api/compiler_module/javascript_api_service.dart';
+import 'package:intelligrade/api/compiler_module/python_api_service.dart';
+import 'package:intelligrade/api/compiler_module/sql_api_service.dart';
+import 'package:intelligrade/api/compiler_module/csharp_compiler_api_service.dart';
+import 'package:intelligrade/api/compiler_module/cpp_compiler_api_service.dart';
 import 'package:intelligrade/api/llm/llm_api.dart';
 import 'package:intelligrade/api/llm/prompt_engine.dart';
 import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
@@ -251,6 +256,26 @@ class MainController {
     return await CompilerApiService.compileAndGrade(files);
   }
 
+  Future<String> compileJavascriptCodeAndGetOutput(List<FileNameAndBytes> files) async {
+    return await JavascriptCompilerApiService.compileAndGrade(files);
+  }
+
+  Future<String> compileSqlCodeAndGetOutput(List<FileNameAndBytes> files) async {
+    return await SqlCompilerApiService.compileAndGrade(files);
+  }
+
+  Future<String> compilePythonCodeAndGetOutput(List<FileNameAndBytes> files) async {
+    return await PythonCompilerApiService.compileAndGrade(files);
+  }
+
+  Future<String> compileCSharpCodeAndGetOutput(List<FileNameAndBytes> files) async {
+    return await CsharpCompilerApiService.compileAndGrade(files);
+  }
+
+   Future<String> compileCPlusPlusCodeAndGetOutput(List<FileNameAndBytes> files) async {
+    return await CPlusPlusCompilerApiService.compileAndGrade(files);
+  }
+
   Future<bool> loginToMoodle(String username, String password) async {
     var moodleApi = MoodleApiSingleton();
     try {
@@ -277,11 +302,33 @@ class MainController {
     var moodleApi = MoodleApiSingleton();
     try {
       List<Course> courses = (await moodleApi.getCourses()).cast<Course>();
-      if (courses.isNotEmpty) {
-        courses.removeAt(
-            0); // first course is always "Moodle" - no need to show it
-      }
       return courses;
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      return [];
+    }
+  }
+
+  Future<List<Quiz>> getCourseQuizzes(int courseID) async {
+    var moodleApi = MoodleApiSingleton();
+    try {
+      List<Quiz> quizzes = (await moodleApi.getQuizzes(courseID)).cast<Quiz>();
+      return quizzes;
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      return [];
+    }
+  }
+
+  Future<List<Assignment>> getCourseAssignments(int courseID) async {
+    var moodleApi = MoodleApiSingleton();
+    try {
+      List<Assignment> assignment = (await moodleApi.getAssignments(courseID)).cast<Assignment>();
+      return assignment;
     } catch (e) {
       if (kDebugMode) {
         print(e);
