@@ -45,6 +45,8 @@ class _GradingPageState extends State<GradingPage> {
   List<Participant> _students = [];
   Iterable<Submission> _submissions = [];
 
+  double? _finalGrade;
+
   bool readyForUpload() {
     return _gradingFile != null && _studentFiles.isNotEmpty;
     // return _studentFileName != null && _studentFileBytesList.isNotEmpty && _gradingFileName != null && _gradingFileBytes != null;
@@ -70,6 +72,22 @@ class _GradingPageState extends State<GradingPage> {
       } else {
         output = "Please select a Programming Language";
       }
+
+      RegExp pattern = RegExp(r'(\d+)/(\d+)\s+tests\s+passed');
+      RegExpMatch? match = pattern.firstMatch(output);
+
+      if (match != null) {
+        // Save the numerator and denominator to variables
+        int numerator = int.parse(match.group(1)!);
+        int denominator = int.parse(match.group(2)!);
+
+        double percentage = (numerator / denominator) * 100;
+        _finalGrade = percentage;
+      } else {
+        print('No match found');
+        _finalGrade = 0;
+      }
+
       return output;
     } catch (e) {
       return e.toString();
@@ -100,11 +118,74 @@ class _GradingPageState extends State<GradingPage> {
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton (
-                    onPressed: () {
+                    onPressed: () async {
+                      bool gradeRes = await MoodleApiSingleton().putGrade(_selectedAssignment!.id.toString(), 
+                        _selectedParticipant!.id.toString(),
+                        _finalGrade.toString());
                       Navigator.of(context).pop();
+                      if (gradeRes) {
+                         _showGradeSuccess();
+                      } else {
+                        _showGradeFailure();
+                      }
                     },
                     child: const Text('Submit Grade to Moodle'),
                   )
+                ]
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showGradeSuccess() {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Grade Successfully Submitted to Moodle!'),
+          content: SingleChildScrollView(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  ElevatedButton (
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Close'),
+                  ),
+                ]
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+    void _showGradeFailure() {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Failed to Submit Grade to Moodle'),
+          content: SingleChildScrollView(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10.0),
+                    child: Text("Please Try Again."),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton (
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Close'),
+                  ),
                 ]
             ),
           ),
