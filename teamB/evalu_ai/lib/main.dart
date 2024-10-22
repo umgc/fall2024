@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:intelligrade/ui/assignment_details_page.dart';
 import 'package:intelligrade/ui/assignment_form.dart';
 import 'package:intelligrade/ui/essay_edit_page.dart';
 import 'package:intelligrade/ui/setting_page.dart';
@@ -37,9 +36,9 @@ class MyApp extends StatelessWidget {
             '/login': (context) => const LoginPage(),
             '/grading': (context) => const GradingPage(),
             '/create': (context) => const CreateAssignmentScreen(), //CreatePage(),
-            '/dashboard': (context) => const DashBoardPage(),
+            '/dashboard': (context) => const DashBoardPage(savedAssignments: [],),
             '/viewAssignments': (context) => const ViewAssignmentsPage(),
-            '/assignemntDetails': (context) => const AssignmentDetailsPage(),
+            '/assignemntDetails': (context) => const AssignmentDetailsPage(assignment: {},),
             '/editEssay': (context) => const EssayEditPage(),
             '/settings': (context) =>
                 Setting(themeModeNotifier: _themeModeNotifier)

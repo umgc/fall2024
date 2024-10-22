@@ -2,13 +2,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intelligrade/ui/header.dart';
 import 'package:intelligrade/ui/custom_navigation_bar.dart';
+
 import 'package:intelligrade/controller/main_controller.dart';
 import 'package:intelligrade/controller/model/beans.dart';
 
 import '../controller/html_converter.dart';
 
 class DashBoardPage extends StatefulWidget {
-  const DashBoardPage({super.key});
+  final List<Map<String, dynamic>> savedAssignments; // Store the saved quizzes
+
+  const DashBoardPage({super.key, required this.savedAssignments});
   static MainController controller = MainController();
 
   @override
@@ -16,26 +19,12 @@ class DashBoardPage extends StatefulWidget {
 }
 
 class _DashBoardPageState extends State<DashBoardPage> {
-  List<Quiz?> quizzes = []; // Initialize as an empty list
   bool _isUserLoggedIn = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchQuizzes();
     _checkUserLoginStatus();
-  }
-
-  Future<void> _fetchQuizzes() async {
-    try {
-      quizzes = DashBoardPage.controller.listAllAssessments();
-      setState(() {});
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching quizzes: $e');
-      }
-      quizzes = [];
-    }
   }
 
   Future<void> _checkUserLoginStatus() async {
@@ -43,263 +32,38 @@ class _DashBoardPageState extends State<DashBoardPage> {
     setState(() {});
   }
 
-  void _showQuizDetails(Quiz quiz) {
-    List<int> selectedQuestions = [];
-    bool regenerateMode = false;
-    bool isRegenerating = false;
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Text(quiz.name ?? 'Quiz Details'),
-              content: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.edit, color: Colors.black),
-                          label: const Text('Edit'),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            _editQuiz(quiz);
-                          },
-                        ),
-                        const SizedBox(width: 8),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.refresh, color: Colors.black),
-                          label: const Text('Regenerate Questions'),
-                          onPressed: !regenerateMode
-                              ? () {
-                                  setState(() {
-                                    regenerateMode = true;
-                                  });
-                                }
-                              : selectedQuestions.isEmpty
-                                  ? null
-                                  : () async {
-                                      setState(() {
-                                        isRegenerating = true;
-                                      });
-                                      bool result = await DashBoardPage
-                                          .controller
-                                          .regenerateQuestions(
-                                              selectedQuestions, quiz);
-                                      setState(() {
-                                        isRegenerating = false;
-                                        regenerateMode = false;
-                                        selectedQuestions.clear();
-                                      });
-                                      if (result) {
-                                        _fetchQuizzes(); // Refresh quiz list
-                                        Navigator.of(context).pop();
-                                        _showQuizDetails(quiz);
-                                      }
-                                    },
-                          style: ButtonStyle(
-                            backgroundColor:
-                                WidgetStateProperty.resolveWith<Color>(
-                                    (Set<WidgetState> states) {
-                              if (states.contains(WidgetState.disabled)) {
-                                return const Color.fromARGB(255, 220, 220, 220);
-                              }
-                              return const Color.fromARGB(255, 212, 236, 255);
-                            }),
-                          ),
-                        ),
-                        if (regenerateMode) const SizedBox(width: 8),
-                        if (regenerateMode)
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.cancel, color: Colors.black),
-                            label: const Text('Cancel Regenerate'),
-                            onPressed: () {
-                              setState(() {
-                                regenerateMode = false;
-                                selectedQuestions.clear();
-                              });
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color.fromARGB(255, 255, 124, 115),
-                            ),
-                          ),
-                      ],
-                    ),
-                    if (regenerateMode)
-                      const Padding(
-                        padding: EdgeInsets.only(top: 16.0),
-                        child: Text(
-                          'Select questions to regenerate:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    for (int i = 0; i < quiz.questionList.length; i++)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                if (regenerateMode)
-                                  Checkbox(
-                                    value: selectedQuestions.contains(i),
-                                    onChanged: (bool? value) {
-                                      setState(() {
-                                        if (value == true) {
-                                          selectedQuestions.add(i);
-                                        } else {
-                                          selectedQuestions.remove(i);
-                                        }
-                                      });
-                                    },
-                                  ),
-                                Expanded(
-                                  child: Text(
-                                    'Question ${i + 1}: ${HtmlConverter.convert(quiz.questionList[i].questionText)}',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                if (isRegenerating &&
-                                    selectedQuestions.contains(i))
-                                  const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.0,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            for (int j = 0;
-                                j < quiz.questionList[i].answerList.length;
-                                j++)
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8.0),
-                                child: Text(
-                                  '${String.fromCharCode('a'.codeUnitAt(0) + j)}) ${quiz.questionList[i].answerList[j].answerText}',
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      color: quiz.questionList[i].answerList[j]
-                                                  .fraction ==
-                                              '100'
-                                          ? Colors.green
-                                          : Colors.red),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('Close'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void _editQuiz(Quiz quiz) async {
-    List<List<TextEditingController>> controllers =
-        quiz.questionList.map((question) {
-      List<TextEditingController> questionControllers = [
-        TextEditingController(text: question.questionText)
-      ];
-      questionControllers.addAll(question.answerList
-          .map((answer) => TextEditingController(text: answer.answerText))
-          .toList());
-      return questionControllers;
-    }).toList();
-
+  void _showQuizDetails(Map<String, dynamic> quiz) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Edit Quiz'),
+          title: Text(quiz['title']),
           content: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ...controllers.asMap().entries.map((entry) {
-                  int questionIndex = entry.key;
-                  List<TextEditingController> controllersForQuestion =
-                      entry.value;
-
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextField(
-                        controller: controllersForQuestion[0],
-                        decoration: InputDecoration(
-                            labelText: 'Edit question ${questionIndex + 1}'),
-                        onChanged: (text) {
-                          quiz.questionList[questionIndex].questionText = text;
-                        },
-                      ),
-                      ...controllersForQuestion
-                          .sublist(1)
-                          .asMap()
-                          .entries
-                          .map((answerEntry) {
-                        int answerIndex = answerEntry.key;
-                        TextEditingController controller = answerEntry.value;
-
-                        return TextField(
-                          controller: controller,
-                          decoration: InputDecoration(
-                              labelText:
-                                  'Edit answer ${String.fromCharCode('a'.codeUnitAt(0) + answerIndex)}'),
-                          onChanged: (text) {
-                            quiz.questionList[questionIndex]
-                                .answerList[answerIndex].answerText = text;
-                          },
-                        );
-                      }),
-                      const SizedBox(height: 20),
-                    ],
-                  );
-                }),
+                Text('Title: ${quiz['title']}'),
+                Text('Subject: ${quiz['subject']}'),
+                Text('Type: ${quiz['type']}'),
+                Text('Number of Questions: ${quiz['numQuestions']}'),
+                Text('Status: ${quiz['status']}'),
+                Text('Date Created: ${quiz['dateCreated']}'),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Save'),
-              onPressed: () async {
-                try {
-                  DashBoardPage.controller.updateFileLocally(quiz);
-                  _fetchQuizzes(); // Refresh quiz list
-                  Navigator.of(context).pop();
-                  _showQuizDetails(quiz);
-                } catch (e) {
-                  if (kDebugMode) {
-                    print('Error updating quiz: $e');
-                  }
-                }
-              },
-            ),
-            TextButton(
-              child: const Text('Cancel'),
+              child: const Text('Close'),
               onPressed: () {
                 Navigator.of(context).pop();
-                _showQuizDetails(quiz);
+              },
+            ),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.edit),
+              label: const Text('Edit'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _editQuiz(quiz);
               },
             ),
           ],
@@ -308,13 +72,23 @@ class _DashBoardPageState extends State<DashBoardPage> {
     );
   }
 
-  Future<void> _deleteQuiz(String filename) async {
+  void _editQuiz(Map<String, dynamic> quiz) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AssignmentDetailsPage(assignment: quiz),
+      ),
+    );
+  }
+
+  // Function to handle the delete button
+  void _deleteQuiz(Map<String, dynamic> quiz) async {
     final bool? confirmDelete = await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Confirm Deletion'),
-          content: const Text('Are you sure you want to delete this quiz?'),
+          content: const Text('Are you sure you want to delete this assignment?'),
           actions: <Widget>[
             TextButton(
               child: const Text('Cancel'),
@@ -334,86 +108,21 @@ class _DashBoardPageState extends State<DashBoardPage> {
     );
 
     if (confirmDelete == true) {
-      try {
-        DashBoardPage.controller.deleteLocalFile(filename);
-        _fetchQuizzes(); // Refresh quiz list
-      } catch (e) {
-        if (kDebugMode) {
-          print('Error deleting quiz: $e');
-        }
-      }
-    }
-  }
-
-  void _downloadQuiz(Quiz quiz, bool includeAnswers) async {
-    try {
-      await DashBoardPage.controller
-          .downloadAssessmentAsPdf(quiz.name ?? '', includeAnswers);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Quiz downloaded successfully')),
-      );
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error downloading quiz: $e');
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error downloading quiz')),
-      );
-    }
-  }
-
-  Future<void> _postQuizToMoodle(Quiz quiz) async {
-    try {
-      List<Course> courses = await DashBoardPage.controller.getCourses();
-      String? selectedCourseId = await showDialog<String>(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Select Moodle Course To Post To'),
-            content: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: courses.map((course) {
-                  return ListTile(
-                    title: Text(course.fullName),
-                    onTap: () {
-                      Navigator.of(context).pop(course.id.toString());
-                    },
-                  );
-                }).toList(),
-              ),
-            ),
-          );
-        },
-      );
-
-      if (selectedCourseId != null) {
-        await DashBoardPage.controller
-            .postAssessmentToMoodle(quiz, selectedCourseId);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Quiz posted to Moodle successfully')),
-        );
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error posting quiz to Moodle: $e');
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error posting quiz to Moodle')),
-      );
+      setState(() {
+        widget.savedAssignments.remove(quiz); // Remove the assignment from the list
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final int selectedIndex =
-        ModalRoute.of(context)?.settings.arguments as int? ??
-            0; //capture index for nav bar
+        ModalRoute.of(context)?.settings.arguments as int? ?? 0;
+
     return Scaffold(
-        appBar: const AppHeader(
-          title: "Dashboard", //maybe change
-        ),
-        body: LayoutBuilder(builder: (context, constraints) {
+      appBar: const AppHeader(title: "Dashboard"),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
           return Row(
             children: <Widget>[
               Container(
@@ -426,106 +135,106 @@ class _DashBoardPageState extends State<DashBoardPage> {
                 ),
                 child: CustomNavigationBar(selectedIndex: selectedIndex),
               ),
-              quizzes.isEmpty
+              widget.savedAssignments.isEmpty
                   ? Expanded(
                       child: Column(
-                        mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text('No saved exams yet.'),
+                          const Text('No saved assignments yet.'),
                           ElevatedButton(
                             onPressed: () {
-                              Navigator.pushReplacementNamed(
-                                  context, '/create');
+                              Navigator.pushReplacementNamed(context, '/create');
                             },
-                            child: const Text('Create Exam'),
+                            child: const Text('Create Assignment'),
                           ),
                         ],
                       ),
                     )
-                  : Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: quizzes.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                Quiz quiz = quizzes[index] ?? Quiz();
-                                return Card(
-                                  elevation: 4,
-                                  margin:
-                                      const EdgeInsets.symmetric(vertical: 8),
-                                  child: ListTile(
-                                    title: Text(quiz.name ?? 'Unnamed Quiz'),
-                                    subtitle: Text(
-                                        quiz.description ?? 'No description'),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Tooltip(
-                                          message: _isUserLoggedIn
-                                              ? 'Post to Moodle'
-                                              : 'Login to Moodle to be able to post exams',
-                                          child: IconButton(
-                                            icon: const Icon(Icons.upload,
-                                                color: Colors.green),
-                                            onPressed: _isUserLoggedIn
-                                                ? () => _postQuizToMoodle(quiz)
-                                                : null,
-                                          ),
-                                        ),
-                                        Tooltip(
-                                          message: 'Download as pdf',
-                                          child: PopupMenuButton<bool>(
-                                            icon: const Icon(Icons.download,
-                                                color: Colors.blue),
-                                            tooltip: '',
-                                            onSelected: (bool includeAnswers) {
-                                              _downloadQuiz(
-                                                  quiz, includeAnswers);
-                                            },
-                                            itemBuilder:
-                                                (BuildContext context) =>
-                                                    <PopupMenuEntry<bool>>[
-                                              const PopupMenuItem<bool>(
-                                                value: true,
-                                                child: Text(
-                                                    'Download with Answers'),
-                                              ),
-                                              const PopupMenuItem<bool>(
-                                                value: false,
-                                                child: Text(
-                                                    'Download without Answers'),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Tooltip(
-                                          message: 'Delete',
-                                          child: IconButton(
-                                            icon: const Icon(Icons.delete,
-                                                color: Colors.red),
+                  : Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: widget.savedAssignments.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  final assignment = widget.savedAssignments[index];
+
+                                  return Card(
+                                    elevation: 4,
+                                    margin: const EdgeInsets.symmetric(vertical: 8),
+                                    child: ListTile(
+                                      title: Text('Title: ${assignment['title']}'),
+                                      subtitle: Text(
+                                          'Subject: ${assignment['subject']} | Type: ${assignment['type']} | # of Questions: ${assignment['numQuestions']}'),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          IconButton(
+                                            icon: const Icon(Icons.edit),
                                             onPressed: () {
-                                              _deleteQuiz(quiz.name ?? '');
+                                              _editQuiz(assignment); // Navigate to edit quiz
                                             },
                                           ),
-                                        )
-                                      ],
+                                          IconButton(
+                                            icon: const Icon(Icons.delete, color: Colors.red),
+                                            onPressed: () {
+                                              _deleteQuiz(assignment); // Prompt for deletion
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                      onTap: () {
+                                        _showQuizDetails(assignment);
+                                      },
                                     ),
-                                    onTap: () {
-                                      _showQuizDetails(quiz);
-                                    },
-                                  ),
-                                );
-                              },
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
             ],
           );
-        }));
+        },
+      ),
+    );
+  }
+}
+
+class AssignmentDetailsPage extends StatelessWidget {
+  final Map<String, dynamic> assignment;
+
+  const AssignmentDetailsPage({required this.assignment, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Edit ${assignment['title']}')),
+      body: ListView.builder(
+        itemCount: assignment['questions'].length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: TextField(
+              controller: TextEditingController(text: assignment['questions'][index]),
+              onChanged: (value) {
+                assignment['questions'][index] = value;
+              },
+              decoration: InputDecoration(labelText: 'Question ${index + 1}'),
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Handle saving the edited questions back to the dashboard or storage
+          Navigator.pop(context);
+        },
+        child: const Icon(Icons.save),
+      ),
+    );
   }
 }
