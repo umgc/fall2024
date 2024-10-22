@@ -21,10 +21,10 @@ class EssayGeneration extends StatefulWidget
 
 
   @override
-  State<EssayGeneration> createState() => _MyHomePageState();
+  State<EssayGeneration> createState() => _EssayGenerationState();
 }
 
-class _MyHomePageState extends State<EssayGeneration> 
+class _EssayGenerationState extends State<EssayGeneration> 
 {
     //Holds values for user input fields
   int _selectedPointScale = 3; // Default value
@@ -176,13 +176,13 @@ class _MyHomePageState extends State<EssayGeneration>
     _additionalCustomizationController.dispose();
     super.dispose();
   }
-  _MyHomePageState();
+  _EssayGenerationState();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         title: Text(widget.title),
       ),
       

@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:learninglens_app/Views/assessments_view.dart';
 import 'package:learninglens_app/Views/course_list.dart';
-import 'package:learninglens_app/Views/edit_questions.dart';
+import 'package:learninglens_app/Views/quiz_generator.dart';
 import 'package:learninglens_app/Views/view_submissions.dart';
 import 'package:learninglens_app/main.dart';
 import 'essay_generation.dart';
-import 'quiz_generator.dart';
-import 'view_submissions.dart';
+
 //import 'course.dart'; // Import the Courses page when available
 
 class TeacherDashboard extends StatelessWidget {
@@ -132,7 +131,7 @@ class TeacherDashboard extends StatelessWidget {
                 // Middle button (larger)
                 _buildResponsiveColumn(
                   context,
-                  'Teacher creates/views assessments.',
+                  'Teacher creates assessments.',
                   'Assessments',
                   middleDescriptionFontSize,
                   middleButtonSize,
@@ -328,7 +327,7 @@ class TeacherDashboard extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      AssessmentsView(),  // Navigate to the Assessments page
+                      CreateAssessment(),  // Navigate to the Assessments page
                 ),
               );
             } else if (title == 'Essays') {
