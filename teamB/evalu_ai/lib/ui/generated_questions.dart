@@ -28,7 +28,7 @@ class _GeneratedQuestionsPageState extends State<GeneratedQuestionsPage> {
   late List<String> _questions;
   bool _isLoading = false; // Add this for showing the loading spinner
 
-  final OpenAiLLM _openAiLLM = OpenAiLLM('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'); // Replace with your actual key
+  final OpenAiLLM _openAiLLM = OpenAiLLM('your-openai-api-key'); // Replace with your actual key
 
   @override
   void initState() {
