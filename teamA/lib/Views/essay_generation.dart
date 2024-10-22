@@ -14,21 +14,19 @@ import 'package:llm_api_modules/claudeai_api.dart';
 // 2 Buttons: 1 Generate Essay Button, 1 Send to Moodle Button
 // 1 Frame to show the rubric that was generated?
 
-class EssayGeneration extends StatefulWidget 
-{
+class EssayGeneration extends StatefulWidget {
   const EssayGeneration({super.key, required this.title});
   final String title;
-
 
   @override
   State<EssayGeneration> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<EssayGeneration> 
-{
-    //Holds values for user input fields
+class _MyHomePageState extends State<EssayGeneration> {
+  //Holds values for user input fields
   int _selectedPointScale = 3; // Default value
-  String _selectedGradeLevel = '12th grade'; // Default value for GradeLevelDropdown
+  String _selectedGradeLevel =
+      '12th grade'; // Default value for GradeLevelDropdown
   bool _isLoading = false;
   String? selectedLLM = 'Perplexity'; // default
 
@@ -36,21 +34,23 @@ class _MyHomePageState extends State<EssayGeneration>
   final List<String> llmOptions = ['ChatGPT', 'CLAUDE', 'Perplexity'];
 
   // Variables to store the text inputs
-  final TextEditingController _standardObjectiveController = TextEditingController();
-  final TextEditingController _assignmentDescriptionController = TextEditingController();
-  final TextEditingController _additionalCustomizationController = TextEditingController();
+  final TextEditingController _standardObjectiveController =
+      TextEditingController();
+  final TextEditingController _assignmentDescriptionController =
+      TextEditingController();
+  final TextEditingController _additionalCustomizationController =
+      TextEditingController();
 
   dynamic globalRubric;
   dynamic rubricasjson;
 
   // api keys
   final perplexityApiKey = dotenv.env['perplexity_apikey'] ?? '';
-  final openApiKey = dotenv.env['openai_apikey']?? 'perplexity_apikey';
-  final claudeApiKey = dotenv.env['claudeApiKey']?? 'perplexity_apikey';
+  final openApiKey = dotenv.env['openai_apikey'] ?? 'perplexity_apikey';
+  final claudeApiKey = dotenv.env['claudeApiKey'] ?? 'perplexity_apikey';
 
   // event handlers
-  void _handlePointScaleChanged(int? newValue) 
-  {
+  void _handlePointScaleChanged(int? newValue) {
     setState(() {
       if (newValue != null) {
         _selectedPointScale = newValue;
@@ -59,8 +59,7 @@ class _MyHomePageState extends State<EssayGeneration>
   }
 
   // Function to store the selected grade level value
-  void _handleGradeLevelChanged(String? newValue) 
-  {
+  void _handleGradeLevelChanged(String? newValue) {
     setState(() {
       if (newValue != null) {
         _selectedGradeLevel = newValue;
@@ -69,8 +68,7 @@ class _MyHomePageState extends State<EssayGeneration>
   }
 
   // Handle LLM Selection
-  void _handleLLMChanged(String? newValue) 
-  {
+  void _handleLLMChanged(String? newValue) {
     setState(() {
       if (newValue != null) {
         selectedLLM = newValue;
@@ -79,10 +77,8 @@ class _MyHomePageState extends State<EssayGeneration>
   }
 
   // Get api key for selected LLM
-  String getApiKey() 
-  {
-    switch (selectedLLM) 
-    {
+  String getApiKey() {
+    switch (selectedLLM) {
       case 'OpenAI':
         return openApiKey;
       case 'Claude':
@@ -93,14 +89,13 @@ class _MyHomePageState extends State<EssayGeneration>
   }
 
   Future<dynamic> pingApi(String inputs) async {
-    try
-    {
-      setState(() 
-      {
+    try {
+      setState(() {
         _isLoading = true; // Set loading state to true
       });
 
-      String apiKey = getApiKey(); // Get the correct API key based on the selected LLM
+      String apiKey =
+          getApiKey(); // Get the correct API key based on the selected LLM
       if (apiKey.isEmpty) {
         throw Exception("API key is missing");
       }
@@ -123,7 +118,7 @@ class _MyHomePageState extends State<EssayGeneration>
         Using this information, you will reply with a rubric that includes 3-5 criteria. Your reply must only contain the JSON information, and begin with a {.
         Remove any ``` from your output.
 
-        You must reply with a representation of the rubric in JSON format that matches this format: 
+        You must reply with a representation of the rubric in JSON format that exactly matches this format: 
         {
             "criteria": [
                 {
@@ -138,27 +133,23 @@ class _MyHomePageState extends State<EssayGeneration>
         #CriteriaDef must be replaced with a detailed description of what meeting that criteria would look like for each scale value.
         #ScoreValue must be replaced with a number representing the score. The score for the lowest scale value will be 0, and the scores will increase by 1 for each scale.
         You should create as many "levels" objects as there are point scale values.
+        Make sure the levels sections always have the definition key inside. That key should neve be called description.
         Here is the assignment information:
         $inputs
       ''';
       globalRubric = await llmInstance.postToLlm(queryPrompt);
       globalRubric = globalRubric.replaceAll('```', '').trim();
       return jsonDecode(globalRubric);
-    }
-    catch (e) 
-    {
+    } catch (e) {
       print("Error in API request: $e");
       return null;
-    }
-    finally 
-    {
-      setState(() 
-      {
+    } finally {
+      setState(() {
         _isLoading = false; // Reset loading state to false
       });
     }
   }
-  
+
   String getSelectedResponses() {
     return '''
       Selected Grade Level: $_selectedGradeLevel
@@ -168,6 +159,7 @@ class _MyHomePageState extends State<EssayGeneration>
       Additional Customization: ${_additionalCustomizationController.text}
     ''';
   }
+
   @override
   void dispose() {
     // Dispose the controllers when the widget is removed from the widget tree
@@ -176,6 +168,7 @@ class _MyHomePageState extends State<EssayGeneration>
     _additionalCustomizationController.dispose();
     super.dispose();
   }
+
   _MyHomePageState();
 
   @override
@@ -185,20 +178,21 @@ class _MyHomePageState extends State<EssayGeneration>
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         title: Text(widget.title),
       ),
-      
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Row( // Using Row to split screen into two sections
+        child: Row(
+          // Using Row to split screen into two sections
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             // Left Column
             Expanded(
-              flex: 2, // This controls the space for the left side, bigger ratio
+              flex:
+                  2, // This controls the space for the left side, bigger ratio
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-
-                  const Text("Rubric Generator", style: TextStyle(fontSize: 24)),
+                  const Text("Rubric Generator",
+                      style: TextStyle(fontSize: 24)),
                   const SizedBox(height: 16),
 
                   // Grade Level Dropdown
@@ -238,8 +232,7 @@ class _MyHomePageState extends State<EssayGeneration>
                     icon: Icons.mic,
                     secondaryIcon: Icons.attachment,
                     initialValue: '',
-                    onChanged: (newValue) 
-                    {
+                    onChanged: (newValue) {
                       _standardObjectiveController.text = newValue!;
                     },
                   ),
@@ -251,8 +244,7 @@ class _MyHomePageState extends State<EssayGeneration>
                     icon: Icons.mic,
                     secondaryIcon: Icons.attachment,
                     initialValue: '',
-                    onChanged: (newValue) 
-                    {
+                    onChanged: (newValue) {
                       _assignmentDescriptionController.text = newValue!;
                     },
                   ),
@@ -264,31 +256,27 @@ class _MyHomePageState extends State<EssayGeneration>
                     icon: Icons.mic,
                     secondaryIcon: Icons.attachment,
                     initialValue: '',
-                    onChanged: (newValue) 
-                    {
+                    onChanged: (newValue) {
                       _additionalCustomizationController.text = newValue!;
                     },
                   ),
 
                   const SizedBox(height: 16),
-                  
+
                   // Generate Button
-                   Button(
+                  Button(
                     'essay',
-                    onPressed: () 
-                    {
+                    onPressed: () {
                       final result = getSelectedResponses();
 
-                      pingApi(result).then((dynamic results) 
-                      {
-                        setState(() 
-                        {
+                      pingApi(result).then((dynamic results) {
+                        setState(() {
                           rubricasjson = globalRubric;
-                          globalRubric = results;  // Store the rubric
+                          globalRubric = results; // Store the rubric
                         });
                       });
                     },
-                   ),
+                  ),
                 ],
               ),
             ),
@@ -297,115 +285,139 @@ class _MyHomePageState extends State<EssayGeneration>
 
             // Right Side
             Expanded(
-            flex: 3,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  height: 600,
-                  color: Colors.grey[200],
-                  child: _isLoading // Make the container dependent on the isLoading var
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircularProgressIndicator(), // Loading spinner
-                            SizedBox(height: 16),
-                            Text(
-                              "Generating Rubric...", // Display this text when we start loading
-                              style: TextStyle(fontSize: 18, color: Colors.black54),
-                            ),
-                          ],
-                        ),
-                      )
-                    : globalRubric != null && globalRubric['criteria'] != null
-                        ? SingleChildScrollView(
-                            child: Table(
-                              border: TableBorder.all(), // Adds border to the table cells
-                              columnWidths: const 
-                              {
-                                0: FlexColumnWidth(2), // Description column
-                                // Dynamically add scores per column
-                              },
-                              children: [
-                                TableRow(
+              flex: 3,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    height: 600,
+                    color: Colors.grey[200],
+                    child:
+                        _isLoading // Make the container dependent on the isLoading var
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Criteria',
-                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                      ),
+                                    CircularProgressIndicator(), // Loading spinner
+                                    SizedBox(height: 16),
+                                    Text(
+                                      "Generating Rubric...", // Display this text when we start loading
+                                      style: TextStyle(
+                                          fontSize: 18, color: Colors.black54),
                                     ),
-
-                                    // Dynamically create score level headers
-                                    for (var level in globalRubric['criteria'][0]['levels']) // Assuming all criteria have the same number of levels
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          '${level['score']}',
-                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
                                   ],
                                 ),
+                              )
+                            : globalRubric != null &&
+                                    globalRubric['criteria'] != null
+                                ? SingleChildScrollView(
+                                    child: Table(
+                                      border: TableBorder
+                                          .all(), // Adds border to the table cells
+                                      columnWidths: const {
+                                        0: FlexColumnWidth(
+                                            1), // Description column
+                                        // Dynamically add scores per column
+                                      },
+                                      children: [
+                                        TableRow(
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Text(
+                                                'Criteria',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16),
+                                              ),
+                                            ),
 
-                                // Create rows
-                                for (var criteria in globalRubric['criteria']) ...[
-                                  TableRow(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          criteria['description'],
-                                          style: TextStyle(fontWeight: FontWeight.bold),
+                                            // Dynamically create score level headers
+                                            for (var level in globalRubric[
+                                                    'criteria'][0][
+                                                'levels']) // Assuming all criteria have the same number of levels
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  '${level['score']}',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 16),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                          ],
                                         ),
-                                      ),
 
-                                      // Add score levels for each column
-                                      for (var level in criteria['levels'])
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            '${level['definition']}',
-                                            textAlign: TextAlign.center,
+                                        // Create rows
+                                        for (var criteria
+                                            in globalRubric['criteria']) ...[
+                                          TableRow(
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  criteria['description'],
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+
+                                              // Add score levels for each column
+                                              for (var level
+                                                  in criteria['levels'])
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Text(
+                                                    '${level['definition']}',
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ),
+                                            ],
                                           ),
-                                        ),
-                                    ],
+                                        ],
+                                      ],
+                                    ),
+                                  )
+                                : Center(
+                                    child: Text(
+                                      "No Rubric Data Available",
+                                      style: TextStyle(
+                                          fontSize: 18, color: Colors.black54),
+                                    ),
                                   ),
-                                ],
-                              ],
-                            ),
-                          )
-                        : Center(
-                            child: Text(
-                              "No Rubric Data Available",
-                              style: TextStyle(fontSize: 18, color: Colors.black54),
-                            ),
-                          ),
-                ),
-                const SizedBox(height: 16),
-                // Send to Moodle Button
-                Button("assessment",
-                onPressed: (){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EssayEditPage(rubricasjson),
-                    ),
-                  );
-                },),
-              ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Send to Moodle Button
+                  Button(
+                    "assessment",
+                    onPressed: rubricasjson != null
+                        ? () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    EssayEditPage(rubricasjson),
+                              ),
+                            );
+                          }
+                        : null, // Disable button when rubricasjson is null
+                  ),
+                ],
+              ),
             ),
-          ),
           ],
         ),
       ),
     );
   }
 }
-
 
 // Create Class for Buttons
 class Button extends StatelessWidget {
@@ -416,10 +428,11 @@ class Button extends StatelessWidget {
   final VoidCallback? onPressed;
   Button._(this.type, this.text, {this.onPressed});
 
-  factory Button(String type, {VoidCallback? onPressed}) 
-  {
+  factory Button(String type, {VoidCallback? onPressed}) {
     if (type == "assessment") {
-      return Button._(type, "Send to Moodle",
+      return Button._(
+        type,
+        "Send to Moodle",
         onPressed: onPressed,
       );
     } else if (type == "essay") {
@@ -433,8 +446,7 @@ class Button extends StatelessWidget {
     }
   }
   @override
-  Widget build(BuildContext context) 
-  {
+  Widget build(BuildContext context) {
     return OutlinedButton(
         onPressed: onPressed,
         child: Row(
@@ -444,7 +456,8 @@ class Button extends StatelessWidget {
   }
 }
 
-class TextBox extends StatefulWidget { // Create stateful widget to maintain persistence in textboxes from events
+class TextBox extends StatefulWidget {
+  // Create stateful widget to maintain persistence in textboxes from events
   final String label;
   final IconData icon;
   final IconData secondaryIcon;
@@ -464,7 +477,8 @@ class TextBox extends StatefulWidget { // Create stateful widget to maintain per
   _TextBoxState createState() => _TextBoxState();
 }
 
-class _TextBoxState extends State<TextBox> { // State within
+class _TextBoxState extends State<TextBox> {
+  // State within
   late TextEditingController _controller;
 
   @override
@@ -503,8 +517,7 @@ class _TextBoxState extends State<TextBox> { // State within
   }
 }
 
-class PointScaleDropdown extends StatelessWidget 
-{
+class PointScaleDropdown extends StatelessWidget {
   final int selectedPointScale;
   // We need to store the value of the int the user inputs
   final ValueChanged<int?> onChanged;
@@ -515,20 +528,17 @@ class PointScaleDropdown extends StatelessWidget
     required this.onChanged,
   }) : super(key: key);
 
-  void _handleValueChanged(int? newValue) 
-  {
+  void _handleValueChanged(int? newValue) {
     // Additional Logic
     onChanged(newValue); // Call the passed onChanged function
   }
 
   @override
-  Widget build(BuildContext context) 
-  {
+  Widget build(BuildContext context) {
     return DropdownButtonFormField<int>(
       decoration: const InputDecoration(labelText: "Point Scale"),
       value: selectedPointScale,
-      items: [1, 2, 3, 4, 5].map((int value) 
-      {
+      items: [1, 2, 3, 4, 5].map((int value) {
         return DropdownMenuItem<int>(
           value: value,
           child: Text(value.toString()),
@@ -539,8 +549,7 @@ class PointScaleDropdown extends StatelessWidget
   }
 }
 
-class GradeLevelDropdown extends StatelessWidget 
-{
+class GradeLevelDropdown extends StatelessWidget {
   final String selectedGradeLevel;
   // We need to store the value of the string the user inputs
   final ValueChanged<String?> onChanged;
@@ -551,18 +560,16 @@ class GradeLevelDropdown extends StatelessWidget
     required this.onChanged,
   }) : super(key: key);
 
-  void _handleTextChanged(String? newValue) 
-  {
+  void _handleTextChanged(String? newValue) {
     // Additional Logic
     onChanged(newValue); // Call the passed onChanged function
   }
 
   @override
-  Widget build(BuildContext context) 
-  {
+  Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
       decoration: const InputDecoration(labelText: "Grade Level"),
-      value:  selectedGradeLevel.isNotEmpty ? selectedGradeLevel : null,
+      value: selectedGradeLevel.isNotEmpty ? selectedGradeLevel : null,
       items: <String>['9th grade', '10th grade', '11th grade', '12th grade']
           .map((String value) {
         return DropdownMenuItem<String>(

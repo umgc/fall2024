@@ -33,17 +33,18 @@ class EssayEditPageState extends State<EssayEditPage> {
     Map<String, dynamic> mappedData = jsonDecode(widget.jsonData);
     // Step 1: Build headers dynamically based on the number of levels in the first criterion
     List<dynamic> levels = List<dynamic>.from(mappedData['criteria']![0]['levels'] as List);
-    headers = [
-      {"title": 'Criteria', 'index': 1, 'key': 'name'},
-    ];
+headers = [
+  {"title": 'Criteria', 'index': 1, 'key': 'name', 'widthFactor': 0.15}, // 30% width
+];
 
-    for (int i = 0; i < levels.length; i++) {
-      headers.add({
-        "title": '${levels[i]['score']}',
-        'index': i + 2,
-        'key': 'level_$i'
-      });
-    }
+for (int i = 0; i < levels.length; i++) {
+  headers.add({
+    "title": '${levels[i]['score']}',
+    'index': i + 2,
+    'key': 'level_$i',
+    'widthFactor': 0.8/levels.length, // 10% width for each level column
+  });
+}
 
     // Step 2: Build rows by mapping each criterion and its levels dynamically
     rows = (mappedData['criteria'] ?? []).map((criterion) {
@@ -90,53 +91,76 @@ class EssayEditPageState extends State<EssayEditPage> {
     return jsonEncode(updatedData); // Return the JSON as a string
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Edit Essay Rubric"),
-        actions: <Widget>[
-          ElevatedButton(
-            child: const Text('Finish and Assign'),
-            onPressed: () {
-              String updatedJson = getUpdatedJson();
-              // Navigate to the Essay Assignment Settings page with the updated JSON
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => EssayAssignmentSettings(updatedJson)));
-              print(updatedJson); // You can now see the updated JSON in the console
-              ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Navigate to the Essay Assignment Page')));
-            },
-          ),
-        ],
-      ),
-      body: Row(
-        children: [
-          Expanded(
-            child: Editable(
-              key: _editableKey,
-              tdEditableMaxLines: 100,
-              trHeight: 100,
-              columnRatio: .9 / headers.length, // sets width of each column
-              columns: headers,
-              rows: rows,
-              showCreateButton: false,
-              tdStyle: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      title: Text("Edit Essay Rubric"),
+    ),
+    body: LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Container(
+            alignment: Alignment.topLeft, // Force the table to stay aligned to the left
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: 600, // Ensure the table never shrinks below 600px
+                maxWidth: constraints.maxWidth > 600 ? constraints.maxWidth : 600,
               ),
-              showSaveIcon: true,
-              onRowSaved: (value) {
-                print('rowsaved $value');
-              },
-              borderColor: Theme.of(context).colorScheme.primaryContainer,
-              onSubmitted: (value) {
-                print('onsubmitted: $value'); // You can grab this data to store anywhere
-              },
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Editable(
+                      key: _editableKey,
+                      tdEditableMaxLines: 100,
+                      trHeight: 100,
+                      columns: headers,
+                      rows: rows,
+                      showCreateButton: false,
+                      tdStyle: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      showSaveIcon: false,
+                      onRowSaved: (value) {
+                        print('rowsaved $value');
+                      },
+                      borderColor: Theme.of(context).colorScheme.primaryContainer,
+                      onSubmitted: (value) {
+                        print('onsubmitted: $value'); // You can grab this data to store anywhere
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 20), // Add some spacing between the Editable and the button
+                  Center(
+                    child: ElevatedButton(
+                      child: const Text('Finish and Assign'),
+                      onPressed: () {
+                        String updatedJson = getUpdatedJson();
+                        // Navigate to the Essay Assignment Settings page with the updated JSON
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                EssayAssignmentSettings(updatedJson)));
+                        print(updatedJson); // You can now see the updated JSON in the console
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Navigate to the Essay Assignment Page')));
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ],
-      ),
-    );
-  }
+        );
+      },
+    ),
+  );
+}
+
+
+
+
 }
