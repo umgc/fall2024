@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:learninglens_app/Views/assessments_view.dart';
 import 'package:learninglens_app/Views/course_list.dart';
 import 'package:learninglens_app/Views/quiz_generator.dart';
 import 'package:learninglens_app/Views/view_submissions.dart';
