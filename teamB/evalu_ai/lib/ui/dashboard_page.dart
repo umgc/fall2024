@@ -6,7 +6,7 @@ import 'package:intelligrade/controller/main_controller.dart';
 import 'package:intelligrade/controller/model/beans.dart';
 
 import '../controller/html_converter.dart';
-
+//look at the singleton file
 class DashBoardPage extends StatefulWidget {
   const DashBoardPage({super.key});
   static MainController controller = MainController();
