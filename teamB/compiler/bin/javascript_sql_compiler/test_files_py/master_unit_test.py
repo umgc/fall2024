@@ -54,7 +54,6 @@ def runTests():
     else:
         print(f"Power test failed: {powerResult} != 8")
 
-    print(f'{studentFilename}: {passed} out of {testCases} test cases passed')
-    print('-------------------------------------------------------------------')
-
+    print(f'${passed}/${testCases} tests passed.')
+    
 runTests()

@@ -3,6 +3,8 @@ import 'package:intelligrade/api/compiler_module/compiler_api_service.dart';
 import 'package:intelligrade/api/compiler_module/javascript_api_service.dart';
 import 'package:intelligrade/api/compiler_module/python_api_service.dart';
 import 'package:intelligrade/api/compiler_module/sql_api_service.dart';
+import 'package:intelligrade/api/compiler_module/csharp_compiler_api_service.dart';
+import 'package:intelligrade/api/compiler_module/cpp_compiler_api_service.dart';
 import 'package:intelligrade/api/llm/llm_api.dart';
 import 'package:intelligrade/api/llm/prompt_engine.dart';
 import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
@@ -264,6 +266,14 @@ class MainController {
 
   Future<String> compilePythonCodeAndGetOutput(List<FileNameAndBytes> files) async {
     return await PythonCompilerApiService.compileAndGrade(files);
+  }
+
+  Future<String> compileCSharpCodeAndGetOutput(List<FileNameAndBytes> files) async {
+    return await CsharpCompilerApiService.compileAndGrade(files);
+  }
+
+   Future<String> compileCPlusPlusCodeAndGetOutput(List<FileNameAndBytes> files) async {
+    return await CPlusPlusCompilerApiService.compileAndGrade(files);
   }
 
   Future<bool> loginToMoodle(String username, String password) async {

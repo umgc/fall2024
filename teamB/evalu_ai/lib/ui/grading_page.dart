@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
 
 import 'package:intelligrade/controller/main_controller.dart';
 import 'package:intelligrade/controller/model/beans.dart';
@@ -20,6 +21,8 @@ class _GradingPageState extends State<GradingPage> {
   Course? _selectedCourse;
   Assignment? _selectedAssignment;
   String? _selectedLanguage;
+  Participant? _selectedParticipant;
+  Submission? _selectedSubmission; 
   List<FileNameAndBytes> _studentFiles = [];
   FileNameAndBytes? _gradingFile;
   // List<String> _studentFileNamesDisplay = []; // names to display
@@ -39,6 +42,10 @@ class _GradingPageState extends State<GradingPage> {
 
   List<Course> courses = [];
   Iterable<Assignment> _assignments = [];
+  List<Participant> _students = [];
+  Iterable<Submission> _submissions = [];
+
+  double? _finalGrade;
 
   bool readyForUpload() {
     return _gradingFile != null && _studentFiles.isNotEmpty;
@@ -62,9 +69,29 @@ class _GradingPageState extends State<GradingPage> {
         output = await MainController().compilePythonCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
       } else if (_selectedLanguage == "Dart") {
         output = await MainController().compileCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      } else if (_selectedLanguage == "C#") {
+        output = await MainController().compileCSharpCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      } else if (_selectedLanguage == "C++") {
+        output = await MainController().compileCPlusPlusCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
       } else {
         output = "Please select a Programming Language";
       }
+
+      RegExp pattern = RegExp(r'(\d+)/(\d+)\s+tests\s+passed');
+      RegExpMatch? match = pattern.firstMatch(output);
+
+      if (match != null) {
+        // Save the numerator and denominator to variables
+        int numerator = int.parse(match.group(1)!);
+        int denominator = int.parse(match.group(2)!);
+
+        double percentage = (numerator / denominator) * 100;
+        _finalGrade = percentage;
+      } else {
+        print('No match found');
+        _finalGrade = 0;
+      }
+
       return output;
     } catch (e) {
       return e.toString();
@@ -83,8 +110,8 @@ class _GradingPageState extends State<GradingPage> {
                 children: [
                   const SizedBox(height: 20),
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 20.0),
-                    child: Text(output ?? 'NO DATA'),
+                    padding: const EdgeInsets.only(bottom: 10.0),
+                    child: Text(output),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton (
@@ -92,7 +119,77 @@ class _GradingPageState extends State<GradingPage> {
                       Navigator.of(context).pop();
                     },
                     child: const Text('Close'),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton (
+                    onPressed: () async {
+                      bool gradeRes = await MoodleApiSingleton().putGrade(_selectedAssignment!.id.toString(), 
+                        _selectedParticipant!.id.toString(),
+                        _finalGrade.toString());
+                      Navigator.of(context).pop();
+                      if (gradeRes) {
+                         _showGradeSuccess();
+                      } else {
+                        _showGradeFailure();
+                      }
+                    },
+                    child: const Text('Submit Grade to Moodle'),
                   )
+                ]
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showGradeSuccess() {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Grade Successfully Submitted to Moodle!'),
+          content: SingleChildScrollView(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  ElevatedButton (
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Close'),
+                  ),
+                ]
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+    void _showGradeFailure() {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Failed to Submit Grade to Moodle'),
+          content: SingleChildScrollView(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10.0),
+                    child: Text("Please Try Again."),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton (
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Close'),
+                  ),
                 ]
             ),
           ),
@@ -158,6 +255,10 @@ class _GradingPageState extends State<GradingPage> {
                 );
               }).toList(),
               onChanged: (value) async {
+                String? courseIDString = value?.id!.toString();
+                MoodleApiSingleton().getCourseParticipants(courseIDString!).then((result) {
+                  _students = result;
+                });
                 MainController().getCourseAssignments(value!.id).then((result) {
                   Iterable<Assignment> codeAssignments = result.where((assignment) => assignment.name.contains("Code"));
                   _assignments = codeAssignments;
@@ -170,7 +271,7 @@ class _GradingPageState extends State<GradingPage> {
             const SizedBox(height: 20),
             DropdownButtonFormField<Assignment>(
               decoration: const InputDecoration(
-                labelText: 'Select Assessment',
+                labelText: 'Select Code Assignment',
                 border: OutlineInputBorder(),
               ),
               value: _selectedAssignment,
@@ -202,6 +303,46 @@ class _GradingPageState extends State<GradingPage> {
               onChanged: (value) {
                 setState(() {
                   _selectedLanguage = value;
+                });
+              },
+            ),
+            const SizedBox(height: 20),
+            DropdownButtonFormField<Participant>(
+              decoration: const InputDecoration(
+                labelText: 'Select Student',
+                border: OutlineInputBorder(),
+              ),
+              value: _selectedParticipant,
+              items: _students.map((student) {
+                return DropdownMenuItem (
+                  value: student,
+                  child: Text(student.fullname),
+                );
+              }).toList(),
+              onChanged: (value) async {
+                int? assignmentID = _selectedAssignment!.id;
+                _submissions = await MoodleApiSingleton().getAssignmentSubmissions(assignmentID!);
+                setState(() {
+                  _selectedParticipant = value;
+                });
+              },
+            ),
+            const SizedBox(height: 20),
+            DropdownButtonFormField<Submission>(
+              decoration: const InputDecoration(
+                labelText: 'Select Student Submission Attempt',
+                border: OutlineInputBorder(),
+              ),
+              value: _selectedSubmission,
+              items: _submissions.map((submission) {
+                return DropdownMenuItem (
+                  value: submission,
+                  child: Text("Attempt #${submission.attemptNumber + 1}"),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedSubmission = value;
                 });
               },
             ),
