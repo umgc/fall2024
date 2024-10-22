@@ -19,11 +19,12 @@ class EssayGeneration extends StatefulWidget {
   final String title;
 
   @override
-  State<EssayGeneration> createState() => _MyHomePageState();
+  State<EssayGeneration> createState() => _EssayGenerationState();
 }
 
-class _MyHomePageState extends State<EssayGeneration> {
-  //Holds values for user input fields
+class _EssayGenerationState extends State<EssayGeneration> 
+{
+    //Holds values for user input fields
   int _selectedPointScale = 3; // Default value
   String _selectedGradeLevel =
       '12th grade'; // Default value for GradeLevelDropdown
@@ -168,8 +169,7 @@ class _MyHomePageState extends State<EssayGeneration> {
     _additionalCustomizationController.dispose();
     super.dispose();
   }
-
-  _MyHomePageState();
+  _EssayGenerationState();
 
   @override
   Widget build(BuildContext context) {
