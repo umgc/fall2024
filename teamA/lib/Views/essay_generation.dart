@@ -134,7 +134,8 @@ class _EssayGenerationState extends State<EssayGeneration>
         #CriteriaDef must be replaced with a detailed description of what meeting that criteria would look like for each scale value.
         #ScoreValue must be replaced with a number representing the score. The score for the lowest scale value will be 0, and the scores will increase by 1 for each scale.
         You should create as many "levels" objects as there are point scale values.
-        Make sure the levels sections always have the definition key inside. That key should neve be called description.
+        Make sure the JSON exactly matches the format above, or you will receive an error.
+        Do not include any additional information in your response.
         Here is the assignment information:
         $inputs
       ''';
