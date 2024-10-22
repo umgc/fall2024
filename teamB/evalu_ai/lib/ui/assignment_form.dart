@@ -144,7 +144,7 @@ class _AssignmentFormState extends State<AssignmentForm> {
       int numShortAnswer = int.parse(_shortAnswerController.text);
 
       // Create OpenAiLLM instance with your API key
-      const apiKey = 'your-openai-api-key'; // Replace with your actual OpenAI API key
+      const apiKey = ' '; // Replace with your actual OpenAI API key
       final openAiLLM = OpenAiLLM(apiKey);
 
       // Create the query prompt
