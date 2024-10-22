@@ -51,7 +51,7 @@ class _MyHomePageState extends State<EssayGeneration> {
   int _selectedPointScale = 3; // Default value
   String _selectedGradeLevel =
       'Advanced'; // Default value for GradeLevelDropdown
-  String? selectedLLM = 'Perplexity'; // default
+  String? selectedLLM = 'OpenAI'; // default
 
   // Variables to store the text inputs
   final TextEditingController _standardObjectiveController =
@@ -116,7 +116,7 @@ class _MyHomePageState extends State<EssayGeneration> {
       String queryPrompt = '''
         I am building a program that creates rubrics when provided with assignment information. I will provide you with the following information about the assignment that needs a rubric:
         Difficulty level, point scale, assignment objective, assignment description. You may also receive additional customization rules.
-        Using this information, you will reply with a rubric that includes 3-5 criteria. Your reply must only contain the JSON information, and begin with a {.
+        Using this information, you will reply with a rubric that includes 4-5 criteria. Your reply must only contain the JSON information, and begin with a {.
         Remove any ``` from your output.
 
         You must reply with a representation of the rubric in JSON format that matches this format: 

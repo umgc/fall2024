@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:editable/editable.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
+import '../../api/llm/openai_api.dart';
 import 'send_essay_to_moodle.dart'; // Import for JSON encoding
 
 class EssayEditor extends StatefulWidget {
@@ -13,6 +15,8 @@ class EssayEditor extends StatefulWidget {
 class EssayEditorState extends State<EssayEditor> {
   // JSON data to be used
   late dynamic jsonData;
+  final openApiKey = dotenv.env['OPENAI_API_KEY'] ?? '';
+  dynamic essayPrompt;
 
   // Convert JSON to rows compatible with Editable
   List rows = [];
@@ -25,6 +29,34 @@ class EssayEditorState extends State<EssayEditor> {
     super.initState();
     jsonData = widget.jsonData;
     populateHeadersAndRows();
+  }
+
+  //Function to query selected AI to generate a rubric
+  Future<dynamic> genPromptFromRubric(String inputs) async {
+    String queryPrompt = '''
+       I am building a program that creates essay prompts when provided with an assignment rubric. I will provide you with the assignment's rubric that will be formatted like this:
+        {
+            "criteria": [
+                {
+                    "description": #CriteriaName,
+                    "levels": [
+                        { "definition": #CriteriaDef, "score": #ScoreValue },
+                    ]
+                }
+          ]
+        }
+        #CriteriaName represents the name of the criteria.
+        #CriteriaDef represents a detailed description of what meeting that criteria would look like for each scale value.
+        #ScoreValue represents the score.
+
+        You must reply only with a 2 sentence essay prompt.
+        Here is the rubric:
+        $inputs
+      ''';
+
+    essayPrompt = await OpenAiLLM(openApiKey).postToLlm(queryPrompt);
+    essayPrompt = essayPrompt.replaceAll('```', '').trim();
+    return essayPrompt;
   }
 
 // Function to dynamically populate headers and rows based on JSON data
@@ -98,13 +130,15 @@ class EssayEditorState extends State<EssayEditor> {
             child: const Text('Finish and Assign'),
             onPressed: () {
               String updatedJson = getUpdatedJson();
-              // Navigate to the Essay Assignment Settings page with the updated JSON
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => EssayAssignmentSettings(updatedJson)));
-              print(
-                  updatedJson); // You can now see the updated JSON in the console
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text('Navigate to the Essay Assignment Page')));
+              genPromptFromRubric(updatedJson).then((dynamic results) {
+                print(results);
+                // Navigate to the Essay Assignment Settings page with the updated JSON
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) =>
+                        EssayAssignmentSettings(updatedJson, results)));
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Navigate to the Essay Assignment Page')));
+              });
             },
           ),
         ],

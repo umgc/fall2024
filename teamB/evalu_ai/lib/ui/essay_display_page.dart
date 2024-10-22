@@ -35,6 +35,20 @@ class EssayManagerPageState extends State<EssayManagerPage> {
     }
   }
 
+  Future<void> refreshCourses() async {
+    try {
+      List<Course>? newCourseList = MoodleApiSingleton().moodleCourses;
+      setState(() {
+        courses = newCourseList ?? [];
+      });
+    } catch (e) {
+      debugPrint('Error fetching courses: $e');
+      setState(() {
+        selectedCourse = null; // Handle the empty case
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,8 +70,10 @@ class EssayManagerPageState extends State<EssayManagerPage> {
               hint: Text('Select a Course'),
               onChanged: (Course? newValue) {
                 setState(() {
+                  refreshCourses();
                   selectedCourse = newValue;
                   assignments = selectedCourse!.essays!;
+                  assignments.removeWhere((item) => item.name.contains('Code'));
                 });
               },
               items: courses.map<DropdownMenuItem<Course>>((Course course) {
@@ -85,7 +101,6 @@ class EssayManagerPageState extends State<EssayManagerPage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Replace ListTile with Row to align title and button
                                   Row(
                                     children: [
                                       Expanded(
