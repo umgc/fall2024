@@ -114,12 +114,12 @@ class _MyHomePageState extends State<EssayGeneration> {
       }
 
       String queryPrompt = '''
-        I am building a program that creates rubrics when provided with assignment information. I will provide you with the following information about the assignment that needs a rubric:
+I am building a program that creates rubrics when provided with assignment information. I will provide you with the following information about the assignment that needs a rubric:
         Difficulty level, point scale, assignment objective, assignment description. You may also receive additional customization rules.
         Using this information, you will reply with a rubric that includes 4-5 criteria. Your reply must only contain the JSON information, and begin with a {.
         Remove any ``` from your output.
-
-        You must reply with a representation of the rubric in JSON format that matches this format: 
+ 
+        You must reply with a representation of the rubric in JSON format that exactly matches this format:
         {
             "criteria": [
                 {
@@ -134,14 +134,13 @@ class _MyHomePageState extends State<EssayGeneration> {
         #CriteriaDef must be replaced with a detailed description of what meeting that criteria would look like for each scale value.
         #ScoreValue must be replaced with a number representing the score. The score for the lowest scale value will be 0, and the scores will increase by 1 for each scale.
         You should create as many "levels" objects as there are point scale values.
+        Make sure the levels sections always have the definition key inside. That key should neve be called description.
         Here is the assignment information:
         $inputs
-      ''';
-      print(queryPrompt);
-      print(apiKey);
-      print(llmInstance.toString());
+        ''';
       globalRubric = await llmInstance.postToLlm(queryPrompt);
       globalRubric = globalRubric.replaceAll('```', '').trim();
+      globalRubric = globalRubric.replaceAll('json', '').trim();
       return jsonDecode(globalRubric);
     } catch (e) {
       print("Error in API request: $e");

@@ -31,7 +31,7 @@ class EssayEditorState extends State<EssayEditor> {
     populateHeadersAndRows();
   }
 
-  //Function to query selected AI to generate a rubric
+  // Function to query selected AI to generate a rubric
   Future<dynamic> genPromptFromRubric(String inputs) async {
     String queryPrompt = '''
        I am building a program that creates essay prompts when provided with an assignment rubric. I will provide you with the assignment's rubric that will be formatted like this:
@@ -59,7 +59,7 @@ class EssayEditorState extends State<EssayEditor> {
     return essayPrompt;
   }
 
-// Function to dynamically populate headers and rows based on JSON data
+  // Function to dynamically populate headers and rows based on JSON data
   void populateHeadersAndRows() {
     // Step 1: Build headers dynamically based on the number of levels in the first criterion
     List<dynamic> levels =
@@ -125,25 +125,8 @@ class EssayEditorState extends State<EssayEditor> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Edit Essay Rubric"),
-        actions: <Widget>[
-          ElevatedButton(
-            child: const Text('Finish and Assign'),
-            onPressed: () {
-              String updatedJson = getUpdatedJson();
-              genPromptFromRubric(updatedJson).then((dynamic results) {
-                print(results);
-                // Navigate to the Essay Assignment Settings page with the updated JSON
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) =>
-                        EssayAssignmentSettings(updatedJson, results)));
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Navigate to the Essay Assignment Page')));
-              });
-            },
-          ),
-        ],
       ),
-      body: Row(
+      body: Column(
         children: [
           Expanded(
             child: Editable(
@@ -159,15 +142,52 @@ class EssayEditorState extends State<EssayEditor> {
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
               ),
-              showSaveIcon: true,
-              onRowSaved: (value) {
-                print('rowsaved $value');
-              },
-              borderColor: Theme.of(context).colorScheme.primaryContainer,
+              showSaveIcon: false, // Hide row save icons
               onSubmitted: (value) {
                 print(
                     'onsubmitted: $value'); // You can grab this data to store anywhere
               },
+            ),
+          ),
+          const SizedBox(
+              height: 20), // Add some space between table and buttons
+          Padding(
+            padding: const EdgeInsets.only(
+                left: 16.0,
+                right: 16.0,
+                bottom:
+                    100.0), // Adds 16 pixels padding to left, right, and bottom
+            child: Row(
+              mainAxisAlignment:
+                  MainAxisAlignment.center, // Align buttons to the center
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    String updatedJson = getUpdatedJson();
+                    print('Saved data: $updatedJson');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Table data saved!')));
+                  },
+                  child: const Text('Save All Changes'),
+                ),
+                const SizedBox(width: 16), // Add some space between the buttons
+                ElevatedButton(
+                  child: const Text('Finish and Assign'),
+                  onPressed: () {
+                    String updatedJson = getUpdatedJson();
+                    genPromptFromRubric(updatedJson).then((dynamic results) {
+                      print(results);
+                      // Navigate to the Essay Assignment Settings page with the updated JSON
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) =>
+                              EssayAssignmentSettings(updatedJson, results)));
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content:
+                              Text('Navigate to the Essay Assignment Page')));
+                    });
+                  },
+                ),
+              ],
             ),
           ),
         ],
