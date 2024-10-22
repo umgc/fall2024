@@ -99,6 +99,7 @@ class Rubric
   String toString() {
     return toXmlString();
   }
+}
 
 // Specific Rubric Criteria
 class RubricCriteria 

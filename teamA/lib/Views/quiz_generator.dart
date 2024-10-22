@@ -34,7 +34,52 @@ class _AssessmentState extends State<CreateAssessment> {
   bool isAdvancedModeOnGetFromGlobalVarsLater = false;
   final _formKey = GlobalKey<FormState>();
   String? selectedLLM, selectedSubject;
+  bool _isLoading = false;
   _AssessmentState();
+
+
+  void generateQuiz(Map<String, TextEditingController> fields) {
+    if (_formKey.currentState!.validate()) {
+      AssignmentForm af = AssignmentForm(
+          questionType: QuestionType.shortanswer, //Potentially not necessary? Need to see about essay generator
+          subject: selectedSubject != null ? selectedSubject.toString() :  fields['subject']!.text, 
+          topic: fields['description']!.text, 
+          gradeLevel: 'Sophomore', // Get these programatically?
+          title: fields['name']!.text,
+          trueFalseCount: int.parse(fields['trueFalse']!.text),
+          shortAnswerCount: int.parse(fields['shortAns']!.text),
+          multipleChoiceCount: int.parse(fields['multipleChoice']!.text),
+          maximumGrade: 100
+        );
+        generateQuestions(af);
+    }
+  }
+
+  Future<void> generateQuestions(AssignmentForm af) async {
+    final openApiKey = dotenv.env['openai_apikey']?? 'default_openai_api_key';
+    final claudApiKey = dotenv.env['claudeai_apikey']?? 'default_claude_api_key';
+    final String perplexityApiKey = dotenv.env['perplexity_apikey']?? 'default_perplexity_api_key';
+    try {
+      setState((){_isLoading=true;});
+      final aiModel;
+      if (selectedLLM == 'ChatGPT') {
+        aiModel = OpenAiLLM(openApiKey);
+      } else if (selectedLLM == 'CLAUDE') {
+        aiModel = ClaudeAiAPI(claudApiKey);
+      } else {
+        aiModel = OpenAiLLM(perplexityApiKey); 
+      }
+      var result = await aiModel.postToLlm(PromptEngine.generatePrompt(af));
+      if (result.isNotEmpty) {
+        setState(() {_isLoading=false;});
+        Navigator.push(context, MaterialPageRoute(builder: (context) => EditQuestions(result)));
+      }
+    }
+  catch (e) {
+    print("Failure sending request to LLM: $e");
+    setState(() {_isLoading=false;});
+  }
+}
 
 
   @override
@@ -60,33 +105,54 @@ class _AssessmentState extends State<CreateAssessment> {
                     child: Column (
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        SizedBox(height: paddingHeight),
-                        TextEntry._('Assessment Name', true, CreateAssessment.nameController),
-                        SizedBox(height: paddingHeight),
-                        TextEntry._('Description', false, CreateAssessment.descriptionController, isTextArea: true,),
-                        SizedBox(height: paddingHeight),
-                        isAdvancedModeOnGetFromGlobalVarsLater ? 
-                          TextEntry._('Question Subject', true, CreateAssessment.subjectController) :
-                          DropdownButtonFormField<String>(
-                          value: selectedSubject,
-                          decoration: const InputDecoration(labelText: "Select Subject"),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedSubject = newValue;
-                            });
-                          },
-                          items: ['Math', 'Science', 'Language Arts', 'Social Studies', 'Health', 'Art', 'Music'].map((String value) {
-                                  return DropdownMenuItem(value: value, child: Text(value),);
-                                }).toList(),
-                        ),
-                        SizedBox(height: paddingHeight),
-                        TextEntry._('Question Source', false, CreateAssessment.sourceController),
-                        SizedBox(height: paddingHeight),
-                        NumberEntry._('Total Multiple Choice Questions', true, CreateAssessment.multipleChoiceController),
-                        SizedBox(height: paddingHeight),
-                        NumberEntry._('Total True / False Questions', true, CreateAssessment.trueFalseController),
-                        SizedBox(height: paddingHeight),
-                        NumberEntry._('Total Short Answer Questions', true, CreateAssessment.shortAnswerController)
+                        Container(
+                          child: _isLoading ?
+                          Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                CircularProgressIndicator(),
+                                SizedBox(height:paddingHeight,),
+                                Text('Generating Quiz Questions...',
+                                  style: TextStyle(fontSize: 18, color: Colors.black54),)
+                              ],
+                            ),
+                          ) : SingleChildScrollView(
+                                child: Table(
+                                columnWidths: const { 0 : FlexColumnWidth(2)},
+                                children: [
+                                  TableRow(children: [SizedBox(height: paddingHeight)]),
+                                  TableRow(children: [TextEntry._('Assessment Name', true, CreateAssessment.nameController)]),
+                                  TableRow(children: [SizedBox(height: paddingHeight)]),
+                                  TableRow(children: [TextEntry._('Description', false, CreateAssessment.descriptionController, isTextArea: true,)]),
+                                  TableRow(children: [SizedBox(height: paddingHeight)]),
+                                  TableRow(children: [isAdvancedModeOnGetFromGlobalVarsLater ? 
+                                    TextEntry._('Question Subject', true, CreateAssessment.subjectController) :
+                                    DropdownButtonFormField<String>(
+                                    value: selectedSubject,
+                                    decoration: const InputDecoration(labelText: "Select Subject"),
+                                    onChanged: (String? newValue) {
+                                      setState(() {
+                                        selectedSubject = newValue;
+                                      });
+                                    },
+                                    items: ['Math', 'Science', 'Language Arts', 'Social Studies', 'Health', 'Art', 'Music'].map((String value) {
+                                            return DropdownMenuItem(value: value, child: Text(value),);
+                                          }).toList(),
+                                  )]),
+                                  TableRow(children: [SizedBox(height: paddingHeight)]),
+                                  TableRow(children: [TextEntry._('Question Source', false, CreateAssessment.sourceController)]),
+                                  TableRow(children: [SizedBox(height: paddingHeight)]),
+                                  TableRow(children: [NumberEntry._('Total Multiple Choice Questions', true, CreateAssessment.multipleChoiceController)]),
+                                  TableRow(children: [SizedBox(height: paddingHeight)]),
+                                  TableRow(children: [NumberEntry._('Total True / False Questions', true, CreateAssessment.trueFalseController)]),
+                                  TableRow(children: [SizedBox(height: paddingHeight)]),
+                                  TableRow(children: [NumberEntry._('Total Short Answer Questions', true, CreateAssessment.shortAnswerController)]),
+                                ] 
+                              )
+                          )
+                        )
                       ],
                     )
                   ),
@@ -116,16 +182,15 @@ class _AssessmentState extends State<CreateAssessment> {
                           }).toList()
                         ),
                         SizedBox(height: paddingHeight),
-                        SubmitButton._(selectedSubject, selectedLLM,
-                                        { "name" : CreateAssessment.nameController, 
-                                          "description" : CreateAssessment.descriptionController,
-                                          "subject" : CreateAssessment.subjectController,
-                                          "multipleChoice" : CreateAssessment.multipleChoiceController,
-                                          "trueFalse" :  CreateAssessment.trueFalseController,
-                                          "shortAns" : CreateAssessment.shortAnswerController
-                                        },
-                                        _formKey,
-                                        context)
+                        ElevatedButton(onPressed: ()=> generateQuiz(
+                          { "name" : CreateAssessment.nameController, 
+                            "description" : CreateAssessment.descriptionController,
+                            "subject" : CreateAssessment.subjectController,
+                            "multipleChoice" : CreateAssessment.multipleChoiceController,
+                            "trueFalse" :  CreateAssessment.trueFalseController,
+                            "shortAns" : CreateAssessment.shortAnswerController
+                          }), child: Text("Submit")
+                        )
                       ],
                     ),
                   )
@@ -136,57 +201,6 @@ class _AssessmentState extends State<CreateAssessment> {
     );
   }
 }
-
-class SubmitButton extends StatelessWidget {
-  final String? selectedSubject, selectedLLM;
-  final Map<String, TextEditingController> fields;
-  final GlobalKey<FormState> formKey;
-  final BuildContext context;
-  final openApiKey = dotenv.env['openai_apikey']?? 'default_openai_api_key';
-  final claudApiKey = dotenv.env['claudeai_apikey']?? 'default_claude_api_key';
-  final String perplexityApiKey = dotenv.env['perplexity_apikey']?? 'default_perplexity_api_key';
-  SubmitButton._(this.selectedSubject,
-                 this.selectedLLM,
-                 this.fields,
-                 this.formKey,
-                 this.context);
-
-  Future<void> _submitToLLM() async {
-    if(formKey.currentState!.validate()) {
-      AssignmentForm af = AssignmentForm(
-        questionType: QuestionType.shortanswer, //Potentially not necessary? Need to see about essay generator
-        subject: selectedSubject != null ? selectedSubject.toString() :  fields['subject']!.text, 
-        topic: fields['description']!.text, 
-        gradeLevel: 'Sophomore', // Get these programatically?
-        title: fields['name']!.text,
-        trueFalseCount: int.parse(fields['trueFalse']!.text),
-        shortAnswerCount: int.parse(fields['shortAns']!.text),
-        multipleChoiceCount: int.parse(fields['multipleChoice']!.text),
-        maximumGrade: 100
-      );
-
-      final aiModel;
-      if (selectedLLM == 'ChatGPT') {
-        aiModel = OpenAiLLM(openApiKey);
-      } else if (selectedLLM == 'CLAUDE') {
-        aiModel = ClaudeAiAPI(claudApiKey);
-      } else {
-        aiModel = OpenAiLLM(perplexityApiKey); 
-      }
-      var result = await aiModel.postToLlm(PromptEngine.generatePrompt(af));
-      if (result.isNotEmpty) {
-       Navigator.push(context, MaterialPageRoute(builder: (context) => EditQuestions(result)));
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: _submitToLLM, child: Text("Submit"));
-  }
-}
-
 
 class NumberEntry extends StatelessWidget {
   final String title;
