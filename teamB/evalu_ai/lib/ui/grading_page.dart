@@ -30,8 +30,7 @@ class _GradingPageState extends State<GradingPage> {
   final List<String> _programmingLanguage = [
     'C#', 
     'C++', 
-    'Dart', 
-    'Java', 
+    'Dart',
     'JavaScript', 
     'Python', 
     'SQL'

@@ -1,4 +1,5 @@
 import 'package:http/http.dart' as http;
+import 'package:intelligrade/controller/model/beans.dart';
 import 'dart:convert';
 
 // A class representing a file with its name and byte content.
@@ -10,7 +11,7 @@ class FileNameAndBytes {
 }
 
 // Static class to access the C++ compiler service.
-class CompilerApiService {
+class CPlusPlusCompilerApiService {
   static const baseUrl = 'http://18.222.224.35:8000';
   static const compileUrl = '$baseUrl/compile/cpp';
 
