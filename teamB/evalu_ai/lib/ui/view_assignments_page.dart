@@ -8,6 +8,7 @@ import 'package:intelligrade/controller/model/beans.dart'
     show AssignmentForm, Course, QuestionType, Quiz;
 import 'package:intelligrade/ui/header.dart';
 import 'package:intelligrade/ui/custom_navigation_bar.dart';
+import 'essay_display_page.dart';
 import 'view_submissions.dart';
 
 class ViewAssignmentsPage extends StatefulWidget {
@@ -587,11 +588,7 @@ class _ViewAssignmentsPage extends State<ViewAssignmentsPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => SubmissionList(
-                                    assignmentId: 73,
-                                    courseId: '2',
-                                  ),
-                                ),
+                                    builder: (context) => EssayManagerPage()),
                               );
                             },
                             child: const Text('Test page'),
