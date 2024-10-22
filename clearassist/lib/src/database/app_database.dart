@@ -2,9 +2,6 @@ import 'package:clearassistapp/src/database/app_seed_data.dart';
 import 'package:clearassistapp/src/database/model/media.dart';
 import 'package:clearassistapp/src/database/repository/audio_repository.dart';
 import 'package:clearassistapp/src/database/repository/photo_repository.dart';
-import 'package:clearassistapp/src/database/repository/significant_object_repository.dart';
-import 'package:clearassistapp/src/database/repository/video_repository.dart';
-import 'package:clearassistapp/src/database/repository/video_response_repository.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -74,45 +71,6 @@ class AppDatabase {
         timestamp $integerType
       )
     ''');
-
-    await db.execute('''
-      CREATE TABLE $tableVideos (
-        ${mediaColumns.join(',\n')},
-        ${VideoFields.videoFileName} $textType,
-        ${VideoFields.thumbnailFileName} $textNullableType,
-        ${VideoFields.duration} $textType
-      )
-    ''');
-
-    await db.execute('''
-    CREATE TABLE $tableVideoResponses (
-      ${VideoResponseFields.id} $idType,
-      ${VideoResponseFields.title} $textType,
-      ${VideoResponseFields.timestamp} $integerType,
-      ${VideoResponseFields.referenceVideoFilePath} $textType,
-      ${VideoResponseFields.confidence} $floatType,
-      ${VideoResponseFields.left} $floatType,
-      ${VideoResponseFields.top} $floatType,
-      ${VideoResponseFields.width} $floatType,
-      ${VideoResponseFields.height} $floatType,
-      ${VideoResponseFields.address} $textNullableType,
-      ${VideoResponseFields.parents} $textNullableType
-    )
-  ''');
-
-    await db.execute('''
-    CREATE TABLE $tableSignificantObjects (
-      ${SignificantObjectFields.id} $idType,
-      ${SignificantObjectFields.objectLabel} $textNullableType,
-      ${SignificantObjectFields.customLabel} $textNullableType,
-      ${SignificantObjectFields.timestamp} $integerType,
-      ${SignificantObjectFields.imageFileName} $textType,
-      ${SignificantObjectFields.left} $floatType,
-      ${SignificantObjectFields.top} $floatType,
-      ${SignificantObjectFields.width} $floatType,
-      ${SignificantObjectFields.height} $floatType
-    )
-  ''');
 
     final appSeedData = AppSeedData();
     appSeedData.loadAppSeedData();

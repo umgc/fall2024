@@ -72,7 +72,6 @@ dependencies:
   audioplayers: ^6.1.0
   local_auth: ^2.1.7
   flutter_sound: ^9.2.13
-  assets_audio_player: ^3.1.1
   permission_handler: ^11.0.1
   speech_to_text: ^7.0.0
   audio_waveforms: ^1.0.4
