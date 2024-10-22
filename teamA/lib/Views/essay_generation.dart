@@ -182,7 +182,7 @@ class _EssayGenerationState extends State<EssayGeneration>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         title: Text(widget.title),
       ),
       
