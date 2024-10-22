@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:editable/editable.dart';
 import 'dart:convert';
 
-import '/Views/send_essay_to_moodle.dart'; // Import for JSON encoding
+import 'send_essay_to_moodle.dart'; // Import for JSON encoding
 
 class EssayEditPage extends StatefulWidget {
   final String jsonData;

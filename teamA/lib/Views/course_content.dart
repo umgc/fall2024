@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:learninglens_app/Controller/beans.dart';
+import '../Controller/beans.dart';
 import '../content_carousel.dart';
 
 //What we need:
