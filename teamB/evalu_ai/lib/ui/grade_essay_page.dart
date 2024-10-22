@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intelligrade/ui/essay_display_page.dart';
 import 'package:intelligrade/ui/header.dart';
 import 'package:intelligrade/ui/custom_navigation_bar.dart';
 import 'package:intelligrade/controller/main_controller.dart';
@@ -42,7 +43,8 @@ class _GradeEssayPage extends State<GradeEssayPage> {
             ),
             // Replace the button with the EssayGeneration page
             Expanded(
-              child: SubmissionList( assignmentId: 73, courseId: '2',),
+              child: EssayManagerPage(),
+              // Pass the required parameters
             ),
           ],
         );

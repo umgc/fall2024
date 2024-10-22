@@ -8,8 +8,10 @@ import 'dart:convert';
 
 class EssayAssignmentSettings extends StatefulWidget {
   final String updatedJson;
+  final String essayPrompt;
 
-  const EssayAssignmentSettings(this.updatedJson, {super.key});
+  const EssayAssignmentSettings(this.updatedJson, this.essayPrompt,
+      {super.key});
 
   @override
   EssayAssignmentSettingsState createState() => EssayAssignmentSettingsState();
@@ -17,6 +19,7 @@ class EssayAssignmentSettings extends StatefulWidget {
 
 class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   // Global key for the form
+  late String essayPrompt;
   final _formKey = GlobalKey<FormState>();
 
   // Date selection variables for "Allow submissions from"
@@ -63,7 +66,7 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   TextEditingController _assignmentNameController = TextEditingController();
 
   // Quill Editor controller
-  final quill.QuillController _quillController = quill.QuillController.basic();
+  quill.QuillController _quillController = quill.QuillController.basic();
 
   // List of courses fetched from the controller
   List<Course> courses = [];
@@ -73,7 +76,21 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
   void initState() {
     super.initState();
     fetchCourses(); // Fetch courses on page load
+    essayPrompt = widget.essayPrompt;
     populateHeadersAndRows();
+    print(essayPrompt);
+    updateQuillContent(essayPrompt);
+  }
+
+  void updateQuillContent(String newContent) {
+    // Clear existing content and set the new content
+    final doc = quill.Document()..insert(0, newContent);
+    setState(() {
+      _quillController = quill.QuillController(
+        document: doc,
+        selection: const TextSelection.collapsed(offset: 0),
+      );
+    });
   }
 
 // Fetch courses from the controller
@@ -228,8 +245,7 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true, // Center the title in the AppBar
-        title: Text('Learning Lens',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text('EvaluAI', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Theme.of(context)
             .colorScheme
             .primaryContainer, // Use primary container color
