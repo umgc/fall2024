@@ -43,7 +43,7 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
           index: 2,
         ),
         _buildListTile(
-          title: 'Edit Essay',
+          title: 'Create Essay',
           icon: Icons.edit_note,
           index: 3,
         ),

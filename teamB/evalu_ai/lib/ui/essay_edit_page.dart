@@ -24,7 +24,7 @@ class _EssayEditPage extends State<EssayEditPage> {
     final int selectedIndex =
         ModalRoute.of(context)?.settings.arguments as int? ?? 0;
     return Scaffold(
-      appBar: const AppHeader(title: "Edit Essay"),
+      appBar: const AppHeader(title: "Create Essay"),
       body: LayoutBuilder(builder: (context, constraints) {
         return Row(
           children: [

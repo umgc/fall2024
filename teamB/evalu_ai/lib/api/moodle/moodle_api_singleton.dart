@@ -111,40 +111,6 @@ class MoodleApiSingleton {
     }
   }
 
-  Future<List<Quiz>> getQuizzes(int? courseID) async {
-    if (_userToken == null) throw StateError('User not logged in to Moodle');
-
-    // URL of the Moodle server
-    final response = await http.post(Uri.parse(moodleURL + serverUrl), body: {
-      'wstoken': _userToken,
-      'wsfunction': 'mod_quiz_get_quizzes_by_courses',
-      'moodlewsrestformat': 'json',
-    });
-
-    if (response.statusCode != 200) {
-      throw HttpException(response.body);
-    }
-
-    List<dynamic>? decodedJson =
-        (jsonDecode(response.body) as Map<String, dynamic>)['quizzes'];
-    if (decodedJson == null) {
-      return [];
-    }
-
-    List<Quiz> results = [];
-    for (int i = 0; i < decodedJson.length; i++) {
-      if (courseID == null || decodedJson[i]['course'] == courseID) {
-        results.insert(
-            results.length,
-            Quiz(
-                name: decodedJson[i]['name'],
-                description: decodedJson[i]['intro'],
-                id: decodedJson[i]['id']));
-      }
-    }
-    return results;
-  }
-
   Future<List<Assignment>> getEssays(int? courseID) async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
 
@@ -553,34 +519,6 @@ class MoodleApiSingleton {
       }
     }
     return results;
-  }
-
-    Future<bool> setRubricGrades(int assignmentId, int userId, String jsonGrades) async {
-    if (_userToken == null) throw StateError('User not logged in to Moodle');
-    try {
-      final response = await http.post(
-        Uri.parse(moodleURL + serverUrl),
-        body: {
-          'wstoken': _userToken,
-          'wsfunction': 'local_learninglens_write_rubric_grades',
-          'moodlewsrestformat': 'json',
-          'assignmentid': assignmentId.toString(),
-          'userid': userId.toString(),
-          'rubricgrades': jsonGrades,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        print('Failed to load grades. Status code: ${response.statusCode}');
-        return false;
-      }
-    } catch (e, stackTrace) {
-      print('Error fetching grades: $e');
-      print('StackTrace: $stackTrace');
-      return false;
-    }
   }
 
   // ********************************************************************************************************************
