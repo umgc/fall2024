@@ -14,7 +14,6 @@ class CreateAssessment extends StatefulWidget {
   static TextEditingController nameController = TextEditingController();
   static TextEditingController descriptionController = TextEditingController();
   static TextEditingController subjectController = TextEditingController();
-  static TextEditingController sourceController = TextEditingController();
   static TextEditingController multipleChoiceController = TextEditingController();
   static TextEditingController trueFalseController = TextEditingController();
   static TextEditingController shortAnswerController = TextEditingController();
@@ -33,7 +32,9 @@ class _AssessmentState extends State<CreateAssessment> {
   double paddingHeight = 16.0, paddingWidth=32;
   bool isAdvancedModeOnGetFromGlobalVarsLater = false;
   final _formKey = GlobalKey<FormState>();
-  String? selectedLLM, selectedSubject;
+  String? selectedLLM, selectedSubject, selectedGradeLevel;
+  List<String> _gradeLevels = ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'];
+  List<String> _subjects = ['Math', 'Science', 'Language Arts', 'Social Studies', 'Health', 'Art', 'Music'];
   bool _isLoading = false;
   _AssessmentState();
 
@@ -41,10 +42,9 @@ class _AssessmentState extends State<CreateAssessment> {
   void generateQuiz(Map<String, TextEditingController> fields) {
     if (_formKey.currentState!.validate()) {
       AssignmentForm af = AssignmentForm(
-          questionType: QuestionType.shortanswer, //Potentially not necessary? Need to see about essay generator
           subject: selectedSubject != null ? selectedSubject.toString() :  fields['subject']!.text, 
           topic: fields['description']!.text, 
-          gradeLevel: 'Sophomore', // Get these programatically?
+          gradeLevel: selectedGradeLevel.toString(), // Get these programatically?
           title: fields['name']!.text,
           trueFalseCount: int.parse(fields['trueFalse']!.text),
           shortAnswerCount: int.parse(fields['shortAns']!.text),
@@ -137,12 +137,23 @@ class _AssessmentState extends State<CreateAssessment> {
                                         selectedSubject = newValue;
                                       });
                                     },
-                                    items: ['Math', 'Science', 'Language Arts', 'Social Studies', 'Health', 'Art', 'Music'].map((String value) {
+                                    items: _subjects.map((String value) {
                                             return DropdownMenuItem(value: value, child: Text(value),);
                                           }).toList(),
                                   )]),
                                   TableRow(children: [SizedBox(height: paddingHeight)]),
-                                  TableRow(children: [TextEntry._('Question Source', false, CreateAssessment.sourceController)]),
+                                  TableRow(children: [DropdownButtonFormField<String>(
+                                    value: selectedGradeLevel,
+                                    decoration: const InputDecoration(labelText: "Select Grade Level"),
+                                    onChanged: (String? newValue) {
+                                      setState(() {
+                                        selectedGradeLevel = newValue;
+                                      });
+                                    },
+                                    items: _gradeLevels.map((String value) {
+                                            return DropdownMenuItem(value: value, child: Text(value),);
+                                          }).toList(),
+                                  )]),
                                   TableRow(children: [SizedBox(height: paddingHeight)]),
                                   TableRow(children: [NumberEntry._('Total Multiple Choice Questions', true, CreateAssessment.multipleChoiceController)]),
                                   TableRow(children: [SizedBox(height: paddingHeight)]),
