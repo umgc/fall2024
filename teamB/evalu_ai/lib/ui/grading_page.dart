@@ -69,6 +69,10 @@ class _GradingPageState extends State<GradingPage> {
         output = await MainController().compilePythonCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
       } else if (_selectedLanguage == "Dart") {
         output = await MainController().compileCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      } else if (_selectedLanguage == "C#") {
+        output = await MainController().compileCSharpCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
+      } else if (_selectedLanguage == "C++") {
+        output = await MainController().compileCPlusPlusCodeAndGetOutput(List.from(_studentFiles)..add(_gradingFile!));
       } else {
         output = "Please select a Programming Language";
       }
