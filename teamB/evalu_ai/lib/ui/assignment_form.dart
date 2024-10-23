@@ -1,9 +1,11 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intelligrade/ui/custom_navigation_bar.dart';
 import 'package:intelligrade/ui/dashboard_page.dart';
 import 'package:intelligrade/ui/generated_questions.dart';
+import 'package:intelligrade/ui/edit_questions.dart';
 import 'package:intelligrade/api/llm/openai_api.dart';
 import 'package:intelligrade/ui/header.dart';
 
@@ -147,8 +149,8 @@ class _AssignmentQuizFormState extends State<AssignmentQuizForm> {
       int numShortAnswer = int.parse(_shortAnswerController.text);
 
       // Create OpenAiLLM instance with your API key
-      const apiKey = 'your-openai-api-key'; // Replace with your actual OpenAI API key
-      final openAiLLM = OpenAiLLM(apiKey);
+      var apiKey = dotenv.env['OPENAI_API_KEY'];
+      final openAiLLM = OpenAiLLM(apiKey!);
 
       // Create the query prompt
       String queryPrompt = '''
@@ -164,13 +166,13 @@ class _AssignmentQuizFormState extends State<AssignmentQuizForm> {
       String generatedQuestions = await openAiLLM.queryAI(queryPrompt);
 
     // Split the generated questions into a list (assuming they are separated by newlines)
-    List<String> questionList = generatedQuestions.split('\n');  // Adjust the delimiter based on your AI's response
+      // List<String> questionList = generatedQuestions.split('\n');  // Adjust the delimiter based on your AI's response
 
       // Navigate to a new page to view the generated questions
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => GeneratedQuestionsPage(generatedQuestions: questionList),
+          builder: (context) => EditQuestions(generatedQuestions),
         ),
       );
     }

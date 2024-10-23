@@ -36,8 +36,8 @@ class EditQuestionsState extends State<EditQuestions> {
       // Handle the case where the API key is null
       throw Exception('API key is not set in the environment variables');
     }
-    myQuiz.name = CreateAssessment.nameController.text;
-    myQuiz.description = CreateAssessment.descriptionController.text;
+    myQuiz.name = "Test Quiz";
+    myQuiz.description = "Test Description";
 
     promptstart =
         'Create a question that is compatible with Moodle XML import. Be a bit creative in how you design the question and answers, making sure it is engaging but still on the subject of $subject and related to $topic. Make sure the XML specification is included, and the question is wrapped in the quiz XML element required by Moodle. Each answer should have feedback that fits the Moodle XML format, and avoid using HTML elements within a CDATA field. The quiz should be challenging and thought-provoking, but appropriate for high school students who speak English. The quesiton typ shoud be ';
