@@ -148,9 +148,9 @@ class Quiz {
   List<Question> questionList = <Question>[]; // list of questions on the quiz.
   String? promptUsed;
   int? id; // quiz id, null if the quiz doesn't exist in Moodle yet
-
+  int? coursedId;
   // Constructor with all optional params.
-  Quiz({this.name, this.description, this.id, List<Question>? questionList})
+  Quiz({this.name, this.coursedId, this.description, this.id, List<Question>? questionList})
       : questionList = questionList ?? [];
 
   // XML factory constructor using XML string
