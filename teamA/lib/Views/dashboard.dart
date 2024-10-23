@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/Views/assessments_view.dart';
 import 'package:learninglens_app/Views/course_list.dart';
+import 'package:learninglens_app/Views/essays_view.dart';
 import 'package:learninglens_app/Views/quiz_generator.dart';
 import 'package:learninglens_app/Views/view_submissions.dart';
 import 'package:learninglens_app/main.dart';
@@ -326,7 +328,7 @@ class TeacherDashboard extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      CreateAssessment(),  // Navigate to the Assessments page
+                      AssessmentsView(),  // Navigate to the Assessments page
                 ),
               );
             } else if (title == 'Essays') {
@@ -334,7 +336,7 @@ class TeacherDashboard extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      const EssayGeneration(title: 'Essay Generation'),
+                      EssaysView(), // Navigate to the Assignments page
                 ),
               );
             }
