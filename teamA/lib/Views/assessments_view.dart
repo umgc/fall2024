@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:learninglens_app/Api/moodle_api_singleton.dart";
 import "package:learninglens_app/Controller/beans.dart";
+import "package:learninglens_app/Controller/custom_appbar.dart";
 import "package:learninglens_app/content_carousel.dart";
 
 
@@ -20,12 +21,15 @@ class _AssessmentsState extends State{
   @override
   Widget build(BuildContext context){
     return Scaffold(
-      appBar: AppBar(),
+      appBar: CustomAppBar(
+    title: 'All Assessments',
+    userprofileurl: MoodleApiSingleton().moodleProfileImage ?? '', // Pass your image URL here
+  ),
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children:[
-            Text('All Quizzes', style: TextStyle(fontSize: 64)),
+            // Text('All Quizzes', style: TextStyle(fontSize: 64)),
             ContentCarousel('assessment', getAllQuizzes()),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

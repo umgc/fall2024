@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:learninglens_app/Controller/custom_appbar.dart';
 import '../Api/moodle_api_singleton.dart';
 import '../Controller/beans.dart';
 import 'view_submission_detail.dart';
@@ -46,11 +47,7 @@ class SubmissionListState extends State<SubmissionList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        title: Text("View Submissions"),
-        actions: [],
-      ),
+      appBar: CustomAppBar(title: 'Submissions', userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),
       body: Stack(
         children: [
           FutureBuilder<List<Participant>>(

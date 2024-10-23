@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/Controller/custom_appbar.dart';
 import 'package:learninglens_app/Views/view_submissions.dart';
 import '../Controller/beans.dart';
 import '../Api/moodle_api_singleton.dart';
@@ -119,10 +120,7 @@ class SubmissionDetailState extends State<SubmissionDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        title: Text('Submission Details'),
-      ),
+      appBar: CustomAppBar(title: 'Submission Details', userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : Padding(

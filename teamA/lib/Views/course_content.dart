@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/Api/moodle_api_singleton.dart';
+import 'package:learninglens_app/Controller/custom_appbar.dart';
 import '../Controller/beans.dart';
 import '../content_carousel.dart';
 
@@ -32,8 +34,7 @@ class _CourseState extends State<ViewCourseContents> {
 @override
 Widget build(BuildContext context) {
   return Scaffold(
-    appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-    title: Text('$courseName Content')),
+    appBar: CustomAppBar(title: 'Course Content', userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),
     body: SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start, // Keeps everything left-aligned

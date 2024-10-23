@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:learninglens_app/Controller/custom_appbar.dart';
 import '/Controller/beans.dart';
 import 'dart:convert';
 import '../Api/moodle_api_singleton.dart';
@@ -234,14 +235,7 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
             0.2; // Description box takes 20% of screen width height
 
         return Scaffold(
-          appBar: AppBar(
-            centerTitle: true, // Center the title in the AppBar
-            title: Text('Learning Lens',
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            backgroundColor: Theme.of(context)
-                .colorScheme
-                .primaryContainer, // Use primary container color
-          ),
+          appBar: CustomAppBar(title: 'Assign Essay', userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),
           body: SingleChildScrollView(
             padding: EdgeInsets.all(14.0),
             child: Form(

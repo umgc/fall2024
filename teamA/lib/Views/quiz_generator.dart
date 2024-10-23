@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:learninglens_app/Api/llm/prompt_engine.dart';
 import 'package:learninglens_app/Api/llm_api.dart';
+import 'package:learninglens_app/Api/moodle_api_singleton.dart';
 import 'package:learninglens_app/Controller/beans.dart';
+import 'package:learninglens_app/Controller/custom_appbar.dart';
 import 'edit_questions.dart';
 import 'package:llm_api_modules/openai_api.dart';
 import 'package:llm_api_modules/claudeai_api.dart';
@@ -88,12 +90,7 @@ class _AssessmentState extends State<CreateAssessment> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        title: Text('Learning Lens',
-          style: TextStyle(fontWeight: FontWeight.bold)),
-      ),
+      appBar: CustomAppBar(title: 'Create Assessment', userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),
       body: Form(
           key: _formKey,
           child:

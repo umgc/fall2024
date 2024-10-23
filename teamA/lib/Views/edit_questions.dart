@@ -1,8 +1,7 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:learninglens_app/Controller/custom_appbar.dart';
 import 'package:learninglens_app/Views/send_quiz_to_moodle.dart';
-
 import '../Api/moodle_api_singleton.dart';
-import 'package:image_network/image_network.dart';
 import '../Controller/beans.dart';
 import 'package:flutter/material.dart';
 import 'package:llm_api_modules/openai_api.dart';
@@ -47,38 +46,11 @@ class EditQuestionsState extends State<EditQuestions> {
 
   @override
   Widget build(BuildContext context) {
-    var userprofileurl = MoodleApiSingleton().moodleProfileImage!;
-
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 100,
-        title: Text('Learning Lens - Edit Questions'),
-        actions: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(right: 10.0),
-            child: InkWell(
-              onTap: () {
-                // Add your action here, like navigating to a new page
-                print("Profile image clicked!");
-                // Navigator.push(...);
-              },
-              child: Material(
-                color: Colors.transparent,
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    // color: Colors.white, //remove this when you add image.
-                  ),
-                  child: ImageNetwork(
-                      image: userprofileurl, height: 100, width: 100),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+  appBar: CustomAppBar(
+    title: 'Edit Questions',
+    userprofileurl: MoodleApiSingleton().moodleProfileImage ?? '', // Pass your image URL here
+  ),
       body: Column(
         children: [
           Padding(

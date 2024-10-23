@@ -92,14 +92,16 @@ class _ContentState extends State<ContentCarousel> {
                       ),
                     );
                   } else if (type == 'essay') {
+                    print ((children[value] as CarouselCard).courseId?.toString());
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => SubmissionList(
                               assignmentId:
                                   (children[value] as CarouselCard).id,
-                              courseId: courseId.toString()),
-                        ));
+                              courseId: (children[value] as CarouselCard).courseId?.toString() ?? '',
+                              // courseId.toString()),
+                        )));
                   }
                 },
                 children: children,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/Controller/custom_appbar.dart';
 import 'package:learninglens_app/Views/course_content.dart';
 import '../Controller/beans.dart'; // Assuming this contains the Course class
 import '../Api/moodle_api_singleton.dart';
@@ -16,19 +17,7 @@ class CourseList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        elevation: 0,
-        centerTitle: true,
-        title: Text(
-          'Learning Lens - Courses',
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+      appBar: CustomAppBar(title: 'Courses', userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),
       body: FutureBuilder<List<Course>>(
         future: courses,
         builder: (context, snapshot) {

@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/Api/moodle_api_singleton.dart';
+import 'package:learninglens_app/Controller/custom_appbar.dart';
 import 'package:learninglens_app/Views/assessments_view.dart';
 import 'package:learninglens_app/Views/course_list.dart';
 import 'package:learninglens_app/Views/essays_view.dart';
-import 'package:learninglens_app/Views/quiz_generator.dart';
-import 'package:learninglens_app/Views/view_submissions.dart';
-import 'package:learninglens_app/main.dart';
-import 'essay_generation.dart';
 
-//import 'course.dart'; // Import the Courses page when available
 
 class TeacherDashboard extends StatelessWidget {
   const TeacherDashboard({super.key});
@@ -15,49 +12,7 @@ class TeacherDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Learning Lens'),
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.account_circle,
-              color: Theme.of(context).colorScheme.onPrimaryContainer,
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MyApp(),
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(
-              Icons.account_circle,
-              color: Theme.of(context).colorScheme.onPrimaryContainer,
-            ),
-            onPressed: () {
-              // Handle profile/account actions here
-            },
-          ),
-          IconButton(
-              icon: Icon(
-                Icons.edit, // Icon for Edit Questions button
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
-              ),
-              onPressed: () {
-                // Navigate to the EditQuestions page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SubmissionList(assignmentId: 52, courseId: '4'),
-                  ),
-                );
-              })
-        ],
-      ),
+      appBar: CustomAppBar(title: 'Learning Lens', userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: LayoutBuilder(
         builder: (context, constraints) {

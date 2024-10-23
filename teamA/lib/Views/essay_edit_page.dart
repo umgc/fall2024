@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:editable/editable.dart';
+import 'package:learninglens_app/Api/moodle_api_singleton.dart';
+import 'package:learninglens_app/Controller/custom_appbar.dart';
 import 'dart:convert';
 
 import 'send_essay_to_moodle.dart'; // Import for JSON encoding
@@ -94,10 +96,7 @@ for (int i = 0; i < levels.length; i++) {
 @override
 Widget build(BuildContext context) {
   return Scaffold(
-    appBar: AppBar(
-      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-      title: Text("Edit Essay Rubric"),
-    ),
+    appBar: CustomAppBar(title: 'Edit Essay Rubric', userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),  
     body: LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
