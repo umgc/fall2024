@@ -2,26 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:intelligrade/ui/assignment_form.dart';
 import 'package:intelligrade/ui/dashboard_page.dart';
 import 'package:intelligrade/api/llm/openai_api.dart';
-
+import 'package:intelligrade/ui/custom_navigation_bar.dart';
+import 'package:intelligrade/ui/header.dart';
 
 class GeneratedQuestionsPage extends StatefulWidget {
   final List<String> generatedQuestions;
+  final String assignmentTitle; // Adding title for the assignment
+  final String subject; // Adding subject for the assignment
+  final String type; // Adding type for the assignment
 
-  const GeneratedQuestionsPage({super.key, required this.generatedQuestions});
+  const GeneratedQuestionsPage({
+    Key? key,
+    required this.generatedQuestions,
+    required this.assignmentTitle, // Required assignment title
+    required this.subject, // Required assignment subject
+    required this.type, 
+  }) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _GeneratedQuestionsPageState createState() => _GeneratedQuestionsPageState();
 }
 
 class _GeneratedQuestionsPageState extends State<GeneratedQuestionsPage> {
   late List<String> _questions;
-  final OpenAiLLM _openAiLLM = OpenAiLLM('your-openai-api-key');
+  bool _isLoading = false; // Add this for showing the loading spinner
+  final OpenAiLLM _openAiLLM = OpenAiLLM('');
 
   @override
   void initState() {
     super.initState();
-    _questions = List.from(widget.generatedQuestions); // Copy initial questions
+    // Filter out any empty or whitespace-only strings from the list of questions
+    _questions = widget.generatedQuestions
+        .map((question) => question.trim()) // Trim any leading/trailing whitespace
+        .where((question) => question.isNotEmpty) // Only keep non-empty questions
+        .toList();
   }
 
   // Function to regenerate a single question
@@ -34,6 +48,9 @@ class _GeneratedQuestionsPageState extends State<GeneratedQuestionsPage> {
 
   // Function to regenerate all questions
   Future<void> _regenerateAllQuestions() async {
+    setState(() {
+      _isLoading = true; // Show loading indicator
+    });
     List<String> regeneratedQuestions = [];
     for (var i = 0; i < _questions.length; i++) {
       String regeneratedQuestion = await _openAiLLM.queryAI('Regenerate question $i');
@@ -41,6 +58,7 @@ class _GeneratedQuestionsPageState extends State<GeneratedQuestionsPage> {
     }
     setState(() {
       _questions = regeneratedQuestions; // Replace with all regenerated questions
+      _isLoading = false; // Hide loading indicator
     });
   }
 
@@ -83,15 +101,38 @@ class _GeneratedQuestionsPageState extends State<GeneratedQuestionsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      appBar: const AppHeader(title: 'Generated Questions'), // Using the same Header component
+      body: Row(
         children: [
-          const Header(), // Keep the header the same
+          Container(
+            width: 250,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.blueGrey,
+                width: 0.5,
+              ),
+            ),
+            child: CustomNavigationBar(selectedIndex: 0), // Add navigation bar
+          ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Text(
+                        'Assignment Title: ${widget.assignmentTitle}',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        'Subject: ${widget.subject}',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Text(
+                        'Type: ${widget.type}',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 20),
                   const Text(
                     'Generated Questions',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -152,6 +193,10 @@ class _GeneratedQuestionsPageState extends State<GeneratedQuestionsPage> {
               ),
             ),
           ),
+          if (_isLoading)
+            Center(
+              child: CircularProgressIndicator(), // Loading spinner
+            ),
         ],
       ),
     );
