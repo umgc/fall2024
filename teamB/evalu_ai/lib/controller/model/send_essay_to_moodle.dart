@@ -78,7 +78,6 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
     fetchCourses(); // Fetch courses on page load
     essayPrompt = widget.essayPrompt;
     populateHeadersAndRows();
-    print(essayPrompt);
     updateQuillContent(essayPrompt);
   }
 
@@ -96,11 +95,14 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
 // Fetch courses from the controller
   Future<void> fetchCourses() async {
     try {
-      List<Course>? courseList = MoodleApiSingleton().moodleCourses;
-      setState(() {
-        courses = courseList ?? [];
-        // Don't auto-select any course here, leave it to the user to select.
-        selectedCourse = 'Select a course';
+      var api = MoodleApiSingleton();
+      //List<Course>? courseList = await api.getCourses();
+      api.getCourses().then((results) {
+        setState(() {
+          courses = results;
+          // Don't auto-select any course here, leave it to the user to select.
+          selectedCourse = 'Select a course';
+        });
       });
     } catch (e) {
       debugPrint('Error fetching courses: $e');

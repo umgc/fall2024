@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
 import '/controller/model/beans.dart';
 import 'view_submissions.dart';
+import '../controller/main_controller.dart';
 
 class EssayManagerPage extends StatefulWidget {
   @override
@@ -16,37 +17,11 @@ class EssayManagerPageState extends State<EssayManagerPage> {
   @override
   void initState() {
     super.initState();
-    fetchCourses(); // Fetch courses on page load
-  }
-
-  // Fetch courses from the controller
-  Future<void> fetchCourses() async {
-    try {
-      List<Course>? courseList = MoodleApiSingleton().moodleCourses;
-      setState(() {
-        courses = courseList ?? [];
-        selectedCourse = null; // No auto-selection; the user selects a course.
-      });
-    } catch (e) {
-      debugPrint('Error fetching courses: $e');
-      setState(() {
-        selectedCourse = null; // Handle the empty case
-      });
-    }
-  }
-
-  Future<void> refreshCourses() async {
-    try {
-      List<Course>? newCourseList = MoodleApiSingleton().moodleCourses;
-      setState(() {
-        courses = newCourseList ?? [];
-      });
-    } catch (e) {
-      debugPrint('Error fetching courses: $e');
-      setState(() {
-        selectedCourse = null; // Handle the empty case
-      });
-    }
+    MoodleApiSingleton().getCourses().then((result) {
+      courses = result;
+      selectedCourse = null;
+      setState(() {});
+    });
   }
 
   @override
@@ -68,10 +43,10 @@ class EssayManagerPageState extends State<EssayManagerPage> {
             DropdownButton<Course>(
               value: selectedCourse,
               hint: Text('Select a Course'),
-              onChanged: (Course? newValue) {
+              onChanged: (newValue) {
                 setState(() {
-                  refreshCourses();
                   selectedCourse = newValue;
+                  print(selectedCourse?.essays);
                   assignments = selectedCourse!.essays!;
                   assignments.removeWhere((item) => item.name.contains('Code'));
                 });
