@@ -103,6 +103,7 @@ dependencies:
   intl: any
   form_field_validator: ^1.1.0
   flutter_contacts: ^1.1.9+2
+  shared_preferences: ^2.3.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
