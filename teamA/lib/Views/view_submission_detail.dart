@@ -215,57 +215,7 @@ class SubmissionDetailState extends State<SubmissionDetail> {
     if (rubric == null)
       return Container(); // No rubric, return an empty container
 
-  // First row: Header row with scores and remarks
-  tableRows.add(
-    TableRow(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primaryContainer,
-      ),
-      children: [
-        TableCell(
-          child: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text(
-              'Criteria',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
-              ),
-            ),
-          ),
-        ),
-        ...rubric!.criteria.first.levels.map((level) {
-          return TableCell(
-            child: Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Align(
-                alignment: Alignment.center,
-                child: Text(
-                  '${level.score} pts',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-        TableCell(
-          child: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text(
-              'Remarks',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
-              ),
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
+    List<TableRow> tableRows = [];
 
     // First row: Header row with scores and remarks
     tableRows.add(
@@ -274,7 +224,6 @@ class SubmissionDetailState extends State<SubmissionDetail> {
           color: Theme.of(context).colorScheme.primaryContainer,
         ),
         children: [
-          // Criterion description
           TableCell(
             child: Padding(
               padding: EdgeInsets.all(8.0),
@@ -325,7 +274,6 @@ class SubmissionDetailState extends State<SubmissionDetail> {
         ],
       ),
     );
-  }
 
     // Add rows for each criterion
     for (var criterion in rubric!.criteria) {
