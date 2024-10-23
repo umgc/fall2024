@@ -96,15 +96,18 @@ class SubmissionDetailState extends State<SubmissionDetail> {
         );
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
         await Future.delayed(snackBar.duration);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SubmissionList(
-              assignmentId: widget.submission.assignmentId,
-              courseId: widget.courseId,
+        if (mounted) {
+          Navigator.pop(context);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SubmissionList(
+                assignmentId: widget.submission.assignmentId,
+                courseId: widget.courseId,
+              ),
             ),
-          ),
-        );
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to update grades.')),

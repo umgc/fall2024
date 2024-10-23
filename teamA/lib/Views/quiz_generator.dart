@@ -2,6 +2,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:learninglens_app/Api/llm/prompt_engine.dart';
+import 'package:learninglens_app/Api/llm_api.dart';
 import 'package:learninglens_app/Controller/beans.dart';
 import 'edit_questions.dart';
 import 'package:llm_api_modules/openai_api.dart';
@@ -67,7 +68,8 @@ class _AssessmentState extends State<CreateAssessment> {
       } else if (selectedLLM == 'CLAUDE') {
         aiModel = ClaudeAiAPI(claudApiKey);
       } else {
-        aiModel = OpenAiLLM(perplexityApiKey); 
+        // aiModel = OpenAiLLM(perplexityApiKey); 
+        aiModel = LlmApi(perplexityApiKey);
       }
       var result = await aiModel.postToLlm(PromptEngine.generatePrompt(af));
       if (result.isNotEmpty) {
