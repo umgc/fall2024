@@ -57,7 +57,7 @@ class _AssessmentState extends State<CreateAssessment> {
 
   Future<void> generateQuestions(AssignmentForm af) async {
     final openApiKey = dotenv.env['openai_apikey']?? 'default_openai_api_key';
-    final claudApiKey = dotenv.env['claudeai_apikey']?? 'default_claude_api_key';
+    final claudApiKey = dotenv.env['claudeApiKey']?? 'default_claude_api_key';
     final String perplexityApiKey = dotenv.env['perplexity_apikey']?? 'default_perplexity_api_key';
     try {
       setState((){_isLoading=true;});
