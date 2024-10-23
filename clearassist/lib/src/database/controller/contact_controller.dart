@@ -1,10 +1,7 @@
 import 'dart:io';
 
-import 'package:clearassistapp/src/address.dart';
-import 'package:clearassistapp/src/database/model/media_type.dart';
 import 'package:clearassistapp/src/database/model/contact.dart';
 import 'package:clearassistapp/src/database/repository/contact_repository.dart';
-import 'package:clearassistapp/src/utils/constants.dart';
 import 'package:clearassistapp/src/utils/directory_manager.dart';
 import 'package:clearassistapp/src/utils/file_manager.dart';
 import 'package:clearassistapp/src/utils/logger.dart';
