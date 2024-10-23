@@ -49,7 +49,7 @@ class CreateAssignmentScreen extends StatelessWidget {
                     child: SingleChildScrollView(
                       child: Padding(
                         padding: EdgeInsets.all(20),
-                        child: AssignmentForm(),
+                        child: AssignmentQuizForm(),
                       ),
                     ),
                   ),
@@ -113,15 +113,15 @@ class Header extends StatelessWidget {
 }
 
 
-class AssignmentForm extends StatefulWidget {
-  const AssignmentForm({super.key});
+class AssignmentQuizForm extends StatefulWidget {
+  const AssignmentQuizForm({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _AssignmentFormState createState() => _AssignmentFormState();
+  _AssignmentQuizFormState createState() => _AssignmentQuizFormState();
 }
 
-class _AssignmentFormState extends State<AssignmentForm> {
+class _AssignmentQuizFormState extends State<AssignmentQuizForm> {
   String _selectedType = 'Quiz';
   String _selectedSubject = 'Usability Engineering 661';
   String _selectedDifficulty = 'Medium';
