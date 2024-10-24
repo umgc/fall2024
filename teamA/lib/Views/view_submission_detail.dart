@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:learninglens_app/Controller/custom_appbar.dart';
 import 'package:learninglens_app/Views/view_submissions.dart';
-import '../Controller/beans.dart';
+import 'package:learninglens_app/Controller/beans.dart';
 import '../Api/moodle_api_singleton.dart';
 import 'dart:math';
 
@@ -158,9 +158,9 @@ class SubmissionDetailState extends State<SubmissionDetail> {
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 8),
-                    widget.submission.onlineText.isNotEmpty
+                    widget.submission.onlineText.isNotEmpty 
                         ? Text(
-                            widget.submission.onlineText,
+                            widget.submission.onlineText.replaceAll(RegExp(r"<[^>]*>"), ""),
                             style: TextStyle(fontSize: 16),
                           )
                         : Text(

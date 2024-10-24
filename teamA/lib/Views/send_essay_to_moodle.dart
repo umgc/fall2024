@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:learninglens_app/Controller/custom_appbar.dart';
-import '/Controller/beans.dart';
+import 'package:learninglens_app/Controller/beans.dart';
 import 'dart:convert';
 import '../Api/moodle_api_singleton.dart';
 
@@ -59,6 +59,7 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
       List.generate(60, (index) => index.toString().padLeft(2, '0'));
 
   TextEditingController _assignmentNameController = TextEditingController();
+  TextEditingController _assignmentSectionController = TextEditingController();
 
   // Quill Editor controller
   final quill.QuillController _quillController = quill.QuillController.basic();
@@ -235,7 +236,9 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
             0.2; // Description box takes 20% of screen width height
 
         return Scaffold(
-          appBar: CustomAppBar(title: 'Assign Essay', userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),
+          appBar: CustomAppBar(
+              title: 'Assign Essay',
+              userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),
           body: SingleChildScrollView(
             padding: EdgeInsets.all(14.0),
             child: Form(
@@ -257,6 +260,21 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                   SizedBox(height: 20),
                   sectionTitle(title: 'General'),
                   _buildCourseDropdown(),
+                  SizedBox(height: 12),
+                  TextFormField(
+                    controller: _assignmentSectionController,
+                    decoration: InputDecoration(
+                      labelText: 'Section Number',
+                      border: OutlineInputBorder(),
+                    ),
+                    // Adding validator to ensure assignment name is not empty
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a section number';
+                      }
+                      return null;
+                    },
+                  ),
                   SizedBox(height: 12),
                   TextFormField(
                     controller: _assignmentNameController,
@@ -427,6 +445,8 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                                     .toString();
                                 String assignmentName =
                                     _assignmentNameController.text;
+                                String sectionNumber =
+                                    _assignmentSectionController.text;
                                 String description =
                                     _quillController.document.toPlainText();
                                 String dueDate =
@@ -436,7 +456,7 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
 
                                 await api.createAssignment(
                                   courseId,
-                                  '1', // Section ID
+                                  sectionNumber, // Section ID
                                   assignmentName,
                                   allowSubmissionFrom,
                                   dueDate,

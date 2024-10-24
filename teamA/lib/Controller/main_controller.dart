@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../Api/moodle_api_singleton.dart';
-import '../Controller/beans.dart';
+import 'package:learninglens_app/Controller/beans.dart';
 
 class MainController 
 {

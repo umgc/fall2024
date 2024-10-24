@@ -4,7 +4,7 @@ import 'package:learninglens_app/Views/essay_generation.dart';
 import 'package:learninglens_app/Views/quiz_generator.dart';
 import 'package:learninglens_app/Views/view_quiz.dart';
 import 'package:learninglens_app/Views/view_submissions.dart';
-import "Controller/beans.dart";
+import 'package:learninglens_app/Controller/beans.dart';
 
 //Provides a carousel of either assessments, essays, or submission
 class ContentCarousel extends StatefulWidget {

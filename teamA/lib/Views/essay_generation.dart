@@ -432,7 +432,7 @@ class Button extends StatelessWidget {
     if (type == "assessment") {
       return Button._(
         type,
-        "Send to Moodle",
+        "Continue (Edit Rubric)",
         onPressed: onPressed,
       );
     } else if (type == "essay") {

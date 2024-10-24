@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:learninglens_app/Controller/custom_appbar.dart';
 import 'package:learninglens_app/Views/course_content.dart';
-import '../Controller/beans.dart'; // Assuming this contains the Course class
+import 'package:learninglens_app/Controller/beans.dart';
 import '../Api/moodle_api_singleton.dart';
 
 // This is the course list UI

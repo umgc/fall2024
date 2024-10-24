@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:learninglens_app/Controller/custom_appbar.dart';
 import '../Api/moodle_api_singleton.dart';
-import '../Controller/beans.dart';
+import 'package:learninglens_app/Controller/beans.dart';
 import 'view_submission_detail.dart';
 import '../Api/llm_api.dart';
 import 'dart:convert';

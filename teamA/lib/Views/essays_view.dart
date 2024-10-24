@@ -26,7 +26,6 @@ class _EssaysState extends State{
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children:[
-            Text('All Essays', style: TextStyle(fontSize: 64)),
             ContentCarousel('essay', getAllEssays()),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

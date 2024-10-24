@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'html_converter.dart';
 import 'package:xml/xml.dart';
 
-import 'beans.dart';
+import 'package:learninglens_app/Controller/beans.dart';
 
 // Static utility class for Moodle XML related functions.
 class XmlConverter {

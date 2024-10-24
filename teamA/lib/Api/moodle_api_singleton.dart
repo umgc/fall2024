@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import '../Controller/beans.dart';
+import 'package:learninglens_app/Controller/beans.dart';
 
 // Singleton class for Moodle API access.
 class MoodleApiSingleton {
@@ -667,7 +667,7 @@ Future<bool> isUserTeacher(List<Course> moodleCourses) async {
   // ********************************************************************************************************************
 
   Future<int?> createQuiz(
-      String courseid, String quizname, String quizintro) async {
+      String courseid, String quizname, String quizintro, String sectionid, String timeopen, String timeclose) async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
     // const String url = 'webservice/rest/server.php';
     try {
@@ -680,6 +680,9 @@ Future<bool> isUserTeacher(List<Course> moodleCourses) async {
           'courseid': courseid,
           'name': quizname,
           'intro': quizintro,
+          'sectionid': sectionid,
+          'timeopen': timeopen,
+          'timeclose': timeclose,
         },
       );
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:learninglens_app/Controller/beans.dart';
 import 'package:learninglens_app/Controller/custom_appbar.dart';
+import 'package:learninglens_app/Views/dashboard.dart';
 import '../Api/moodle_api_singleton.dart';
 
 class QuizMoodle extends StatefulWidget {
@@ -149,11 +150,14 @@ class QuizMoodleState extends State<QuizMoodle> {
   late TextEditingController quizNameController;
   TextEditingController gradeController = TextEditingController();
   late TextEditingController quizQuestionsController;
+  TextEditingController quizSectionController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: 'Assign Assessment', userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),
+      appBar: CustomAppBar(
+          title: 'Assign Assessment',
+          userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(15.0),
         child: Column(
@@ -187,6 +191,17 @@ class QuizMoodleState extends State<QuizMoodle> {
                 border: OutlineInputBorder(),
               ),
               enabled: false,
+            ),
+            SizedBox(height: 15),
+
+            sectionTitle(title: 'Section Number'),
+            SizedBox(height: 15),
+            TextField(
+              controller: quizSectionController,
+              decoration: InputDecoration(
+                labelText: 'Course Section Number',
+                border: OutlineInputBorder(),
+              ),
             ),
             SizedBox(height: 15),
 
@@ -298,73 +313,73 @@ class QuizMoodleState extends State<QuizMoodle> {
             ),
             SizedBox(height: 16),
 
-            // Grading Section
-            sectionTitle(title: 'Grade'),
-            SizedBox(height: 15),
+            // // Grading Section
+            // sectionTitle(title: 'Grade'),
+            // SizedBox(height: 15),
 
-            sectionTitle(title: 'Grade Categories:'),
-            DropdownButton<String>(
-              value: selectedCategory,
-              icon: Icon(Icons.keyboard_arrow_down),
-              items: categoryItems.map((String item) {
-                return DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(item),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedCategory = newValue!;
-                });
-              },
-            ),
-            SizedBox(height: 16),
+            // sectionTitle(title: 'Grade Categories:'),
+            // DropdownButton<String>(
+            //   value: selectedCategory,
+            //   icon: Icon(Icons.keyboard_arrow_down),
+            //   items: categoryItems.map((String item) {
+            //     return DropdownMenuItem<String>(
+            //       value: item,
+            //       child: Text(item),
+            //     );
+            //   }).toList(),
+            //   onChanged: (String? newValue) {
+            //     setState(() {
+            //       selectedCategory = newValue!;
+            //     });
+            //   },
+            // ),
+            // SizedBox(height: 16),
 
-            sectionTitle(title: 'Grade to Pass:'),
-            TextField(
-              controller: gradeController,
-              decoration: InputDecoration(
-                labelText: 'Enter grade',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 16),
+            // sectionTitle(title: 'Grade to Pass:'),
+            // TextField(
+            //   controller: gradeController,
+            //   decoration: InputDecoration(
+            //     labelText: 'Enter grade',
+            //     border: OutlineInputBorder(),
+            //   ),
+            // ),
+            // SizedBox(height: 16),
 
-            sectionTitle(title: 'Attempts Allowed:'),
-            DropdownButton<String>(
-              value: selectedAttempt,
-              icon: Icon(Icons.keyboard_arrow_down),
-              items: attemptItems.map((String attempt) {
-                return DropdownMenuItem<String>(
-                  value: attempt,
-                  child: Text(attempt),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedAttempt = newValue!;
-                });
-              },
-            ),
-            SizedBox(height: 16),
+            // sectionTitle(title: 'Attempts Allowed:'),
+            // DropdownButton<String>(
+            //   value: selectedAttempt,
+            //   icon: Icon(Icons.keyboard_arrow_down),
+            //   items: attemptItems.map((String attempt) {
+            //     return DropdownMenuItem<String>(
+            //       value: attempt,
+            //       child: Text(attempt),
+            //     );
+            //   }).toList(),
+            //   onChanged: (String? newValue) {
+            //     setState(() {
+            //       selectedAttempt = newValue!;
+            //     });
+            //   },
+            // ),
+            // SizedBox(height: 16),
 
-            sectionTitle(title: 'Grading Method:'),
-            DropdownButton<String>(
-              value: selectedGradingMethod,
-              icon: Icon(Icons.keyboard_arrow_down),
-              items: gradingMethodItems.map((String method) {
-                return DropdownMenuItem<String>(
-                  value: method,
-                  child: Text(method),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedGradingMethod = newValue!;
-                });
-              },
-            ),
-            SizedBox(height: 16),
+            // sectionTitle(title: 'Grading Method:'),
+            // DropdownButton<String>(
+            //   value: selectedGradingMethod,
+            //   icon: Icon(Icons.keyboard_arrow_down),
+            //   items: gradingMethodItems.map((String method) {
+            //     return DropdownMenuItem<String>(
+            //       value: method,
+            //       child: Text(method),
+            //     );
+            //   }).toList(),
+            //   onChanged: (String? newValue) {
+            //     setState(() {
+            //       selectedGradingMethod = newValue!;
+            //     });
+            //   },
+            // ),
+            // SizedBox(height: 16),
 
             Directionality(
               textDirection: TextDirection.ltr,
@@ -377,6 +392,9 @@ class QuizMoodleState extends State<QuizMoodle> {
                         selectedCourse,
                         widget.quiz.name ?? 'Quiz Name',
                         widget.quiz.description ?? 'Quiz Description',
+                        quizSectionController.text,
+                        '$selectedDaySubmission $selectedMonthSubmission $selectedYearSubmission $selectedHourSubmission:$selectedMinuteSubmission',
+                        '$selectedDayDue $selectedMonthDue $selectedYearDue $selectedHourDue:$selectedMinuteDue',
                       );
                       print('Quiz ID: $quizid');
                       var categoryid = await MoodleApiSingleton()
@@ -386,22 +404,46 @@ class QuizMoodleState extends State<QuizMoodle> {
                           .addRandomQuestions(categoryid.toString(),
                               quizid.toString(), quizQuestionsController.text);
                       print('Random Result: $randomresult');
+
+                      if (mounted) {
+                        if (randomresult == 'true') {
+                          final snackBar = SnackBar(
+                            content: Text('Quiz submitted successfully!'),
+                            duration: Duration(seconds: 2),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          await Future.delayed(snackBar.duration);
+                          if (mounted) {
+                            Navigator.pop(context);
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TeacherDashboard(),
+                              ),
+                            );
+                          }
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Failed to update grades.')),
+                          );
+                        }
+                      }
                     },
                     child: Text(
                       'Send to Moodle',
                       textDirection: TextDirection.ltr,
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Back to quiz action
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                      'Go back to update quiz',
-                      textDirection: TextDirection.ltr,
-                    ),
-                  ),
+                  // ElevatedButton(
+                  //   onPressed: () {
+                  //     // Back to quiz action
+                  //     Navigator.pop(context);
+                  //   },
+                  //   child: Text(
+                  //     'Go back to update quiz',
+                  //     textDirection: TextDirection.ltr,
+                  //   ),
+                  // ),
                 ],
               ),
             ),
