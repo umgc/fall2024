@@ -497,7 +497,7 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
       children: [
         Text(label),
         Wrap(
-          spacing: 8.0, // Space between dropdowns
+          spacing: 10.0, // Space between dropdowns
           runSpacing: 8.0, // Space between rows when wrapping
           children: [
             _buildDropdownButton(days, selectedDay, onDayChanged, isEnabled),
