@@ -152,8 +152,7 @@ class QuizMoodleState extends State<QuizMoodle> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        home: Scaffold(
+    return Scaffold(
       appBar: CustomAppBar(title: 'Assign Assessment', userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(15.0),
@@ -409,7 +408,7 @@ class QuizMoodleState extends State<QuizMoodle> {
           ],
         ),
       ),
-    ));
+    );
   }
 
   // Dropdown Builder
