@@ -3,7 +3,6 @@ import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:intelligrade/ui/dashboard_page.dart';
 import '/controller/model/beans.dart';
 import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
-import '/controller/model/essay_editor.dart';
 import 'dart:convert';
 
 class EssayAssignmentSettings extends StatefulWidget {
