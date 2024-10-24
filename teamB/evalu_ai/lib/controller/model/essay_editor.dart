@@ -18,6 +18,9 @@ class EssayEditorState extends State<EssayEditor> {
   final openApiKey = dotenv.env['OPENAI_API_KEY'] ?? '';
   dynamic essayPrompt;
 
+  // Variables to track the button state
+  bool isAssigning = false;
+
   // Convert JSON to rows compatible with Editable
   List rows = [];
 
@@ -172,20 +175,31 @@ class EssayEditorState extends State<EssayEditor> {
                 ),
                 const SizedBox(width: 16), // Add some space between the buttons
                 ElevatedButton(
-                  child: const Text('Finish and Assign'),
-                  onPressed: () {
-                    String updatedJson = getUpdatedJson();
-                    genPromptFromRubric(updatedJson).then((dynamic results) {
-                      print(results);
-                      // Navigate to the Essay Assignment Settings page with the updated JSON
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              EssayAssignmentSettings(updatedJson, results)));
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content:
-                              Text('Navigate to the Essay Assignment Page')));
-                    });
-                  },
+                  onPressed: isAssigning
+                      ? null
+                      : () async {
+                          setState(() {
+                            isAssigning =
+                                true; // Disable the button and change the text
+                          });
+
+                          String updatedJson = getUpdatedJson();
+                          await genPromptFromRubric(updatedJson)
+                              .then((dynamic results) {
+                            print(results);
+                            // Navigate to the Essay Assignment Settings page with the updated JSON
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => EssayAssignmentSettings(
+                                    updatedJson, results)));
+                          });
+
+                          setState(() {
+                            isAssigning =
+                                false; // Re-enable the button and reset the text
+                          });
+                        },
+                  child:
+                      Text(isAssigning ? 'Assigning...' : 'Finish and Assign'),
                 ),
               ],
             ),
