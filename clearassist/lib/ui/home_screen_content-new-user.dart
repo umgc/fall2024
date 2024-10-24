@@ -4,7 +4,6 @@ import '../src/utils/contact_display.dart';
 import 'calendar_screen.dart';
 import 'assistant_screen.dart';
 import 'gallery_screen.dart';
-import 'response_screen.dart';
 import 'audio_screen.dart';
 import 'location_history_screen.dart';
 import 'tour_screen.dart';
