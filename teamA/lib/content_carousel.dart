@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:learninglens_app/Api/moodle_api_singleton.dart';
 import 'package:learninglens_app/Views/essay_generation.dart';
 import 'package:learninglens_app/Views/quiz_generator.dart';
 import 'package:learninglens_app/Views/view_quiz.dart';
@@ -92,14 +93,16 @@ class _ContentState extends State<ContentCarousel> {
                       ),
                     );
                   } else if (type == 'essay') {
+                    print ((children[value] as CarouselCard).courseId?.toString());
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => SubmissionList(
                               assignmentId:
                                   (children[value] as CarouselCard).id,
-                              courseId: courseId.toString()),
-                        ));
+                              courseId: (children[value] as CarouselCard).courseId?.toString() ?? '',
+                              // courseId.toString()),
+                        )));
                   }
                 },
                 children: children,
@@ -127,7 +130,8 @@ class CarouselCard extends StatelessWidget {
         input.name ?? "Unnamed Quiz",
         input.description?.replaceAll(RegExp(r"<[^>]*>"), "") ?? '',
         'assessment',
-        input.id ?? 0);
+        input.id ?? 0,
+        courseId: input.coursedId);
   }
 
   static List<CarouselCard>? fromQuizzes(List? input) {
@@ -167,6 +171,8 @@ class CarouselCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<Course>? theCourses = MoodleApiSingleton().moodleCourses;
+    Course matchedCourse = theCourses!.firstWhere((element) => element.id == courseId);
     return Card(
       color: Theme.of(context).colorScheme.secondaryContainer,
       elevation: 2,
@@ -185,6 +191,10 @@ class CarouselCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(information),
+            ), 
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('Course: ${matchedCourse.fullName}'),
             ),
             Spacer(), // Pushes the buttons to the bottom
           ],

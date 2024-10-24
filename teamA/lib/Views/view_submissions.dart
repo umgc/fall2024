@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:learninglens_app/Controller/custom_appbar.dart';
 import '../Api/moodle_api_singleton.dart';
 import '../Controller/beans.dart';
 import 'view_submission_detail.dart';
 import '../Api/llm_api.dart';
 import 'dart:convert';
+import 'package:llm_api_modules/openai_api.dart';
+import 'package:llm_api_modules/claudeai_api.dart';
 
 class SubmissionList extends StatefulWidget {
   final int assignmentId;
   final String courseId;
-  static var apiKey = dotenv.env['perplexity_apikey'] ?? '';
+
   SubmissionList({
     required this.assignmentId,
     required this.courseId,
@@ -27,6 +30,36 @@ class SubmissionListState extends State<SubmissionList> {
       api.getSubmissionsWithGrades(widget.assignmentId);
   late Future<List<Participant>> futureParticipants =
       api.getCourseParticipants(widget.courseId);
+
+  // LLM
+  String selectedLlm = 'Perplexity'; // Default selection
+
+  // api keys
+  final perplexityApiKey = dotenv.env['perplexity_apikey'] ?? '';
+  final openApiKey = dotenv.env['openai_apikey'] ?? 'perplexity_apikey';
+  final claudeApiKey = dotenv.env['claudeApiKey'] ?? 'perplexity_apikey';
+
+  // Get api key for selected LLM
+  String getApiKey() 
+  {
+    switch (selectedLlm) {
+      case 'OpenAI':
+        return openApiKey;
+      case 'Claude':
+        return claudeApiKey;
+      default:
+        return perplexityApiKey;
+    }
+  }
+
+    // Handle LLM Selection
+  void _handleLLMChanged(String? newValue) {
+    setState(() {
+      if (newValue != null) {
+        selectedLlm = newValue;
+      }
+    });
+  }
 
   @override
   void initState() {
@@ -46,11 +79,7 @@ class SubmissionListState extends State<SubmissionList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        title: Text("View Submissions"),
-        actions: [],
-      ),
+      appBar: CustomAppBar(title: 'Submissions', userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),
       body: Stack(
         children: [
           FutureBuilder<List<Participant>>(
@@ -211,9 +240,20 @@ class SubmissionListState extends State<SubmissionList> {
                                           ),
                                         SizedBox(height: 8),
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
+                                          // LLM Selection Dropdown
+                                          DropdownButton<String>(
+                                            value: selectedLlm,
+                                            onChanged: _handleLLMChanged,
+                                            items: <String>['Perplexity', 'OpenAI', 'Claude']
+                                                .map<DropdownMenuItem<String>>((String value) {
+                                              return DropdownMenuItem<String>(
+                                                value: value,
+                                                child: Text(value),
+                                              );
+                                            }).toList(),
+                                          ),
                                             if (submissionWithGrade != null &&
                                                 submissionWithGrade.submission
                                                         .gradingStatus ==
@@ -258,8 +298,7 @@ class SubmissionListState extends State<SubmissionList> {
                                                                     {});
                                                           }
 
-                                                          String queryPrompt =
-                                                              '''
+                                                  String queryPrompt = '''
                                                   I am building a program that generates essay rubric assignments that teachers can distribute to students
                                                   who can then submit their responses to be graded. Here is an example format of a rubric roughly:
                                                   [
@@ -320,65 +359,74 @@ class SubmissionListState extends State<SubmissionList> {
 
                                                   You must reply with a representation of the rubric in JSON format that matches this example format, 
                                                   obviously put your generated scores in and be specific with the remarks on the scoring and give specific examples from the 
-                                                  submitted assignment that were either good or bad depending on the score given.
+                                                  submitted assignment that were either good or bad depending on the score given. Also cut out anything that is not
+                                                  the json response. No extraneous comments outside that: 
+                                                [
+                                                  {
+                                                      "criterionid": 67,
+                                                      "criterion_description": "Content",
+                                                      "levelid": 236,
+                                                      "level_description": "Essay is mostly well-organized, with few issues in flow",
+                                                      "score": 6,
+                                                      "remark": "The essay has a clear structure and transitions between paragraphs. Each paragraph focuses on a different aspect of having a park, such as relaxation, activity, and aesthetics. However, there are a few places where the flow could be improved, like the transition between the third and fourth paragraphs."
+                                                  },
+                                                  {
+                                                      "criterionid": 68,
+                                                      "criterion_description": "Use of Evidence",
+                                                      "levelid": 243,
+                                                      "level_description": "Good use of evidence with occasional gaps",
+                                                      "score": 6,
+                                                      "remark": "The essay uses good evidence to support its claims, such as 'Spending time outside can make us feel happier and less anxious, which would help us do better in class.' However, there are occasional gaps where more specific or detailed evidence could strengthen the arguments further."
+                                                  }
+                                                ]
                                                 ''';
 
-                                                          final perplexityApiKey =
-                                                              dotenv.env[
-                                                                  'perplexity_apikey'] ??
-                                                                  '';
-                                                          final llmApi = LlmApi(
-                                                              perplexityApiKey);
-
-                                                          String gradedResponse =
-                                                              await llmApi.postToLlm(
-                                                                  queryPrompt);
-                                                          gradedResponse =
-                                                              gradedResponse
-                                                                  .replaceAll(
-                                                                      '```json',
-                                                                      '')
-                                                                  .replaceAll(
-                                                                      '```',
-                                                                      '')
-                                                                  .trim();
-                                                          var results =
-                                                              await MoodleApiSingleton()
-                                                                  .setRubricGrades(
-                                                                      widget
-                                                                          .assignmentId,
-                                                                      participant
-                                                                          .id,
-                                                                      gradedResponse);
-                                                          Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  SubmissionDetail(
-                                                                participant:
-                                                                    participant,
-                                                                submission:
-                                                                    submissionWithGrade
-                                                                        .submission,
-                                                                courseId: widget
-                                                                    .courseId,
-                                                              ),
-                                                            ),
-                                                          );
-                                                          print(
-                                                              'Results: $results');
-                                                        } catch (e) {
-                                                          print(
-                                                              'An error occurred: $e');
-                                                        } finally {
-                                                          setState(() {
-                                                            isLoading =
-                                                                false;
-                                                          });
-                                                        }
-                                                      },
-                                                      child: Text('Grade'),
-                                                    ),
+                                                  String apiKey = getApiKey(); // Get the correct API key based on the selected LLM
+                                                  // Dynamically instantiate the appropriate LLM class based on the selectedLLM
+                                                  dynamic llmInstance;
+                                                  if (selectedLlm == 'OpenAI') 
+                                                  {
+                                                      llmInstance = OpenAiLLM(apiKey);
+                                                  } else if (selectedLlm == 'Claude') 
+                                                  {
+                                                      llmInstance = ClaudeAiAPI(apiKey);
+                                                  } 
+                                                  else
+                                                  {
+                                                      llmInstance = LlmApi(apiKey); // Perplexity API class
+                                                  }
+                                                  dynamic gradedResponse = await llmInstance.postToLlm(queryPrompt);
+                                                  gradedResponse = gradedResponse.replaceAll('```json','').replaceAll('```','').trim();
+                                                  var results = await MoodleApiSingleton().setRubricGrades(widget.assignmentId, participant.id,gradedResponse);
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              SubmissionDetail(
+                                                            participant:
+                                                                participant,
+                                                            submission:
+                                                                submissionWithGrade
+                                                                    .submission,
+                                                            courseId: widget
+                                                                .courseId,
+                                                          ),
+                                                        ),
+                                                      );
+                                                      print(
+                                                          'Results: $results');
+                                                    } catch (e) {
+                                                      print(
+                                                          'An error occurred: $e');
+                                                    } finally {
+                                                      setState(() {
+                                                        isLoading =
+                                                            false;
+                                                      });
+                                                    }
+                                                  },
+                                                  child: Text('Grade'),
+                                                ),
                                             SizedBox(width: 8),
                                             if (submissionWithGrade != null)
                                               ElevatedButton(

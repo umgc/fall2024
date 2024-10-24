@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:learninglens_app/Controller/beans.dart';
-import 'package:learninglens_app/main.dart';
+import 'package:learninglens_app/Controller/custom_appbar.dart';
 import '../Api/moodle_api_singleton.dart';
 
 class QuizMoodle extends StatefulWidget {
@@ -154,39 +154,7 @@ class QuizMoodleState extends State<QuizMoodle> {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        elevation: 0,
-        flexibleSpace: SafeArea(
-            child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => DevLaunch()),
-                );
-              },
-            ),
-            Expanded(
-              child: Align(
-                alignment: Alignment.center,
-                child: Text(
-                  'Learning Lens',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        )),
-      ),
+      appBar: CustomAppBar(title: 'Assign Assessment', userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(15.0),
         child: Column(

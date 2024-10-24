@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:learninglens_app/Api/moodle_api_singleton.dart';
+import 'package:learninglens_app/Controller/custom_appbar.dart';
 import 'package:learninglens_app/Views/essay_edit_page.dart';
 import 'dart:convert';
 import '../Api/llm_api.dart';
@@ -175,10 +177,7 @@ class _EssayGenerationState extends State<EssayGeneration>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        title: Text(widget.title),
-      ),
+      appBar: CustomAppBar(title: 'Create Essay Rubric', userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(

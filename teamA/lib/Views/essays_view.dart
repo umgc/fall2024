@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:learninglens_app/Api/moodle_api_singleton.dart";
 import "package:learninglens_app/Controller/beans.dart";
+import "package:learninglens_app/Controller/custom_appbar.dart";
 import "package:learninglens_app/content_carousel.dart";
 
 
@@ -20,7 +21,7 @@ class _EssaysState extends State{
   @override
   Widget build(BuildContext context){
     return Scaffold(
-      appBar: AppBar(),
+      appBar: CustomAppBar(title: 'All Essays', userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
