@@ -28,10 +28,10 @@ class ContactController {
       );
       int contactFileSize = FileManager.calculateFileSizeInBytes(contactFile);
       ContactModel newContact = ContactModel(
-        name: displayName,
-        phoneNum: number,
-        nickName: nickName,
-        eMail: address,
+        name: Name(first: 'Jarrod', last: 'Brown'),
+        phoneNum: Phone('3183222237', isPrimary: true),
+        nickName: 'Caregiver Prime',
+        eMail: Email('jbrown843@student.umgc.edu'),
       );
       ContactModel createdContact =
           await ContactRepository.instance.create(newContact);
