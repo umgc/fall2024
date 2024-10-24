@@ -190,7 +190,9 @@ class CarouselCard extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(information),
+              child: SingleChildScrollView(
+                child: Text(information),
+              )
             ), 
             Padding(
               padding: const EdgeInsets.all(8.0),
