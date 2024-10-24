@@ -6,34 +6,31 @@ import "package:learninglens_app/content_carousel.dart";
 
 
 //The Page
-class AssessmentsView extends StatefulWidget{
-  AssessmentsView();
+class EssaysView extends StatefulWidget{
+  EssaysView();
 
   @override
   State createState(){
-    return _AssessmentsState();
+    return _EssaysState();
   }
 }
 
-class _AssessmentsState extends State{
+class _EssaysState extends State{
 
 
   @override
   Widget build(BuildContext context){
     return Scaffold(
-      appBar: CustomAppBar(
-    title: 'All Assessments',
-    userprofileurl: MoodleApiSingleton().moodleProfileImage ?? '', // Pass your image URL here
-  ),
+      appBar: CustomAppBar(title: 'All Essays', userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children:[
-            // Text('All Quizzes', style: TextStyle(fontSize: 64)),
-            ContentCarousel('assessment', getAllQuizzes()),
+            Text('All Essays', style: TextStyle(fontSize: 64)),
+            ContentCarousel('essay', getAllEssays()),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children:[CreateButton('assessment')]
+              children:[CreateButton('essay')]
             )
           ]
         )
@@ -42,11 +39,11 @@ class _AssessmentsState extends State{
   }
 }
 
-//Helper function that pulls the quizzes from all the user's courses
-List<Quiz>? getAllQuizzes(){
-  List<Quiz>? result;
+//Helper function that pulls the essays from all the user's courses
+List<Assignment>? getAllEssays(){
+  List<Assignment>? result;
   for (Course c in MoodleApiSingleton().moodleCourses ?? []){
-    result = (result ?? []) + (c.quizzes ?? []);
+    result = (result ?? []) + (c.essays ?? []);
   }
   if (result == []){
     return null;

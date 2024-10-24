@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:learninglens_app/Api/moodle_api_singleton.dart';
 import 'package:learninglens_app/main.dart';
 import '/controller/main_controller.dart';
 import '/Views/dashboard.dart';
@@ -58,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,

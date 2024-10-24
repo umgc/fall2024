@@ -31,12 +31,14 @@ migrate_working_dir/
 .pub/
 /build/
 
+/assets/api-keys.json
+
 # Symbolication related
 app.*.symbols
 
 # Obfuscation related
 app.*.map.json
-
+macos/*
 # Android Studio will place build artifacts here
 /android/app/debug
 /android/app/profile

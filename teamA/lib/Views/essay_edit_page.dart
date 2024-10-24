@@ -1,36 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:editable/editable.dart';
+import 'package:learninglens_app/Api/moodle_api_singleton.dart';
+import 'package:learninglens_app/Controller/custom_appbar.dart';
 import 'dart:convert';
 
-import '/Views/send_essay_to_moodle.dart'; // Import for JSON encoding
+import 'send_essay_to_moodle.dart'; // Import for JSON encoding
 
 class EssayEditPage extends StatefulWidget {
+  final String jsonData;
+  EssayEditPage(this.jsonData);
+  
   @override
   EssayEditPageState createState() => EssayEditPageState(); // Public State class
 }
 
 class EssayEditPageState extends State<EssayEditPage> {
-  // JSON data to be used
-  final jsonData = {
-    "criteria": [
-      {
-        "description": "Content",
-        "levels": [
-          {"definition": "Excellent", "score": 5},
-          {"definition": "Good", "score": 3},
-          {"definition": "Poor", "score": 1}
-        ]
-      },
-      {
-        "description": "Clarity",
-        "levels": [
-          {"definition": "Very Clear", "score": 5},
-          {"definition": "Somewhat Clear", "score": 3},
-          {"definition": "Unclear", "score": 1}
-        ]
-      }
-    ]
-  };
+
 
   // Convert JSON to rows compatible with Editable
   List rows = [];
@@ -41,27 +26,30 @@ class EssayEditPageState extends State<EssayEditPage> {
   @override
   void initState() {
     super.initState();
+    
     populateHeadersAndRows();
   }
 
   // Function to dynamically populate headers and rows based on JSON data
   void populateHeadersAndRows() {
+    Map<String, dynamic> mappedData = jsonDecode(widget.jsonData);
     // Step 1: Build headers dynamically based on the number of levels in the first criterion
-    List<dynamic> levels = List<dynamic>.from(jsonData['criteria']![0]['levels'] as List);
-    headers = [
-      {"title": 'Criteria', 'index': 1, 'key': 'name'},
-    ];
+    List<dynamic> levels = List<dynamic>.from(mappedData['criteria']![0]['levels'] as List);
+headers = [
+  {"title": 'Criteria', 'index': 1, 'key': 'name', 'widthFactor': 0.15}, // 30% width
+];
 
-    for (int i = 0; i < levels.length; i++) {
-      headers.add({
-        "title": '${levels[i]['score']}',
-        'index': i + 2,
-        'key': 'level_$i'
-      });
-    }
+for (int i = 0; i < levels.length; i++) {
+  headers.add({
+    "title": '${levels[i]['score']}',
+    'index': i + 2,
+    'key': 'level_$i',
+    'widthFactor': 0.8/levels.length, // 10% width for each level column
+  });
+}
 
     // Step 2: Build rows by mapping each criterion and its levels dynamically
-    rows = (jsonData['criteria'] ?? []).map((criterion) {
+    rows = (mappedData['criteria'] ?? []).map((criterion) {
       Map<String, dynamic> row = {
         "name": criterion['description'],
       };
@@ -82,11 +70,12 @@ class EssayEditPageState extends State<EssayEditPage> {
   /// Merge edits into the original jsonData and return updated JSON
   String getUpdatedJson() {
     List editedRows = _editableKey.currentState!.editedRows;
+    Map<String, dynamic> mappedData = jsonDecode(widget.jsonData);
 
     // Apply the edits to the original jsonData
     for (var editedRow in editedRows) {
       int rowIndex = editedRow['row'];
-      var originalCriterion = jsonData['criteria']?[rowIndex];
+      var originalCriterion = mappedData['criteria']?[rowIndex];
 
       // For each edited level, update the corresponding level in the original data
       editedRow.forEach((key, value) {
@@ -99,58 +88,78 @@ class EssayEditPageState extends State<EssayEditPage> {
 
     // Convert the updated jsonData back to the required format and return it
     Map<String, dynamic> updatedData = {
-      "criteria": jsonData['criteria']
+      "criteria": mappedData['criteria']
     };
     return jsonEncode(updatedData); // Return the JSON as a string
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Edit Essay Rubric"),
-        actions: <Widget>[
-          ElevatedButton(
-            child: const Text('Finish and Assign'),
-            onPressed: () {
-              String updatedJson = getUpdatedJson();
-              // Navigate to the Essay Assignment Settings page with the updated JSON
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => EssayAssignmentSettings(updatedJson)));
-              print(updatedJson); // You can now see the updated JSON in the console
-              ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Navigate to the Essay Assignment Page')));
-            },
-          ),
-        ],
-      ),
-      body: Row(
-        children: [
-          Expanded(
-            child: Editable(
-              key: _editableKey,
-              tdEditableMaxLines: 100,
-              trHeight: 100,
-              columnRatio: .9 / headers.length, // sets width of each column
-              columns: headers,
-              rows: rows,
-              showCreateButton: false,
-              tdStyle: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: CustomAppBar(title: 'Edit Essay Rubric', userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),  
+    body: LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Container(
+            alignment: Alignment.topLeft, // Force the table to stay aligned to the left
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: 600, // Ensure the table never shrinks below 600px
+                maxWidth: constraints.maxWidth > 600 ? constraints.maxWidth : 600,
               ),
-              showSaveIcon: true,
-              onRowSaved: (value) {
-                print('rowsaved $value');
-              },
-              borderColor: Theme.of(context).colorScheme.primaryContainer,
-              onSubmitted: (value) {
-                print('onsubmitted: $value'); // You can grab this data to store anywhere
-              },
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Editable(
+                      key: _editableKey,
+                      tdEditableMaxLines: 100,
+                      trHeight: 100,
+                      columns: headers,
+                      rows: rows,
+                      showCreateButton: false,
+                      tdStyle: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      showSaveIcon: false,
+                      onRowSaved: (value) {
+                        print('rowsaved $value');
+                      },
+                      borderColor: Theme.of(context).colorScheme.primaryContainer,
+                      onSubmitted: (value) {
+                        print('onsubmitted: $value'); // You can grab this data to store anywhere
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 20), // Add some spacing between the Editable and the button
+                  Center(
+                    child: ElevatedButton(
+                      child: const Text('Finish and Assign'),
+                      onPressed: () {
+                        String updatedJson = getUpdatedJson();
+                        // Navigate to the Essay Assignment Settings page with the updated JSON
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                EssayAssignmentSettings(updatedJson)));
+                        print(updatedJson); // You can now see the updated JSON in the console
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Navigate to the Essay Assignment Page')));
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ],
-      ),
-    );
-  }
+        );
+      },
+    ),
+  );
+}
+
+
+
+
 }
