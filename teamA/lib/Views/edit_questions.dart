@@ -18,7 +18,7 @@ class EditQuestions extends StatefulWidget {
 
 class EditQuestionsState extends State<EditQuestions> {
   late Quiz myQuiz;
-  final TextEditingController _textController = TextEditingController();
+  // final TextEditingController _textController = TextEditingController();
   var apikey = dotenv.env['openai_apikey'];
   late OpenAiLLM openai;
   bool _isLoading = false;

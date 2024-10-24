@@ -71,6 +71,40 @@ class MoodleApiSingleton {
     moodleProfileImage = userData['userpictureurl'];
   }
 
+
+
+Future<bool> isUserTeacher(List<Course> moodleCourses) async {
+
+  // Step 1: Iterate over each course in moodleCourses
+  for (var course in moodleCourses) {
+    final courseId = course.id;
+
+    // Step 2: Check the user's roles in each course
+    final getRolesUrl = Uri.parse('$moodleURL?wsfunction=core_role_get_roles_in_context&moodlewsrestformat=json');
+    final rolesResponse = await http.post(getRolesUrl, body: {
+      'wstoken': _userToken,
+      'userid': 'me',  // 'me' to indicate the current user based on the token
+      'courseid': courseId.toString(),
+    });
+
+    if (rolesResponse.statusCode == 200) {
+      List<dynamic> roles = json.decode(rolesResponse.body);
+
+      // Check if the user has a teacher role (id 3 = editingteacher, 4 = teacher)
+      for (var role in roles) {
+        if (role['roleid'] == 3 || role['roleid'] == 4) {
+          return true; // User is a teacher in at least one course
+        }
+      }
+    } else {
+      throw Exception('Failed to load roles for course $courseId');
+    }
+  }
+
+  return false; // User is not a teacher in any course
+}
+
+
   // Log out of Moodle by deleting the stored user token.
   void logout() {
     _userToken = null;

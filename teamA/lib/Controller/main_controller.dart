@@ -38,6 +38,18 @@ class MainController
     }
   }
 
+  Future<bool> checkIfTeacher() async {
+  Future<bool> isTeacher = MoodleApiSingleton().isUserTeacher(MoodleApiSingleton().moodleCourses ?? []);
+  if (await isTeacher) {
+    print('The user is a teacher in at least one course.');
+    return true;
+  } else {
+    print('The user is not a teacher in any course.');
+    return false;
+  }
+}
+
+
   void logoutFromMoodle() 
   {
     var moodleApi = MoodleApiSingleton();
