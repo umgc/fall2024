@@ -46,8 +46,7 @@ function runTest() {
         console.log(`Power test failed: ${powerResult} !== 4`);
     }
 
-    console.log(`${studentFilePath}: ${passed} out of ${testCases} test cases passed`);
-    console.log(`-------------------------------------------------------------------`);
+    console.log(`${passed}/${testCases} tests passed.`);
 }
 
 runTest();

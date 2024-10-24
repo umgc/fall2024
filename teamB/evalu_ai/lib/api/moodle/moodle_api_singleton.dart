@@ -247,6 +247,30 @@ class MoodleApiSingleton {
     }
   }
 
+  
+  Future<bool> putGrade(String assignmentid, String userid, String grade) async {
+    if (_userToken == null) throw StateError('User not logged in to Moodle');
+    final response = await http.post(
+      Uri.parse(moodleURL + serverUrl),
+      body: {
+        'wstoken': _userToken,
+        'wsfunction': 'local_learninglens_write_grades',
+        'moodlewsrestformat': 'json',
+        'assignmentid': assignmentid,
+        'userid': userid,
+        'grade': grade
+      },
+    );
+  
+    if (response.statusCode == 200) {
+      print('true');
+      return true;
+    } else {
+      print('Request failed with status: ${response.body}.');
+      return false;
+    }
+  }
+  
   // ********************************************************************************************************************
   // Set rubric grades for an assignment.
   // ********************************************************************************************************************

@@ -32,11 +32,10 @@ async function validateSQLFile(filePath, fileName) {
             }
         }
 
-        console.log(`${fileName}: Validated ${validStatements} out of ${totalStatements} statements.`);
-        console.log(`-------------------------------------------------------------------`);
+        console.log(`${passed}/${testCases} tests passed.`);
         return validStatements === totalStatements;
     } catch (error) {
-        console.log(`${fileName}: Validated 0 statements. Error with student submission: ${error}`);
+        console.log(`${passed}/${testCases} tests passed. Error with student submission: ${error}`);
     }
 }
 

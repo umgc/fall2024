@@ -49,7 +49,7 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
         ),
         _buildListTile(
           title: 'Grade Essay',
-          icon: Icons.edit_note,
+          icon: Icons.edit_document,
           index: 4,
         ),
         _buildListTile(

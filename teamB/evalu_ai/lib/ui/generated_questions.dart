@@ -1,157 +1,176 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intelligrade/controller/model/beans.dart';
 import 'package:intelligrade/ui/assignment_form.dart';
-import 'package:intelligrade/ui/dashboard_page.dart';
+//import 'package:intelligrade/ui/dashboard_page.dart';
+import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
 import 'package:intelligrade/api/llm/openai_api.dart';
-
+//import 'package:intelligrade/ui/custom_navigation_bar.dart';
+//import 'package:intelligrade/ui/header.dart';
+import 'package:intelligrade/ui/send_quiz_to_moodle.dart';
 
 class GeneratedQuestionsPage extends StatefulWidget {
-  final List<String> generatedQuestions;
+  final String questionXML;
 
-  const GeneratedQuestionsPage({super.key, required this.generatedQuestions});
+  GeneratedQuestionsPage(this.questionXML);
 
   @override
-  // ignore: library_private_types_in_public_api
   _GeneratedQuestionsPageState createState() => _GeneratedQuestionsPageState();
 }
 
 class _GeneratedQuestionsPageState extends State<GeneratedQuestionsPage> {
-  late List<String> _questions;
-  final OpenAiLLM _openAiLLM = OpenAiLLM('your-openai-api-key');
+ late Quiz myQuiz;
+  final TextEditingController _textController = TextEditingController();
+  var apikey = dotenv.env['OPENAI_API_KEY'];
+  late OpenAiLLM openai;
+  bool _isLoading = false;
+
+  String subject = AssignmentQuizForm.descriptionController.text;
+  String topic = AssignmentQuizForm.topicController.text;
+  late String promptstart;
 
   @override
   void initState() {
     super.initState();
-    _questions = List.from(widget.generatedQuestions); // Copy initial questions
-  }
-
-  // Function to regenerate a single question
-  Future<void> _regenerateQuestion(int index) async {
-    String regeneratedQuestion = await _openAiLLM.queryAI('Regenerate question');
-    setState(() {
-      _questions[index] = regeneratedQuestion; // Update the specific question
-    });
-  }
-
-  // Function to regenerate all questions
-  Future<void> _regenerateAllQuestions() async {
-    List<String> regeneratedQuestions = [];
-    for (var i = 0; i < _questions.length; i++) {
-      String regeneratedQuestion = await _openAiLLM.queryAI('Regenerate question $i');
-      regeneratedQuestions.add(regeneratedQuestion);
+    myQuiz = Quiz.fromXmlString(widget.questionXML);
+    if (apikey != null) {
+      openai = OpenAiLLM(apikey!);
+    } else {
+      // Handle the case where the API key is null
+      throw Exception('API key is not set in the environment variables');
     }
-    setState(() {
-      _questions = regeneratedQuestions; // Replace with all regenerated questions
-    });
-  }
+    myQuiz.name = AssignmentQuizForm.nameController.text;
+    myQuiz.description = AssignmentQuizForm.descriptionController.text;
 
-  // Function to edit a specific question
-  void _editQuestion(int index) {
-    TextEditingController controller = TextEditingController(text: _questions[index]);
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Edit Question'),
-          content: TextField(
-            controller: controller,
-            maxLines: 4,
-            decoration: const InputDecoration(hintText: 'Edit question'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _questions[index] = controller.text; // Save edited question
-                });
-                Navigator.pop(context);
-              },
-              child: const Text('Save'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Close without saving
-              },
-              child: const Text('Cancel'),
-            ),
-          ],
-        );
-      },
-    );
+    promptstart =
+        'Create a question that is compatible with Moodle XML import. Be a bit creative in how you design the question and answers, making sure it is engaging but still on the subject of $subject and related to $topic. Make sure the XML specification is included, and the question is wrapped in the quiz XML element required by Moodle. Each answer should have feedback that fits the Moodle XML format, and avoid using HTML elements within a CDATA field. The quiz should be challenging and thought-provoking, but appropriate for high school students who speak English. The quesiton typ shoud be ';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+  appBar: AppBar(
+    title: Text('Edit Questions'),
+),
       body: Column(
         children: [
-          const Header(), // Keep the header the same
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Generated Questions',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 20),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: _questions.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(_questions[index]),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit),
-                                onPressed: () {
-                                  _editQuestion(index); // Edit question
-                                },
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.refresh),
-                                onPressed: () {
-                                  _regenerateQuestion(index); // Regenerate single question
-                                },
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ElevatedButton(
-                        onPressed: _regenerateAllQuestions, // Regenerate all questions
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF7D6CE2),
-                          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                        ),
-                        child: const Text('Regenerate All Questions'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          // Implement logic to submit the questions to the next page
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF7D6CE2),
-                          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                        ),
-                        child: const Text('Submit Questions'),
-                      ),
-                    ],
-                  ),
-                ],
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _textController,
+              decoration: InputDecoration(
+                labelText: 'Prompt: ${myQuiz.promptUsed}',
+                border: OutlineInputBorder(),
               ),
             ),
           ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: myQuiz.questionList.length,
+              itemBuilder: (context, index) {
+                var question = myQuiz.questionList[index];
+                return Dismissible(
+                  key: Key(question.toString()),
+                  background: Stack(
+                    children: [
+                      Container(
+                        color: Colors.green,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 16),
+                            child: Icon(Icons.favorite),
+                          ),
+                        ),
+                      ),
+                      if (_isLoading)
+                        Center(
+                          child:
+                              CircularProgressIndicator(), // Spinner behind the item
+                        ),
+                    ],
+                  ),
+                  secondaryBackground: Container(
+                    color: Colors.red,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 16),
+                        child: Icon(Icons.delete),
+                      ),
+                    ),
+                  ),
+                  confirmDismiss: (direction) async {
+                    if (direction == DismissDirection.startToEnd) {
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      var result = await openai
+                          // .postToLlm(promptstart + question.toString());
+                          .postToLlm(promptstart + question.type.toString());
+
+                      setState(() {
+                        _isLoading = false; // Stop showing the spinner
+                      });
+
+                      if (result.isNotEmpty) {
+                        setState(() {
+                          //replace the old question with the new one from the api call
+                          question = Quiz.fromXmlString(result).questionList[0];
+                          question.setName = 'Question ${index + 1}';
+                          myQuiz.questionList[index] = question.copyWith(
+                              isFavorite: !question.isFavorite);
+                        });
+                      }
+                      return false;
+                    } else {
+                      bool delete = true;
+                      final snackbarController =
+                          ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Deleted $Question'),
+                          action: SnackBarAction(
+                              label: 'Undo', onPressed: () => delete = false),
+                        ),
+                      );
+                      await snackbarController.closed;
+                      return delete;
+                    }
+                  },
+                  onDismissed: (_) {
+                    setState(() {
+                      myQuiz.questionList.removeAt(index);
+                    });
+                  },
+                  child: ListTile(
+                    title: Text(question.toString()),
+                    tileColor: (index.isEven)
+                        ? Theme.of(context).colorScheme.secondary
+                        : Theme.of(context).colorScheme.secondaryContainer,
+                    textColor: (index.isEven)
+                        ? Theme.of(context).colorScheme.onSecondary
+                        : Theme.of(context).colorScheme.onSecondaryContainer,
+                  ),
+                );
+              },
+            ),
+          ),
+          Row(
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QuizMoodle(quiz: myQuiz)
+                    ),
+                  );
+                },
+                child: const Text('Send to Moodle Set up'),
+              ),
+            
+            ],
+          )
         ],
       ),
     );
