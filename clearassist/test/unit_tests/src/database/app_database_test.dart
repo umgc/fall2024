@@ -6,8 +6,6 @@ import 'package:clearassistapp/src/database/model/audio.dart';
 import 'package:clearassistapp/src/database/repository/audio_repository.dart';
 import 'package:clearassistapp/src/database/model/photo.dart';
 import 'package:clearassistapp/src/database/repository/photo_repository.dart';
-import 'package:clearassistapp/src/database/model/video.dart';
-import 'package:clearassistapp/src/database/repository/video_repository.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import '../../../resources/fake_path_provider_platform.dart';
 
@@ -35,18 +33,6 @@ final unitTestPhoto = Photo(
     photoFileName: 'unit_test_photo.png',
     storageSize: 1000000,
     isFavorited: false);
-
-final unitTestVideo = Video(
-    title: unitTestVideoTitle,
-    description: 'Unit Test Video Description',
-    tags: ['orange', 'banana', 'bear'],
-    timestamp: DateTime(2023, 10, 20, 8, 26),
-    physicalAddress: "501 Hungerford Dr, Rockville, Maryland, 20850, US",
-    videoFileName: 'unit_test_video.mp4',
-    storageSize: 1000000,
-    isFavorited: false,
-    duration: "1:00",
-    thumbnailFileName: "unit_test_thumbnail.png");
 
 /// Initialize sqflite for test.
 void sqfliteTestInit() {
@@ -89,18 +75,6 @@ void main() async {
       expect(photoTableQueryResult.length, 1);
       await db.execute(
           "DELETE FROM $tablePhotos WHERE title='$unitTestPhotoTitle'");
-    });
-
-    test('U-13-3: adding video to db', () async {
-      await db.execute(
-          "DELETE FROM $tableVideos WHERE title='$unitTestVideoTitle'");
-      var videoTableQueryResult = await db.query(tableVideos,
-          groupBy: "title", where: "title in ('$unitTestVideoTitle')");
-      expect(videoTableQueryResult.length, 0);
-      //    await VideoRepository.instance.create(unitTestVideo);
-      //    videoTableQueryResult = await db.query(tableVideos, groupBy: "title", where: "title in ('$unitTestVideoTitle')");
-      //  expect(videoTableQueryResult.length, 1);
-      // await db.execute("DELETE FROM $tableVideos WHERE title='$unitTestVideoTitle'");
     });
   });
 }

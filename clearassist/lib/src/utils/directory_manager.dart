@@ -10,6 +10,7 @@ class DirectoryManager {
   late Directory _rootDirectory;
   late Directory _photosDirectory;
   late Directory _videosDirectory;
+  late Directory _contactsDirectory;
   late Directory _audiosDirectory;
   late Directory _transcriptsDirectory;
   late Directory _videoThumbnailsDirectory;
@@ -25,6 +26,7 @@ class DirectoryManager {
   Directory get rootDirectory => _rootDirectory;
   Directory get photosDirectory => _photosDirectory;
   Directory get videosDirectory => _videosDirectory;
+  Directory get contactsDirectory => _contactsDirectory;
   Directory get audiosDirectory => _audiosDirectory;
   Directory get transcriptsDirectory => _transcriptsDirectory;
   Directory get videoStillsDirectory => _videoStillsDirectory;
@@ -38,6 +40,8 @@ class DirectoryManager {
       _rootDirectory = await getApplicationDocumentsDirectory();
       _photosDirectory =
           _createDirectoryIfDoesNotExist('${_rootDirectory.path}$photosPath');
+      _contactsDirectory =
+          _createDirectoryIfDoesNotExist('${_rootDirectory.path}$contactsPath');
       _videosDirectory =
           _createDirectoryIfDoesNotExist('${_rootDirectory.path}$videosPath');
       _audiosDirectory =

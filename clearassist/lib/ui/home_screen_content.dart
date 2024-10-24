@@ -1,10 +1,9 @@
+import 'package:clearassistapp/ui/assistant_screen.dart';
+import 'package:clearassistapp/ui/home_screen.dart';
 import 'package:flutter/material.dart';
 import '../src/utils/contact_display.dart';
 import 'calendar_screen.dart';
-import 'response_screen.dart';
 import 'audio_screen.dart';
-import 'location_history_screen.dart';
-import 'tour_screen.dart';
 
 class HomeScreenContent extends StatefulWidget {
   const HomeScreenContent({super.key});
@@ -52,7 +51,7 @@ class HomeScreenContentBody extends StatelessWidget {
             child: Text(
               'Helping you remember the important things.\n Choose a feature to get started!',
               style: TextStyle(
-                fontSize: 16.0,
+                fontSize: 22.0,
                 color: Colors.white,
               ),
               textAlign: TextAlign.center,
@@ -68,12 +67,6 @@ class HomeScreenContentBody extends StatelessWidget {
               children: [
                 _buildElevatedButton(
                   homeScreenState: homeScreenState,
-                  icon: Icon(Icons.search, size: iconSize, color: Colors.white),
-                  text: 'Object Search',
-                  screen: ResponseScreen(),
-                ),
-                _buildElevatedButton(
-                  homeScreenState: homeScreenState,
                   icon: Icon(Icons.mic_rounded,
                       size: iconSize, color: Colors.white),
                   text: 'Record Audio',
@@ -81,16 +74,17 @@ class HomeScreenContentBody extends StatelessWidget {
                 ),
                 _buildElevatedButton(
                   homeScreenState: homeScreenState,
-                  icon: Icon(Icons.location_history,
+                  icon: Icon(Icons.analytics,
                       size: iconSize, color: Colors.white),
-                  text: 'Location',
-                  screen: LocationHistoryScreen(),
+                  text: 'Analytics',
+                  screen: HomeScreen(),
                 ),
                 _buildElevatedButton(
                   homeScreenState: homeScreenState,
-                  icon: Icon(Icons.flag, size: iconSize, color: Colors.white),
-                  text: 'Tour Guide',
-                  screen: TourScreen(),
+                  icon: Icon(Icons.handshake_outlined,
+                      size: iconSize, color: Colors.white),
+                  text: 'Virtual Assistant',
+                  screen: AssistantScreen(),
                 ),
                 _buildElevatedButton(
                   homeScreenState: homeScreenState,

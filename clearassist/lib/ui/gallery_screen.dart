@@ -11,7 +11,6 @@ import 'package:clearassistapp/src/database/model/audio.dart';
 import 'package:clearassistapp/src/database/model/media.dart';
 import 'package:clearassistapp/src/database/model/media_type.dart';
 import 'package:clearassistapp/src/database/model/photo.dart';
-import 'package:clearassistapp/src/database/model/video.dart';
 import 'package:clearassistapp/src/utils/directory_manager.dart';
 import 'package:clearassistapp/src/camera_manager.dart';
 import 'package:clearassistapp/src/utils/format_utils.dart';
@@ -19,7 +18,6 @@ import 'package:clearassistapp/src/utils/ui_utils.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:clearassistapp/ui/assistant_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:clearassistapp/src/video_display.dart';
 
 // Define an enumeration for sorting criteria
 enum SortingCriteria { storageSize, timeStamp, title, type }
@@ -420,8 +418,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
               children: [
                 if (media is Photo && media.photo != null)
                   _buildGridImage(media.title, media.photo!),
-                if (media is Video && media.thumbnail != null)
-                  _buildGridImage(media.title, media.thumbnail!),
                 if (media is Audio) _buildConversationIcon(media),
                 if (media is Audio) returnTextOverlay(media.title),
               ],
@@ -502,9 +498,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
         return false;
       }
       if (media is Photo && !_showPhotos) {
-        return false;
-      }
-      if (media is Video && !_showVideos) {
         return false;
       }
       if (media is Audio && !_showConversations) {
@@ -679,10 +672,6 @@ class _FullObjectViewState extends State<FullObjectView> {
                         Image(
                           image: (widget.activeMedia as Photo).photo!.image,
                         ),
-                      if (widget.activeMedia is Video &&
-                          (widget.activeMedia as Video).thumbnail != null)
-                        videoDisplay(widget.activeMedia as Video),
-                      addSpacingSizedBox(),
                       if (widget.activeMedia.description != null &&
                           widget.activeMedia.description != "")
                         returnTextBox(
@@ -726,8 +715,6 @@ class _FullObjectViewState extends State<FullObjectView> {
       await DataService.instance.removeAudio(media.id!);
     } else if (media is Photo) {
       await DataService.instance.removePhoto(media.id!);
-    } else {
-      await DataService.instance.removeVideo(media.id!);
     }
   }
 
@@ -896,11 +883,6 @@ class _FullObjectViewState extends State<FullObjectView> {
                       id: media.id!,
                       title: titleController.text,
                       description: descriptionController.text);
-                } else if (media is Video) {
-                  updatedMedia = await DataService.instance.updateVideo(
-                      id: media.id!,
-                      title: titleController.text,
-                      description: descriptionController.text);
                 } else if (media is Audio) {
                   updatedMedia = await DataService.instance.updateAudio(
                       id: media.id!,
@@ -941,12 +923,6 @@ class _FullObjectViewState extends State<FullObjectView> {
       onPressed: _isPlaying ? _stopPlayback : _startPlayback,
       child: Text(_isPlaying ? 'Stop Audio' : 'Play Audio'),
     );
-  }
-
-  VideoDisplay videoDisplay(Video video) {
-    String fullFilePath =
-        "${DirectoryManager.instance.videosDirectory.path}/${video.videoFileName}";
-    return VideoDisplay(fullFilePath: fullFilePath);
   }
 
   /// Function to handle starting the playback of the recorded audio.

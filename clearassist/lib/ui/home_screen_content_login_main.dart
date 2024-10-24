@@ -1,15 +1,15 @@
-import 'package:clearassistapp/ui/registration_screen_cargiver.dart';
+import 'package:clearassistapp/ui/home_screen.dart';
+import 'package:clearassistapp/ui/home_screen_caregiver.dart';
 import 'package:flutter/material.dart';
-import 'registration_screen.dart';
 
-class HomeScreenContentNewUser extends StatefulWidget {
-  const HomeScreenContentNewUser({super.key});
+class HomeScreenContentLoginMain extends StatefulWidget {
+  const HomeScreenContentLoginMain({super.key});
 
   @override
   _HomeScreenContentUserState createState() => _HomeScreenContentUserState();
 }
 
-class _HomeScreenContentUserState extends State<HomeScreenContentNewUser> {
+class _HomeScreenContentUserState extends State<HomeScreenContentLoginMain> {
   Widget _currentScreen =
       const HomeScreenContentNewUserBody(); // Start with the home content
 
@@ -46,9 +46,9 @@ class HomeScreenContentNewUserBody extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.fromLTRB(16.0, 140, 16.0, 25),
             child: Text(
-              'Are you a Primary User or a Care Giver',
+              'Are you a Primary User or a Care Giver?',
               style: TextStyle(
-                fontSize: 20.0,
+                fontSize: 25.0,
                 color: Colors.white,
               ),
               textAlign: TextAlign.center,
@@ -67,14 +67,14 @@ class HomeScreenContentNewUserBody extends StatelessWidget {
                   icon: Icon(Icons.person_2_sharp,
                       size: iconSize, color: Colors.white),
                   text: 'Primary User',
-                  screen: RegistrationScreen(),
+                  screen: HomeScreen(),
                 ),
                 _buildElevatedButton(
                   homeScreenState: homeScreenState,
                   icon: Icon(Icons.person_3_sharp,
                       size: iconSize, color: Colors.white),
                   text: 'Care Giver',
-                  screen: RegistrationScreenCareGiver(),
+                  screen: HomeScreenCaregiver(),
                 ),
               ],
             ),

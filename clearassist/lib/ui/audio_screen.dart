@@ -18,6 +18,17 @@ class _AudioScreenState extends State<AudioScreen> {
   // Flags to track if recording or playback is currently in progress.
   bool _isRecording = false;
 
+<<<<<<< HEAD
+=======
+  /// Variable to track the duration of the current recording.
+  final Duration _duration = const Duration(seconds: 0);
+
+  /// This variable will store the path where the recorded audio will be saved.
+  String? _pathToSaveRecording;
+
+  /// Timer is used to update the duration of the recording in real-time.
+
+>>>>>>> cafe0a259e989ae6acdd0e96497a1db91e4f4c98
   late FlutterSoundRecorder _recorder;
 
   String? _audioFilePath;
@@ -102,7 +113,11 @@ class _AudioScreenState extends State<AudioScreen> {
 
     var url = Uri.parse('https://api.openai.com/v1/audio/transcriptions');
     var request = http.MultipartRequest('POST', url)
+<<<<<<< HEAD
       ..headers['Authorization'] = 'Bearer $openAIKey'
+=======
+      ..headers['Authorization'] = 'Bearer Add Your Key Here'
+>>>>>>> cafe0a259e989ae6acdd0e96497a1db91e4f4c98
       ..fields['model'] = 'whisper-1'
       ..fields['language'] = 'en'
       ..files.add(await http.MultipartFile.fromPath('file', _audioFilePath!));
@@ -272,7 +287,11 @@ class _AudioScreenState extends State<AudioScreen> {
       translationUrl,
       headers: {
         'Content-Type': 'application/json',
+<<<<<<< HEAD
         'Authorization': 'Bearer $openAIKey',
+=======
+        'Authorization': 'Bearer Add Your Key Here',
+>>>>>>> cafe0a259e989ae6acdd0e96497a1db91e4f4c98
       },
       body: json.encode({
         'model': 'gpt-3.5-turbo',
@@ -508,8 +527,15 @@ Widget build(BuildContext context) {
               ElevatedButton(
                 onPressed: () {
                   _isRecording ? _stopRecording() : _startRecording();
+<<<<<<< HEAD
                 },
                 child: Text(_isRecording ? 'Stop Recording' : 'Start Recording'),
+=======
+                  printCacheFiles(); // Call to print files after starting or stopping recording
+                },
+                child:
+                    Text(_isRecording ? 'Stop Recording' : 'Start Recording'),
+>>>>>>> cafe0a259e989ae6acdd0e96497a1db91e4f4c98
               ),
               SizedBox(height: 20),
               Text(

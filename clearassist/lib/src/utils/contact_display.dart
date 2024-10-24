@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
@@ -61,5 +62,6 @@ class ContactPage extends StatelessWidget {
             'Phone number: ${contact.phones.isNotEmpty ? contact.phones.first.number : '(none)'}'),
         Text(
             'Email address: ${contact.emails.isNotEmpty ? contact.emails.first.address : '(none)'}'),
+        Image.file(contact.photo as File),
       ]));
 }

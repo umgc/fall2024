@@ -1,31 +1,26 @@
 import 'package:clearassistapp/ui/reusable/custom_title.dart';
-import 'package:clearassistapp/ui/settings_screen.dart';
 import 'package:flutter/material.dart';
-import 'home_screen_content.dart';
-import 'assistant_screen.dart';
-import 'gallery_screen.dart';
-import 'login_screen.dart'; // Import the login screen for navigation
+import 'home_screen_content_caregiver.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomeScreenCaregiver extends StatefulWidget {
+  const HomeScreenCaregiver({super.key});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  // ignore: library_private_types_in_public_api
+  _HomeScreenCaregiverState createState() => _HomeScreenCaregiverState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenCaregiverState extends State<HomeScreenCaregiver> {
   int _selectedIndex = 0;
 
   // List of pages to switch between with the bottom navigation bar
   static const List<Widget> _widgetOptions = <Widget>[
-    HomeScreenContent(),
-    AssistantScreen(),
-    SettingsScreen(),
+    HomeScreenContentCaregiver()
   ];
 
   // Callback for changing the selected index
   void _onItemTapped(int index) {
-    if (index == 3) {
+    if (index == 1) {
       // If logout icon is tapped, show the logout dialog
       _showLogoutDialog(context);
     } else {
@@ -86,14 +81,6 @@ class _HomeScreenState extends State<HomeScreen> {
             BottomNavigationBarItem(
               icon: Icon(Icons.home, color: Colors.white),
               label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.handshake_outlined, color: Colors.white),
-              label: 'Virtual Assistant',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.settings, color: Colors.white),
-              label: 'Settings',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.logout, color: Colors.white), // Logout icon

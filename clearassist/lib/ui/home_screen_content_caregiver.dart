@@ -1,17 +1,19 @@
-import 'package:clearassistapp/ui/registration_screen_cargiver.dart';
 import 'package:flutter/material.dart';
-import 'registration_screen.dart';
+import '../src/utils/contact_display.dart';
+import 'calendar_screen.dart';
 
-class HomeScreenContentNewUser extends StatefulWidget {
-  const HomeScreenContentNewUser({super.key});
+class HomeScreenContentCaregiver extends StatefulWidget {
+  const HomeScreenContentCaregiver({super.key});
 
   @override
-  _HomeScreenContentUserState createState() => _HomeScreenContentUserState();
+  _HomeScreenContentCareGiverState createState() =>
+      _HomeScreenContentCareGiverState();
 }
 
-class _HomeScreenContentUserState extends State<HomeScreenContentNewUser> {
+class _HomeScreenContentCareGiverState
+    extends State<HomeScreenContentCaregiver> {
   Widget _currentScreen =
-      const HomeScreenContentNewUserBody(); // Start with the home content
+      const HomeScreenContentCaregiverBody(); // Start with the home content
 
   @override
   Widget build(BuildContext context) {
@@ -30,14 +32,14 @@ class _HomeScreenContentUserState extends State<HomeScreenContentNewUser> {
   }
 }
 
-class HomeScreenContentNewUserBody extends StatelessWidget {
-  const HomeScreenContentNewUserBody({super.key});
+class HomeScreenContentCaregiverBody extends StatelessWidget {
+  const HomeScreenContentCaregiverBody({super.key});
 
   @override
   Widget build(BuildContext context) {
     double iconSize = 65;
-    _HomeScreenContentUserState homeScreenState =
-        context.findAncestorStateOfType<_HomeScreenContentUserState>()!;
+    _HomeScreenContentCareGiverState homeScreenState =
+        context.findAncestorStateOfType<_HomeScreenContentCareGiverState>()!;
 
     return Container(
       color: Colors.transparent, // Set container background to transparent
@@ -46,9 +48,9 @@ class HomeScreenContentNewUserBody extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.fromLTRB(16.0, 140, 16.0, 25),
             child: Text(
-              'Are you a Primary User or a Care Giver',
+              'Empowering you to assist with memory needs. Pick a feature to continue!',
               style: TextStyle(
-                fontSize: 20.0,
+                fontSize: 22.0,
                 color: Colors.white,
               ),
               textAlign: TextAlign.center,
@@ -64,17 +66,17 @@ class HomeScreenContentNewUserBody extends StatelessWidget {
               children: [
                 _buildElevatedButton(
                   homeScreenState: homeScreenState,
-                  icon: Icon(Icons.person_2_sharp,
+                  icon: Icon(Icons.calendar_view_month,
                       size: iconSize, color: Colors.white),
-                  text: 'Primary User',
-                  screen: RegistrationScreen(),
+                  text: 'Calendar',
+                  screen: CalendarPage(),
                 ),
                 _buildElevatedButton(
                   homeScreenState: homeScreenState,
-                  icon: Icon(Icons.person_3_sharp,
+                  icon: Icon(Icons.analytics,
                       size: iconSize, color: Colors.white),
-                  text: 'Care Giver',
-                  screen: RegistrationScreenCareGiver(),
+                  text: 'Analytics',
+                  screen: ContactDisplay(),
                 ),
               ],
             ),
@@ -85,7 +87,7 @@ class HomeScreenContentNewUserBody extends StatelessWidget {
   }
 
   Widget _buildElevatedButton({
-    required _HomeScreenContentUserState homeScreenState,
+    required _HomeScreenContentCareGiverState homeScreenState,
     required Icon icon,
     required String text,
     required Widget screen,

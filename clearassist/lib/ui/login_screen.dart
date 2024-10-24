@@ -4,6 +4,7 @@
 Author: Eyerusalme (Jerry)
 */
 import 'package:clearassistapp/src/utils/permission_manager.dart';
+import 'package:clearassistapp/ui/home_screen_login_main.dart';
 import 'package:clearassistapp/ui/home_screen_new_user.dart';
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
@@ -30,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (didAuthenticate) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+          MaterialPageRoute(builder: (context) => HomeScreenLoginMain()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -190,7 +191,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => HomeScreenLoginMain()),
                       );
                     },
                     style:

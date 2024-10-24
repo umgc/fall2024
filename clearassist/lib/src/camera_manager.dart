@@ -7,13 +7,11 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:clearassistapp/src/data_service.dart';
-import 'package:clearassistapp/src/database/model/video.dart';
 import 'package:clearassistapp/src/utils/directory_manager.dart';
 import 'package:clearassistapp/src/utils/file_manager.dart';
 import 'package:clearassistapp/src/utils/format_utils.dart';
 import 'package:clearassistapp/src/utils/logger.dart';
 import 'package:clearassistapp/src/utils/permission_manager.dart';
-import 'package:clearassistapp/src/video_processor.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
@@ -118,10 +116,6 @@ class CameraManager {
       XFile? file = await controller.stopVideoRecording();
 
       await saveMediaLocally(file);
-      if (uploadToRekognition) {
-        VideoProcessor vp = VideoProcessor();
-        vp.automaticallySendToRekognition();
-      }
     } catch (e) {
       appLogger.severe(e);
     }
@@ -185,11 +179,6 @@ class CameraManager {
 
     // Copy the media to the local directory
     await localFile.writeAsBytes(await mediaFile.readAsBytes());
-
-    Video? vid = await DataService.instance.addVideo(videoFile: localFile);
-    if (vid != null) {
-      recentThumbnail = Image(image: vid.thumbnail!.image);
-    }
 
     // Check if the media file has been successfully saved
     if (localFile.existsSync()) {

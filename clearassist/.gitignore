@@ -5,7 +5,7 @@
 .packages
 build/
 pubspec.lock
-
+utils/test.dart
 # Directory created by dartdoc
 # If you don't generate documentation locally you can remove this line.
 doc/api/
