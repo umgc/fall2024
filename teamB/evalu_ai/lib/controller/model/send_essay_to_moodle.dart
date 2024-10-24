@@ -454,6 +454,22 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                             widget.updatedJson,
                             description,
                           );
+
+                          // Show the success SnackBar
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Assignment submission successful'),
+                            ),
+                          );
+
+                          // Navigate to the dashboard after a delay to show the SnackBar
+                          Future.delayed(Duration(seconds: 2), () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => DashBoardPage(),
+                              ),
+                            );
+                          });
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               content: Text('Failed to retrieve user token.')));
@@ -463,26 +479,9 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                             content: Text(
                                 'Please fill out all fields and ensure a course, description, and valid availability dates are selected.')));
                       }
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => DashBoardPage(),
-                        ),
-                      );
                     },
                     child: Text('Send to Moodle'),
                   ),
-                  /*
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => EssayEditPage(),
-                        ),
-                      );
-                    },
-                    child: Text('Go Back to Edit Essay'),
-                  ),
-                  */
                 ],
               ),
             ],
