@@ -10,9 +10,6 @@ class LoginApp extends StatelessWidget {
       title: 'Learning Lens Login',
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple.shade200,
-        ),
       ),
       debugShowCheckedModeBanner: false,
       scrollBehavior: CustomScrollBehavior(),
@@ -33,6 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _moodleURLController = TextEditingController();
+  bool _isLoading = false;
 
   void _showLoginFailedDialog() {
     showDialog(
@@ -146,26 +144,37 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 32),
                     SizedBox(
                       width: 246,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          var wasSuccessful =
-                              await LoginScreen.controller.loginToMoodle(
-                            _usernameController.text,
-                            _passwordController.text,
-                            _moodleURLController.text,
-                          );
-                          if (wasSuccessful) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => TeacherDashboard()),
-                            );
-                          } else {
-                            _showLoginFailedDialog();
-                          }
-                        },
-                        child: const Text('Login'),
-                      ),
+                      child: _isLoading
+                          ? CircularProgressIndicator() // Show spinner when loading
+                          : ElevatedButton(
+                              onPressed: () async {
+                                setState(() {
+                                  _isLoading = true; // Start loading
+                                });
+                                var wasSuccessful = await LoginScreen
+                                    .controller
+                                    .loginToMoodle(
+                                  _usernameController.text,
+                                  _passwordController.text,
+                                  _moodleURLController.text,
+                                );
+                                setState(() {
+                                  _isLoading = false; // Stop loading
+                                });
+
+                                if (wasSuccessful) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            TeacherDashboard()),
+                                  );
+                                } else {
+                                  _showLoginFailedDialog();
+                                }
+                              },
+                              child: const Text('Login'),
+                            ),
                     ),
                     const SizedBox(height: 16),
                   ],
@@ -267,28 +276,37 @@ class _LoginScreenState extends State<LoginScreen> {
                             SizedBox(
                               width: constraints.maxWidth *
                                   0.6, // Relative sizing for buttons
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  var wasSuccessful = await LoginScreen
-                                      .controller
-                                      .loginToMoodle(
-                                    _usernameController.text,
-                                    _passwordController.text,
-                                    _moodleURLController.text,
-                                  );
-                                  if (wasSuccessful) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              TeacherDashboard()),
-                                    );
-                                  } else {
-                                    _showLoginFailedDialog();
-                                  }
-                                },
-                                child: const Text('Login'),
-                              ),
+                              child: _isLoading
+                                  ? CircularProgressIndicator() // Show spinner when loading
+                                  : ElevatedButton(
+                                      onPressed: () async {
+                                        setState(() {
+                                          _isLoading = true; // Start loading
+                                        });
+                                        var wasSuccessful = await LoginScreen
+                                            .controller
+                                            .loginToMoodle(
+                                          _usernameController.text,
+                                          _passwordController.text,
+                                          _moodleURLController.text,
+                                        );
+                                        setState(() {
+                                          _isLoading = false; // Stop loading
+                                        });
+
+                                        if (wasSuccessful) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    TeacherDashboard()),
+                                          );
+                                        } else {
+                                          _showLoginFailedDialog();
+                                        }
+                                      },
+                                      child: const Text('Login'),
+                                    ),
                             ),
                           ],
                         ),
