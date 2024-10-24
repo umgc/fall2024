@@ -503,7 +503,7 @@ class QuizMoodleState extends State<QuizMoodle> {
                             widget.quiz.name ?? 'Code Assignment',
                             allowSubmissionFrom,
                             dueDate,
-                            '''{"criteria":[{"description":"Full Score","levels":[{"definition":"Score Given by Code Compiler","score": 100}]}]}''',
+                            '''{"criteria":[{"description":"Full Score","levels":[{"definition":"Score Given by Code Compiler","score": 0}]}]}''',
                             widget.quiz.description ?? 'Code Assignment',
                           );
                           _showMoodleSuccess();
