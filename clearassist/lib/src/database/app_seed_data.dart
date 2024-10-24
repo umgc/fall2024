@@ -50,19 +50,9 @@ class AppSeedData {
 
   Future<void> loadSeedVideo() async {
     try {
-      File? videoFile = await FileManager.loadAssetFile(
-          'assets/seed_data_files/dog.mp4', 'dog.mp4');
       File? thumbnailFile = await FileManager.loadAssetFile(
           'assets/seed_data_files/dog.png', 'dog.png');
       List<String>? tagsList = ['pet', 'dog'];
-      await DataService.instance.addSeedVideo(
-        title: 'Dog',
-        description: 'A video of my pet dog, Spot.',
-        tags: tagsList,
-        videoFile: videoFile,
-        thumbnailFile: thumbnailFile,
-        duration: '00:08',
-      );
       FileManager.unloadAssetFile('dog.mp4');
       FileManager.unloadAssetFile('dog.png');
     } catch (e) {

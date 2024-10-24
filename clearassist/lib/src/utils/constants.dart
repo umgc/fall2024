@@ -5,6 +5,7 @@ const String defaultAddress =
     "3501 University Boulevard East, Adelphi, Maryland, 20783, US";
 
 // Directory Names:
+const String contactsDirName = "contacts";
 const String filesDirName = "files";
 const String photosDirName = "photos";
 const String audiosDirName = "audios";
@@ -21,6 +22,7 @@ const String filesPath = "/$filesDirName";
 const String photosPath = "$filesPath/$photosDirName";
 const String audiosPath = "$filesPath/$audiosDirName";
 const String audioTranscriptsPath = "$audiosPath/$audioTranscriptsDirName";
+const String contactsPath = "$filesPath/$contactsDirName";
 const String videosPath = "$filesPath/$videosDirName";
 const String videoThumbnailsPath = "$videosPath/$videoThumbnailsDirName";
 const String videoStillsPath = "$videosPath/$videoStillsDirName";

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../src/utils/contact_display.dart';
 import 'calendar_screen.dart';
-import 'response_screen.dart';
 import 'audio_screen.dart';
 import 'location_history_screen.dart';
 import 'tour_screen.dart';
@@ -66,12 +65,6 @@ class HomeScreenContentBody extends StatelessWidget {
               childAspectRatio: 1.30,
               padding: const EdgeInsets.all(26.0),
               children: [
-                _buildElevatedButton(
-                  homeScreenState: homeScreenState,
-                  icon: Icon(Icons.search, size: iconSize, color: Colors.white),
-                  text: 'Object Search',
-                  screen: ResponseScreen(),
-                ),
                 _buildElevatedButton(
                   homeScreenState: homeScreenState,
                   icon: Icon(Icons.mic_rounded,
