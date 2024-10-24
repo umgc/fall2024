@@ -24,24 +24,24 @@ class SubmissionList extends StatefulWidget {
 
 class SubmissionListState extends State<SubmissionList> {
   MoodleApiSingleton api = MoodleApiSingleton();
-  bool isLoading = false;
+  Map<int, bool> isLoadingMap = {}; // Track loading state for each participant
+  Map<int, String> llmSelectionMap = {}; // Track LLM selection for each participant
 
   late Future<List<SubmissionWithGrade>> futureSubmissionsWithGrades =
       api.getSubmissionsWithGrades(widget.assignmentId);
   late Future<List<Participant>> futureParticipants =
       api.getCourseParticipants(widget.courseId);
 
-  // LLM
-  String selectedLlm = 'Perplexity'; // Default selection
+  // Default LLM selection
+  final String defaultLlm = 'Perplexity';
 
-  // api keys
+  // API keys
   final perplexityApiKey = dotenv.env['perplexity_apikey'] ?? '';
   final openApiKey = dotenv.env['openai_apikey'] ?? 'perplexity_apikey';
   final claudeApiKey = dotenv.env['claudeApiKey'] ?? 'perplexity_apikey';
 
-  // Get api key for selected LLM
-  String getApiKey() 
-  {
+  // Get API key for selected LLM
+  String getApiKey(String selectedLlm) {
     switch (selectedLlm) {
       case 'OpenAI':
         return openApiKey;
@@ -52,27 +52,27 @@ class SubmissionListState extends State<SubmissionList> {
     }
   }
 
-    // Handle LLM Selection
-  void _handleLLMChanged(String? newValue) {
-    setState(() {
-      if (newValue != null) {
-        selectedLlm = newValue;
-      }
-    });
-  }
-
   @override
   void initState() {
     super.initState();
     _fetchData();
   }
 
-  //needed to refresh the submissions if a grade gets updated on the detail page
+  // Refresh the submissions if a grade gets updated on the detail page
   void _fetchData() {
     setState(() {
       futureSubmissionsWithGrades =
           api.getSubmissionsWithGrades(widget.assignmentId);
       futureParticipants = api.getCourseParticipants(widget.courseId);
+    });
+  }
+
+  // Handle LLM selection change for a specific participant
+  void _handleLLMChanged(int participantId, String? newValue) {
+    setState(() {
+      if (newValue != null) {
+        llmSelectionMap[participantId] = newValue;
+      }
     });
   }
 
@@ -86,7 +86,6 @@ class SubmissionListState extends State<SubmissionList> {
             future: futureParticipants,
             builder: (BuildContext context,
                 AsyncSnapshot<List<Participant>> participantSnapshot) {
-              print("Rebuilding FutureBuilder with new data..."); // Debug log
               if (participantSnapshot.connectionState ==
                   ConnectionState.waiting) {
                 return Center(child: CircularProgressIndicator());
@@ -119,10 +118,9 @@ class SubmissionListState extends State<SubmissionList> {
                         int lastNameComparison =
                             a.lastname.compareTo(b.lastname);
                         if (lastNameComparison != 0) {
-                          return lastNameComparison; // If last names are different, return the result of this comparison
+                          return lastNameComparison; 
                         } else {
-                          return a.firstname.compareTo(b
-                              .firstname); // If last names are the same, compare by first name
+                          return a.firstname.compareTo(b.firstname);
                         }
                       });
 
@@ -132,12 +130,14 @@ class SubmissionListState extends State<SubmissionList> {
                           runSpacing: 8.0,
                           alignment: WrapAlignment.center,
                           children: participants.map((participant) {
-                            // Try to find a submission for the current participant
                             SubmissionWithGrade? submissionWithGrade =
                                 submissionsWithGrades
                                     .where((sub) =>
                                         sub.submission.userid == participant.id)
                                     .firstOrNull;
+
+                            bool isLoading = isLoadingMap[participant.id] ?? false;
+                            String selectedLlm = llmSelectionMap[participant.id] ?? defaultLlm;
 
                             return SizedBox(
                               width: MediaQuery.of(context).size.width < 450
@@ -147,10 +147,10 @@ class SubmissionListState extends State<SubmissionList> {
                                 decoration: BoxDecoration(
                                   color: Theme.of(context)
                                       .colorScheme
-                                      .secondaryContainer, // Card background color
+                                      .secondaryContainer,
                                   border: Border.all(
-                                    color: Theme.of(context).colorScheme.onSecondaryContainer, // Border color
-                                    width: 2.0, // Border width
+                                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                                    width: 2.0,
                                   ),
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
@@ -160,7 +160,7 @@ class SubmissionListState extends State<SubmissionList> {
                                   color: Theme.of(context)
                                       .colorScheme
                                       .secondaryContainer,
-                                  elevation: 0, // Optional: Remove card shadow if needed
+                                  elevation: 0,
                                   child: ListTile(
                                     leading: CircleAvatar(
                                       backgroundColor: Theme.of(context)
@@ -196,29 +196,42 @@ class SubmissionListState extends State<SubmissionList> {
                                               Text(
                                                   'Grade: ${submissionWithGrade.grade != null ? submissionWithGrade.grade!.grade.toString() : "Not graded yet"}'),
                                               SizedBox(height: 4),
-                                              Text(
-                                                'Content: ${submissionWithGrade.submission.onlineText.isNotEmpty ? "Available" : "No content provided."}',
-                                                style: TextStyle(
-                                                  fontStyle: submissionWithGrade
-                                                          .submission
-                                                          .onlineText
-                                                          .isNotEmpty
-                                                      ? FontStyle.normal
-                                                      : FontStyle.italic,
-                                                ),
-                                              ),
+                                              // Text(
+                                              //   'Content: ${submissionWithGrade.submission.onlineText.isNotEmpty ? "Available" : "No content provided."}',
+                                              //   style: TextStyle(
+                                              //     fontStyle: submissionWithGrade
+                                              //             .submission
+                                              //             .onlineText
+                                              //             .isNotEmpty
+                                              //         ? FontStyle.normal
+                                              //         : FontStyle.italic,
+                                              //   ),
+                                              // ),
+
+                                            DropdownButton<String>(
+                                              value: selectedLlm,
+                                              onChanged: (newValue) => _handleLLMChanged(participant.id, newValue),
+                                              items: <String>['Perplexity', 'OpenAI', 'Claude']
+                                                  .map<DropdownMenuItem<String>>((String value) {
+                                                return DropdownMenuItem<String>(
+                                                  value: value,
+                                                  child: Text(value),
+                                                );
+                                              }).toList(),
+                                            ),
+
                                               SizedBox(height: 4),
-                                              Text(
-                                                'Comments: ${submissionWithGrade.submission.comments.isNotEmpty ? "Available" : "No comments."}',
-                                                style: TextStyle(
-                                                  fontStyle: submissionWithGrade
-                                                          .submission
-                                                          .comments
-                                                          .isNotEmpty
-                                                      ? FontStyle.normal
-                                                      : FontStyle.italic,
-                                                ),
-                                              ),
+                                              // Text(
+                                              //   'Comments: ${submissionWithGrade.submission.comments.isNotEmpty ? "Available" : "No comments."}',
+                                              //   style: TextStyle(
+                                              //     fontStyle: submissionWithGrade
+                                              //             .submission
+                                              //             .comments
+                                              //             .isNotEmpty
+                                              //         ? FontStyle.normal
+                                              //         : FontStyle.italic,
+                                              //   ),
+                                              // ),
                                             ],
                                           )
                                         else
@@ -242,63 +255,34 @@ class SubmissionListState extends State<SubmissionList> {
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                          // LLM Selection Dropdown
-                                          DropdownButton<String>(
-                                            value: selectedLlm,
-                                            onChanged: _handleLLMChanged,
-                                            items: <String>['Perplexity', 'OpenAI', 'Claude']
-                                                .map<DropdownMenuItem<String>>((String value) {
-                                              return DropdownMenuItem<String>(
-                                                value: value,
-                                                child: Text(value),
-                                              );
-                                            }).toList(),
-                                          ),
-                                            if (submissionWithGrade != null &&
-                                                submissionWithGrade.submission
-                                                        .gradingStatus ==
-                                                    'notgraded')
+
+                                            if (submissionWithGrade != null)
                                               isLoading
                                                   ? CircularProgressIndicator()
                                                   : ElevatedButton(
                                                       onPressed: () async {
                                                         try {
                                                           setState(() {
-                                                            isLoading = true;
+                                                            isLoadingMap[participant.id] = true; 
                                                           });
-                                                          var submissionText =
-                                                              submissionWithGrade
-                                                                  .submission
-                                                                  .onlineText;
-                                                          int? contextId =
-                                                              await MoodleApiSingleton()
-                                                                  .getContextId(
-                                                                      widget
-                                                                          .assignmentId,
-                                                                      widget
-                                                                          .courseId);
+
+                                                          var submissionText = submissionWithGrade.submission.onlineText;
+                                                          int? contextId = await MoodleApiSingleton()
+                                                              .getContextId(widget.assignmentId, widget.courseId);
 
                                                           var fetchedRubric;
-                                                          if (contextId !=
-                                                              null) {
-                                                            fetchedRubric =
-                                                                await MoodleApiSingleton()
-                                                                    .getRubric(widget
-                                                                        .assignmentId
-                                                                        .toString());
-                                                            if (fetchedRubric ==
-                                                                null) {
-                                                              print(
-                                                                  'Failed to fetch rubric.');
+                                                          if (contextId != null) {
+                                                            fetchedRubric = await MoodleApiSingleton()
+                                                                .getRubric(widget.assignmentId.toString());
+                                                            if (fetchedRubric == null) {
+                                                              print('Failed to fetch rubric.');
                                                               return;
                                                             }
                                                             fetchedRubric = jsonEncode(
-                                                                fetchedRubric
-                                                                        ?.toJson() ??
-                                                                    {});
+                                                                fetchedRubric?.toJson() ?? {});
                                                           }
 
-                                                  String queryPrompt = '''
+                                                          String queryPrompt = '''
                                                   I am building a program that generates essay rubric assignments that teachers can distribute to students
                                                   who can then submit their responses to be graded. Here is an example format of a rubric roughly:
                                                   [
@@ -381,52 +365,41 @@ class SubmissionListState extends State<SubmissionList> {
                                                 ]
                                                 ''';
 
-                                                  String apiKey = getApiKey(); // Get the correct API key based on the selected LLM
-                                                  // Dynamically instantiate the appropriate LLM class based on the selectedLLM
-                                                  dynamic llmInstance;
-                                                  if (selectedLlm == 'OpenAI') 
-                                                  {
-                                                      llmInstance = OpenAiLLM(apiKey);
-                                                  } else if (selectedLlm == 'Claude') 
-                                                  {
-                                                      llmInstance = ClaudeAiAPI(apiKey);
-                                                  } 
-                                                  else
-                                                  {
-                                                      llmInstance = LlmApi(apiKey); // Perplexity API class
-                                                  }
-                                                  dynamic gradedResponse = await llmInstance.postToLlm(queryPrompt);
-                                                  gradedResponse = gradedResponse.replaceAll('```json','').replaceAll('```','').trim();
-                                                  var results = await MoodleApiSingleton().setRubricGrades(widget.assignmentId, participant.id,gradedResponse);
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              SubmissionDetail(
-                                                            participant:
-                                                                participant,
-                                                            submission:
-                                                                submissionWithGrade
-                                                                    .submission,
-                                                            courseId: widget
-                                                                .courseId,
-                                                          ),
-                                                        ),
-                                                      );
-                                                      print(
-                                                          'Results: $results');
-                                                    } catch (e) {
-                                                      print(
-                                                          'An error occurred: $e');
-                                                    } finally {
-                                                      setState(() {
-                                                        isLoading =
-                                                            false;
-                                                      });
-                                                    }
-                                                  },
-                                                  child: Text('Grade'),
-                                                ),
+                                                          String apiKey = getApiKey(selectedLlm);
+                                                          dynamic llmInstance;
+                                                          if (selectedLlm == 'OpenAI') {
+                                                            llmInstance = OpenAiLLM(apiKey);
+                                                          } else if (selectedLlm == 'Claude') {
+                                                            llmInstance = ClaudeAiAPI(apiKey);
+                                                          } else {
+                                                            llmInstance = LlmApi(apiKey); 
+                                                          }
+                                                          dynamic gradedResponse = await llmInstance.postToLlm(queryPrompt);
+                                                          gradedResponse = gradedResponse.replaceAll('```json','').replaceAll('```','').trim();
+                                                          var results = await MoodleApiSingleton()
+                                                              .setRubricGrades(widget.assignmentId, participant.id, gradedResponse);
+                                                              _fetchData();
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) => SubmissionDetail(
+                                                                participant: participant,
+                                                                submission: submissionWithGrade.submission,
+                                                                courseId: widget.courseId,
+                                                              ),
+                                                            ),
+                                                          );
+                                                          print('Results: $results');
+                                                        } catch (e) {
+                                                          print('An error occurred: $e');
+                                                        } finally {
+                                                          setState(() {
+                                                            isLoadingMap[participant.id] = false;
+                                                          });
+                                                        }
+                                                      },
+                                                      child: Text('Grade'),
+                                                    ),
                                             SizedBox(width: 8),
                                             if (submissionWithGrade != null)
                                               ElevatedButton(
@@ -436,13 +409,9 @@ class SubmissionListState extends State<SubmissionList> {
                                                     MaterialPageRoute(
                                                       builder: (context) =>
                                                           SubmissionDetail(
-                                                        participant:
-                                                            participant,
-                                                        submission:
-                                                            submissionWithGrade
-                                                                .submission,
-                                                        courseId:
-                                                            widget.courseId,
+                                                        participant: participant,
+                                                        submission: submissionWithGrade.submission,
+                                                        courseId: widget.courseId,
                                                       ),
                                                     ),
                                                   );
