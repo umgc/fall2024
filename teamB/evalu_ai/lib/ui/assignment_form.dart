@@ -100,12 +100,12 @@ class _AssignmentQuizFormState extends State<AssignmentQuizForm> {
           multipleChoiceCount: int.parse(fields['multipleChoice']!.text),
           maximumGrade: 100
         );
+        print('Before Generate Questiona from AI');
         generateQuestionsFromAI(af);
     }
   }
 
   Future<void> generateQuestionsFromAI(AssignmentForm af) async {
-    if (_formKey.currentState!.validate()) {
       final openApiKey = dotenv.env['OPENAI_API_KEY']?? 'default_openai_api_key';
       final claudApiKey = dotenv.env['CLAUDE_API_KEY']?? 'default_claude_api_key';
       final String perplexityApiKey = dotenv.env['PERPLEXITY_API_KEY']?? 'default_perplexity_api_key';
@@ -115,6 +115,7 @@ class _AssignmentQuizFormState extends State<AssignmentQuizForm> {
 
         aiModel = OpenAiLLM(openApiKey);
 
+        print('Before to the Post to the LLM');
         var result = await aiModel.postToLlm(PromptEngine.generatePrompt(af));
         if (result.isNotEmpty) {
           setState(() {_isLoading=false;});
@@ -125,7 +126,6 @@ class _AssignmentQuizFormState extends State<AssignmentQuizForm> {
         print("Failure sending request to LLM: $e");
         setState(() {_isLoading=false;});
       }
-    }
   }
 
   @override
@@ -167,7 +167,7 @@ class _AssignmentQuizFormState extends State<AssignmentQuizForm> {
                       children: [
                         _buildNumberInput('Number of Multiple Choice Questions', '0', controller: AssignmentQuizForm.multipleChoiceController),
                         const SizedBox(height: 15),
-                        _buildNumberInput('Number of True/False Questions', '0', controller: AssignmentQuizForm.shortAnswerController),
+                        _buildNumberInput('Number of True/False Questions', '0', controller: AssignmentQuizForm.trueFalseController),
                         const SizedBox(height: 15),
                         _buildNumberInput('Number of Short Answer Questions', '0', controller: AssignmentQuizForm.shortAnswerController),
                         const SizedBox(height: 15),
