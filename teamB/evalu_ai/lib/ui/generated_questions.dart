@@ -19,7 +19,7 @@ class GeneratedQuestionsPage extends StatefulWidget {
 }
 
 class _GeneratedQuestionsPageState extends State<GeneratedQuestionsPage> {
- late Quiz myQuiz;
+  late Quiz myQuiz;
   final TextEditingController _textController = TextEditingController();
   var apikey = dotenv.env['OPENAI_API_KEY'];
   late OpenAiLLM openai;

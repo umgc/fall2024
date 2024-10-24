@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intelligrade/controller/model/beans.dart';
 import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
+import 'package:intelligrade/ui/dashboard_page.dart';
 import 'package:intelligrade/ui/header.dart';
 
 class QuizMoodle extends StatefulWidget {
@@ -46,6 +47,66 @@ class QuizMoodleState extends State<QuizMoodle> {
         selectedCourse = 'No courses available'; // Handle the empty case
       });
     }
+  }
+
+    void _showMoodleSuccess() {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Successfully Submitted to Moodle!'),
+          content: SingleChildScrollView(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  ElevatedButton (
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => DashBoardPage(),
+                          ),
+                      );
+                    },
+                    child: const Text('Close'),
+                  ),
+                ]
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+      void _showMoodleFailure() {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Failed to Submit to Moodle'),
+          content: SingleChildScrollView(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10.0),
+                    child: Text("Please Try Again."),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton (
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Close'),
+                  ),
+                ]
+            ),
+          ),
+        );
+      },
+    );
   }
 
   // Dropdown to display courses with "Select a course" as the default option
@@ -424,19 +485,48 @@ class QuizMoodleState extends State<QuizMoodle> {
                   children: [
                     ElevatedButton(
                       onPressed: () async {
-                        var quizid = await MoodleApiSingleton().createQuiz(
-                          selectedCourse,
-                          widget.quiz.name ?? 'Quiz Name',
-                          widget.quiz.description ?? 'Quiz Description',
-                        );
-                        print('Quiz ID: $quizid');
-                        var categoryid = await MoodleApiSingleton()
-                            .importQuizQuestions(selectedCourse, quizasxml);
-                        print('Category ID: $categoryid');
-                        var randomresult = await MoodleApiSingleton()
-                            .addRandomQuestions(categoryid.toString(),
-                                quizid.toString(), quizQuestionsController.text);
-                        print('Random Result: $randomresult');
+                        if (widget.quiz.name!.contains("Coding") || widget.quiz.name!.contains("Code")) {
+                          print(selectedCourse);
+                          courses.forEach((course) {
+                            print(course.id);
+                          });
+                          List<Course> matchingCourse = courses.where((course) => course.id.toString() == selectedCourse).toList();
+                          String dueDate =
+                              '$selectedDayDue $selectedMonthDue $selectedYearDue $selectedHourDue:$selectedMinuteDue';
+                          print(dueDate);
+                          String allowSubmissionFrom =
+                              '$selectedDaySubmission $selectedMonthSubmission $selectedYearSubmission $selectedHourSubmission:$selectedMinuteSubmission';
+                          print(allowSubmissionFrom);
+                          await MoodleApiSingleton().createAssignment(
+                            matchingCourse!.first.id.toString(),
+                            '3', // Section ID
+                            widget.quiz.name ?? 'Code Assignment',
+                            allowSubmissionFrom,
+                            dueDate,
+                            '''{"criteria":[{"description":"Full Score","levels":[{"definition":"Score Given by Code Compiler","score": 100}]}]}''',
+                            widget.quiz.description ?? 'Code Assignment',
+                          );
+                          _showMoodleSuccess();
+                        } else {
+                          var quizid = await MoodleApiSingleton().createQuiz(
+                            selectedCourse,
+                            widget.quiz.name ?? 'Quiz Name',
+                            widget.quiz.description ?? 'Quiz Description',
+                          );
+                          print('Quiz ID: $quizid');
+                          var categoryid = await MoodleApiSingleton()
+                              .importQuizQuestions(selectedCourse, quizasxml);
+                          print('Category ID: $categoryid');
+                          var randomresult = await MoodleApiSingleton()
+                              .addRandomQuestions(categoryid.toString(),
+                                  quizid.toString(), quizQuestionsController.text);
+                          print('Random Result: $randomresult');
+                          if (quizid != null) {
+                            _showMoodleSuccess();
+                          } else {
+                            _showMoodleFailure();
+                          }
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF7D6CE2), // Match the color

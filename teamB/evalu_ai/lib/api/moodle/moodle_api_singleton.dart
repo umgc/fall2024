@@ -725,6 +725,8 @@ class MoodleApiSingleton {
       String rubricJson,
       String description) async {
     if (_userToken == null) throw StateError('User not logged in to Moodle');
+    print("here?");
+    print(rubricJson);
     try {
       final response = await http.post(
         Uri.parse(moodleURL + serverUrl),
