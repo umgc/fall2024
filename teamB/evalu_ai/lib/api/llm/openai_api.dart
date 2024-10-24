@@ -77,6 +77,7 @@ class OpenAiLLM {
     // use the following test query so Perplexity doesn't charge
     // 'How many stars are there in our galaxy?'
     if (queryPrompt.isNotEmpty) {
+      print('Querying AI');
       resp = await queryAI(queryPrompt);
     }
     return resp;
