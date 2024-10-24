@@ -1,10 +1,14 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intelligrade/api/llm/openai_api.dart';
+import 'package:intelligrade/controller/model/beans.dart';
 import 'package:intelligrade/ui/custom_navigation_bar.dart';
 import 'package:intelligrade/ui/dashboard_page.dart';
 import 'package:intelligrade/ui/generated_questions.dart';
+//import 'package:intelligrade/api/llm/openai_api.dart';
+import 'package:intelligrade/api/llm/prompt_engine.dart';
 import 'package:intelligrade/ui/header.dart';
 
 class CreateAssignmentScreen extends StatelessWidget {
@@ -37,7 +41,7 @@ class CreateAssignmentScreen extends StatelessWidget {
                     child: SingleChildScrollView(
                       child: Padding(
                         padding: EdgeInsets.all(20),
-                        child: AssignmentForm(),
+                        child: AssignmentQuizForm(),
                       ),
                     ),
                   ),
@@ -51,84 +55,75 @@ class CreateAssignmentScreen extends StatelessWidget {
   }
 }
 
-class AssignmentForm extends StatefulWidget {
-  const AssignmentForm({super.key});
+class AssignmentQuizForm extends StatefulWidget {
 
+  static TextEditingController nameController = TextEditingController();
+  static TextEditingController descriptionController = TextEditingController();
+  static TextEditingController subjectController = TextEditingController();
+  static TextEditingController multipleChoiceController = TextEditingController();
+  static TextEditingController trueFalseController = TextEditingController();
+  static TextEditingController shortAnswerController = TextEditingController();
+  static TextEditingController topicController = TextEditingController();
+  
   @override
-  _AssignmentFormState createState() => _AssignmentFormState();
+  State createState() {
+    return _AssignmentQuizFormState();
+  }
 }
 
-class _AssignmentFormState extends State<AssignmentForm> {
+class _AssignmentQuizFormState extends State<AssignmentQuizForm> {
   String _selectedType = 'Quiz';
   String _selectedSubject = 'Math';
   String _selectedDifficulty = 'Medium';
+  String selectedLLM = 'OpenAI';
 
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _multipleChoiceController = TextEditingController(text: '');
-  final TextEditingController _trueFalseController = TextEditingController(text: '');
-  final TextEditingController _shortAnswerController = TextEditingController(text: '');
+  // final TextEditingController _titleController = TextEditingController();
+  // final TextEditingController _descriptionController = TextEditingController();
+  // final TextEditingController _multipleChoiceController = TextEditingController(text: '');
+  // final TextEditingController _trueFalseController = TextEditingController(text: '');
+  // final TextEditingController _shortAnswerController = TextEditingController(text: '');
 
   final _formKey = GlobalKey<FormState>();
 
     // State variable for showing the loading spinner
   bool _isLoading = false;
 
-  Future<void> generateQuestionsFromAI() async {
+  void generateQuiz(Map<String, TextEditingController> fields) {
     if (_formKey.currentState!.validate()) {
-      // Collect form data
-      String assignmentTitle = _titleController.text;
-      String assignmentType = _selectedType;
-      String subject = _selectedSubject;
-      String difficulty = _selectedDifficulty;
-      String description = _descriptionController.text;
-      int numMultipleChoice = int.parse(_multipleChoiceController.text);
-      int numTrueFalse = int.parse(_trueFalseController.text);
-      int numShortAnswer = int.parse(_shortAnswerController.text);
-
-      // Create OpenAiLLM instance with your API key
-      const apiKey = ''; // Replace with your actual OpenAI API key
-      final openAiLLM = OpenAiLLM(apiKey);
-
-      // Create the query prompt
-      String queryPrompt = '''
-      Generate a $assignmentType on the subject of $subject. 
-      Difficulty: $difficulty. 
-      Number of Multiple Choice: $numMultipleChoice, 
-      True/False: $numTrueFalse, 
-      Short Answer: $numShortAnswer. 
-      Description: $description.
-      ''';
-
-      // Show loading spinner
-      setState(() {
-        _isLoading = true;
-      });
-
-      try {
-        // Call the AI to generate questions
-        String generatedQuestions = await openAiLLM.queryAI(queryPrompt);
-
-        // Split the generated questions into a list (assuming they are separated by newlines)
-        List<String> questionList = generatedQuestions.split('\n');  // Adjust the delimiter based on your AI's response
-
-        // Navigate to a new page to view the generated questions
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => GeneratedQuestionsPage(
-              generatedQuestions: questionList, 
-              assignmentTitle: assignmentTitle, 
-              subject: subject, 
-              type: assignmentType, 
-              ),
-          ),
+      AssignmentForm af = AssignmentForm(
+          subject: _selectedSubject != null ? _selectedSubject.toString() :  fields['subject']!.text, 
+          topic: fields['description']!.text, 
+          gradeLevel: "University",
+          title: fields['name']!.text,
+          trueFalseCount: int.parse(fields['trueFalse']!.text),
+          shortAnswerCount: int.parse(fields['shortAns']!.text),
+          multipleChoiceCount: int.parse(fields['multipleChoice']!.text),
+          maximumGrade: 100
         );
-      } finally {
-        // Hide loading spinner
-        setState(() {
-          _isLoading = false;
-        });
+        generateQuestionsFromAI(af);
+    }
+  }
+
+  Future<void> generateQuestionsFromAI(AssignmentForm af) async {
+    if (_formKey.currentState!.validate()) {
+      final openApiKey = dotenv.env['OPENAI_API_KEY']?? 'default_openai_api_key';
+      final claudApiKey = dotenv.env['CLAUDE_API_KEY']?? 'default_claude_api_key';
+      final String perplexityApiKey = dotenv.env['PERPLEXITY_API_KEY']?? 'default_perplexity_api_key';
+      try {
+        setState((){_isLoading=true;});
+        final aiModel;
+
+        aiModel = OpenAiLLM(openApiKey);
+
+        var result = await aiModel.postToLlm(PromptEngine.generatePrompt(af));
+        if (result.isNotEmpty) {
+          setState(() {_isLoading=false;});
+          Navigator.push(context, MaterialPageRoute(builder: (context) => GeneratedQuestionsPage(result)));
+        }
+      }
+      catch (e) {
+        print("Failure sending request to LLM: $e");
+        setState(() {_isLoading=false;});
       }
     }
   }
@@ -142,7 +137,7 @@ class _AssignmentFormState extends State<AssignmentForm> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildTextFormField('Assignment Title', 'Type name', controller: _titleController),
+              _buildTextFormField('Assignment Title', 'Type name', controller: AssignmentQuizForm.nameController),
               const SizedBox(height: 20),
               Row(
                 children: [
@@ -170,11 +165,11 @@ class _AssignmentFormState extends State<AssignmentForm> {
                     flex: 3,
                     child: Column(
                       children: [
-                        _buildNumberInput('Number of Multiple Choice Questions', '0', controller: _multipleChoiceController),
+                        _buildNumberInput('Number of Multiple Choice Questions', '0', controller: AssignmentQuizForm.multipleChoiceController),
                         const SizedBox(height: 15),
-                        _buildNumberInput('Number of True/False Questions', '0', controller: _trueFalseController),
+                        _buildNumberInput('Number of True/False Questions', '0', controller: AssignmentQuizForm.shortAnswerController),
                         const SizedBox(height: 15),
-                        _buildNumberInput('Number of Short Answer Questions', '0', controller: _shortAnswerController),
+                        _buildNumberInput('Number of Short Answer Questions', '0', controller: AssignmentQuizForm.shortAnswerController),
                         const SizedBox(height: 15),
                       ],
                     ),
@@ -182,7 +177,7 @@ class _AssignmentFormState extends State<AssignmentForm> {
                   const SizedBox(width: 20),
                   Expanded(
                     flex: 7,
-                    child: _buildTextFormField('Description', 'Enter assignment description', maxLines: 10, controller: _descriptionController),
+                    child: _buildTextFormField('Description', 'Enter assignment description', maxLines: 10, controller: AssignmentQuizForm.descriptionController),
                   ),
                 ],
               ),
@@ -191,7 +186,16 @@ class _AssignmentFormState extends State<AssignmentForm> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   ElevatedButton(
-                    onPressed: generateQuestionsFromAI,
+                    onPressed: () {
+                      generateQuiz(
+                          { "name" : AssignmentQuizForm.nameController, 
+                            "description" : AssignmentQuizForm.descriptionController,
+                            "subject" : AssignmentQuizForm.subjectController,
+                            "multipleChoice" : AssignmentQuizForm.multipleChoiceController,
+                            "trueFalse" :  AssignmentQuizForm.trueFalseController,
+                            "shortAns" : AssignmentQuizForm.shortAnswerController
+                          });
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF7D6CE2),
                       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),

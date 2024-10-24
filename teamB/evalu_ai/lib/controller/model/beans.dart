@@ -487,7 +487,6 @@ enum QuestionType {
 
 // Object to pass user-specified parameters to LLM API.
 class AssignmentForm {
-  QuestionType questionType;
   String? gradingCriteria;
   String subject;
   String topic;
@@ -497,13 +496,11 @@ class AssignmentForm {
   int trueFalseCount;
   int shortAnswerCount;
   int multipleChoiceCount;
-  int questionCount;
   String? codingLanguage;
   String title;
 
   AssignmentForm(
-      {required this.questionType,
-      required this.subject,
+      {required this.subject,
       required this.topic,
       required this.gradeLevel,
       required this.title,
@@ -511,7 +508,6 @@ class AssignmentForm {
       required this.shortAnswerCount,
       required this.multipleChoiceCount,
       required this.maximumGrade,
-      required this.questionCount,
       this.assignmentCount,
       this.gradingCriteria,
       this.codingLanguage});
