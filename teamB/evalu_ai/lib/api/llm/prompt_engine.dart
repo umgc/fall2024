@@ -72,7 +72,12 @@ class PromptEngine {
   }
 
   static String generatePrompt(AssignmentForm form) {
-    String prompt = prompt_quizgen_other + _FormatQuestionNumbers(form) + prompt_quizgen_choice_example;
+    String prompt = prompt_quizgen_other + _FormatQuestionNumbers(form);
+    if (form.codingLanguage != null) {
+      prompt = prompt + prompt_quizgen_coding_example;
+    } else {
+      prompt = prompt + prompt_quizgen_choice_example;
+    }
     prompt = prompt
         .replaceAll('[subject]', form.subject)
         .replaceAll('[topic]', form.topic)
@@ -90,6 +95,7 @@ class PromptEngine {
       prompt = prompt.replaceAll('[codinglanguage]', form.codingLanguage!);
     }
     prompt += prompt_quizgen_xmlonly;
+    print(prompt);
     return prompt;
   }
 }

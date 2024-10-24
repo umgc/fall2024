@@ -64,6 +64,7 @@ class AssignmentQuizForm extends StatefulWidget {
   static TextEditingController trueFalseController = TextEditingController();
   static TextEditingController shortAnswerController = TextEditingController();
   static TextEditingController topicController = TextEditingController();
+  static TextEditingController codingLanguageController = TextEditingController();
   
   @override
   State createState() {
@@ -76,6 +77,10 @@ class _AssignmentQuizFormState extends State<AssignmentQuizForm> {
   String _selectedSubject = 'Math';
   String _selectedDifficulty = 'Medium';
   String selectedLLM = 'OpenAI';
+
+  final List<String> _subjects = ['Math', 'Chemistry', 'Biology', 'Computer Science', 'Literature', 'History', 'Language Arts'];
+  final List<String> _programmingLanguages = ['C#', 'C++', 'Dart', 'Java', 'JavaScript', 'Python', 'SQL'];
+  List<String> _selectedSubjectList = [];
 
   // final TextEditingController _titleController = TextEditingController();
   // final TextEditingController _descriptionController = TextEditingController();
@@ -90,18 +95,34 @@ class _AssignmentQuizFormState extends State<AssignmentQuizForm> {
 
   void generateQuiz(Map<String, TextEditingController> fields) {
     if (_formKey.currentState!.validate()) {
-      AssignmentForm af = AssignmentForm(
-          subject: _selectedSubject != null ? _selectedSubject.toString() :  fields['subject']!.text, 
-          topic: fields['description']!.text, 
-          gradeLevel: "University",
-          title: fields['name']!.text,
-          trueFalseCount: int.parse(fields['trueFalse']!.text),
-          shortAnswerCount: int.parse(fields['shortAns']!.text),
-          multipleChoiceCount: int.parse(fields['multipleChoice']!.text),
-          maximumGrade: 100
-        );
-        print('Before Generate Questiona from AI');
-        generateQuestionsFromAI(af);
+      if (_selectedType == "Quiz") {
+        AssignmentForm af = AssignmentForm(
+            subject: _selectedSubject != null ? _selectedSubject.toString() :  fields['subject']!.text, 
+            topic: fields['description']!.text, 
+            gradeLevel: "University",
+            title: fields['name']!.text,
+            trueFalseCount: int.parse(fields['trueFalse']!.text),
+            shortAnswerCount: int.parse(fields['shortAns']!.text),
+            multipleChoiceCount: int.parse(fields['multipleChoice']!.text),
+            maximumGrade: 100
+          );
+          print('Before Generate Questiona from AI');
+          generateQuestionsFromAI(af);
+      } else {
+        AssignmentForm af = AssignmentForm(
+            subject: "Computer Science", 
+            topic: fields['description']!.text, 
+            gradeLevel: "University",
+            title: fields['name']!.text,
+            trueFalseCount: int.parse(fields['trueFalse']!.text),
+            shortAnswerCount: int.parse(fields['shortAns']!.text),
+            multipleChoiceCount: int.parse(fields['multipleChoice']!.text),
+            codingLanguage: _selectedSubject != null ? _selectedSubject.toString() :  fields['subject']!.text,
+            maximumGrade: 100
+          );
+          print('Before Generate Questiona from AI');
+          generateQuestionsFromAI(af);
+      }
     }
   }
 
@@ -141,9 +162,22 @@ class _AssignmentQuizFormState extends State<AssignmentQuizForm> {
               const SizedBox(height: 20),
               Row(
                 children: [
-                  Expanded(child: _buildDropdown('Type', ['Quiz', 'Exam', 'Assignment'], _selectedType, (value) => setState(() => _selectedType = value!))),
+                  Expanded(child: _buildDropdown('Type', ['Quiz', 'Code Assignment'], _selectedType, (value) {
+                    if (value == "Code Assignment") {
+                      setState(() {
+                        _selectedSubjectList = _programmingLanguages;
+                        _selectedSubject = "C#";
+                        });
+                    } else {
+                      setState(() {
+                        _selectedSubjectList = _subjects;
+                        _selectedSubject = "Math";
+                        });
+                    }
+                    setState(() => _selectedType = value!);
+                  })),
                   const SizedBox(width: 20),
-                  Expanded(child: _buildDropdown('Subject', ['Math', 'Chemistry', 'Biology', 'Computer Science', 'Literature', 'History', 'Language Arts'], _selectedSubject, (value) => setState(() => _selectedSubject = value!))),
+                  Expanded(child: _buildDropdown('Subject', _selectedSubjectList, _selectedSubject, (value) => setState(() => _selectedSubject = value!))),
                 ],
               ),
               const SizedBox(height: 20),
