@@ -69,8 +69,7 @@ class _CalendarPageState extends State<CalendarPage> {
       title: Text("Alert Saved!"),
       titleTextStyle: TextStyle(color: Colors.black),
       contentTextStyle: TextStyle(color: Colors.black),
-      content: Text(
-          "You will be reminded of " + reminderText + " every " + frequency),
+      content: Text("You will be reminded of $reminderText every $frequency"),
       actions: [
         // Widget btn=TextButton(child: Text("")
         btnOK,
@@ -85,10 +84,10 @@ class _CalendarPageState extends State<CalendarPage> {
 
   saveReminderToFile(String reminderName) async {
     Directory location = await getApplicationDocumentsDirectory();
-    final FileLocation = await location;
-    File file = new File(FileLocation.path+"/data.txt");
+    final FileLocation = location;
+    File file = File("${FileLocation.path}/data.txt");
     print("Save Data");
-    print("Save into " + FileLocation.path);
+    print("Save into ${FileLocation.path}");
     file.writeAsString("test");
   }
 

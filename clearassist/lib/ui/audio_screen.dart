@@ -19,7 +19,7 @@ class _AudioScreenState extends State<AudioScreen> {
   bool _isRecording = false;
 
   /// Variable to track the duration of the current recording.
-  Duration _duration = const Duration(seconds: 0);
+  final Duration _duration = const Duration(seconds: 0);
 
   /// This variable will store the path where the recorded audio will be saved.
   String? _pathToSaveRecording;
@@ -109,8 +109,7 @@ class _AudioScreenState extends State<AudioScreen> {
 
     var url = Uri.parse('https://api.openai.com/v1/audio/transcriptions');
     var request = http.MultipartRequest('POST', url)
-      ..headers['Authorization'] =
-          'Bearer Add Your Key Here'
+      ..headers['Authorization'] = 'Bearer Add Your Key Here'
       ..fields['model'] = 'whisper-1'
       ..fields['language'] = 'en'
       ..files.add(await http.MultipartFile.fromPath('file', _audioFilePath!));
@@ -205,8 +204,7 @@ class _AudioScreenState extends State<AudioScreen> {
       translationUrl,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization':
-            'Bearer Add Your Key Here',
+        'Authorization': 'Bearer Add Your Key Here',
       },
       body: json.encode({
         'model': 'gpt-3.5-turbo',
@@ -240,31 +238,31 @@ class _AudioScreenState extends State<AudioScreen> {
     }
   }
 
+  Future<void> printCacheFiles() async {
+    try {
+      // Define the cache directory for the app
+      Directory cacheDir =
+          Directory('/data/user/0/comclearassist.clearassistapp/cache/');
 
-Future<void> printCacheFiles() async {
-  try {
-    // Define the cache directory for the app
-    Directory cacheDir = Directory('/data/user/0/comclearassist.clearassistapp/cache/');
+      // Check if the directory exists
+      if (await cacheDir.exists()) {
+        // List all files in the directory and its subdirectories
+        List<FileSystemEntity> files = cacheDir.listSync(recursive: true);
 
-    // Check if the directory exists
-    if (await cacheDir.exists()) {
-      // List all files in the directory and its subdirectories
-      List<FileSystemEntity> files = cacheDir.listSync(recursive: true);
-
-      // Print each file path
-      for (FileSystemEntity file in files) {
-        if (file is File) {  // Ensure it's a file before printing
-          print('File: ${file.path}');
+        // Print each file path
+        for (FileSystemEntity file in files) {
+          if (file is File) {
+            // Ensure it's a file before printing
+            print('File: ${file.path}');
+          }
         }
+      } else {
+        print('Cache directory does not exist.');
       }
-    } else {
-      print('Cache directory does not exist.');
+    } catch (e) {
+      print('Error reading cache directory: $e');
     }
-  } catch (e) {
-    print('Error reading cache directory: $e');
   }
-}
-
 
 // Helper method to get the language name based on the selected language code
   String _getLanguageName(String languageCode) {
@@ -317,12 +315,13 @@ Future<void> printCacheFiles() async {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-              onPressed: () {
-                _isRecording ? _stopRecording() : _startRecording();
-                printCacheFiles(); // Call to print files after starting or stopping recording
-              },
-              child: Text(_isRecording ? 'Stop Recording' : 'Start Recording'),
-            ),
+                onPressed: () {
+                  _isRecording ? _stopRecording() : _startRecording();
+                  printCacheFiles(); // Call to print files after starting or stopping recording
+                },
+                child:
+                    Text(_isRecording ? 'Stop Recording' : 'Start Recording'),
+              ),
               SizedBox(height: 20),
               Text(
                 'Transcription:',
