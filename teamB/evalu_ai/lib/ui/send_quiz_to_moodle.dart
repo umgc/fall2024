@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intelligrade/controller/model/beans.dart';
 import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
+import 'package:intelligrade/ui/header.dart';
 
 class QuizMoodle extends StatefulWidget {
   final Quiz quiz;
@@ -31,13 +32,12 @@ class QuizMoodleState extends State<QuizMoodle> {
     fetchCourses();
   }
 
-// Fetch courses from the controller
+  // Fetch courses from the controller
   Future<void> fetchCourses() async {
     try {
       List<Course>? courseList = MoodleApiSingleton().moodleCourses;
       setState(() {
         courses = courseList ?? [];
-        // Don't auto-select any course here, leave it to the user to select.
         selectedCourse = 'Select a course';
       });
     } catch (e) {
@@ -48,15 +48,18 @@ class QuizMoodleState extends State<QuizMoodle> {
     }
   }
 
-// Dropdown to display courses with "Select a course" as the default option
+  // Dropdown to display courses with "Select a course" as the default option
   DropdownButtonFormField<String> _buildCourseDropdown() {
     return DropdownButtonFormField<String>(
-      value: selectedCourse == 'Select a course'
-          ? null
-          : selectedCourse, // Set initial value to null if 'Select a course'
+      value: selectedCourse == 'Select a course' ? null : selectedCourse,
       decoration: InputDecoration(
         labelText: 'Course name',
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(5),
+          borderSide: const BorderSide(color: Color(0xFFC1C3C5)),
+        ),
+        filled: true,
+        fillColor: const Color(0xFFF4F6F9),
       ),
       validator: (value) {
         if (value == null || value == 'Select a course') {
@@ -97,27 +100,14 @@ class QuizMoodleState extends State<QuizMoodle> {
   bool isSubmissionEnabled = true;
   bool isDueDateEnabled = true;
 
-  List<String> days =
-      List.generate(31, (index) => (index + 1).toString().padLeft(2, '0'));
+  List<String> days = List.generate(31, (index) => (index + 1).toString().padLeft(2, '0'));
   List<String> months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
   ];
   List<String> years = ['2023', '2024', '2025'];
-  List<String> hours =
-      List.generate(24, (index) => index.toString().padLeft(2, '0'));
-  List<String> minutes =
-      List.generate(60, (index) => index.toString().padLeft(2, '0'));
+  List<String> hours = List.generate(24, (index) => index.toString().padLeft(2, '0'));
+  List<String> minutes = List.generate(60, (index) => index.toString().padLeft(2, '0'));
 
   // Initial selected values for dropdowns
   String selectedCategory = 'No Category Selected';
@@ -126,23 +116,13 @@ class QuizMoodleState extends State<QuizMoodle> {
 
   // Lists of static items for dropdowns
   var categoryItems = [
-    'No Category Selected',
-    'Category 1',
-    'Category 2',
-    'Category 3'
+    'No Category Selected', 'Category 1', 'Category 2', 'Category 3'
   ];
   var attemptItems = [
-    'No attempt limit',
-    'Unlimited',
-    'First',
-    'Second',
-    'Last'
+    'No attempt limit', 'Unlimited', 'First', 'Second', 'Last'
   ];
   var gradingMethodItems = [
-    'No grading method selected',
-    'Highest Grade',
-    'Average Grade',
-    'Low Grade'
+    'No grading method selected', 'Highest Grade', 'Average Grade', 'Low Grade'
   ];
 
   late TextEditingController quizNameController;
@@ -152,263 +132,344 @@ class QuizMoodleState extends State<QuizMoodle> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        home: Scaffold(
-      appBar: AppBar(title: Text('Assign Assessment')),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(15.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 15.0),
-                child: Text(
-                  'Send Quiz to Moodle',
-                  textDirection: TextDirection.ltr,
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.normal),
-                  textAlign: TextAlign.center,
+      home: Scaffold(
+        appBar: const AppHeader(title: 'Send to Moodle'), // Using the AppHeader
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(15.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              // Assignment Title Section
+              sectionTitle(title: 'Assignment Title'),
+              SizedBox(height: 15),
+              TextField(
+                controller: quizNameController,
+                decoration: InputDecoration(
+                  labelText: 'Assignment Title',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    borderSide: const BorderSide(color: Color(0xFFC1C3C5)),
+                  ),
+                  filled: true,
+                  fillColor: const Color(0xFFF4F6F9),
+                ),
+                enabled: false,
+              ),
+              SizedBox(height: 15),
+
+              // Course Name and Number of Questions side by side
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        sectionTitle(title: 'Course Name'),
+                        SizedBox(height: 15),
+                        _buildCourseDropdown(),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 15), // Spacing between the columns
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        sectionTitle(title: 'Number of Questions'),
+                        SizedBox(height: 15),
+                        TextField(
+                          controller: quizQuestionsController,
+                          decoration: InputDecoration(
+                            labelText: 'Number of questions',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(5),
+                              borderSide: const BorderSide(color: Color(0xFFC1C3C5)),
+                            ),
+                            filled: true,
+                            fillColor: const Color(0xFFF4F6F9),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 15),
+
+              // Grading Section
+              sectionTitle(title: 'Grade'),
+              SizedBox(height: 15),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Grade Categories
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        sectionTitle(title: 'Grade Categories:'),
+                        DropdownButton<String>(
+                          value: selectedCategory,
+                          icon: Icon(Icons.keyboard_arrow_down),
+                          items: categoryItems.map((String item) {
+                            return DropdownMenuItem<String>(
+                              value: item,
+                              child: Text(item),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedCategory = newValue!;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 15), // Space between the columns
+
+                  // Grading Method
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        sectionTitle(title: 'Grading Method:'),
+                        DropdownButton<String>(
+                          value: selectedGradingMethod,
+                          icon: Icon(Icons.keyboard_arrow_down),
+                          items: gradingMethodItems.map((String method) {
+                            return DropdownMenuItem<String>(
+                              value: method,
+                              child: Text(method),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedGradingMethod = newValue!;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 15), // Space between the columns
+
+                  // Attempts Allowed
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        sectionTitle(title: 'Attempts Allowed:'),
+                        DropdownButton<String>(
+                          value: selectedAttempt,
+                          icon: Icon(Icons.keyboard_arrow_down),
+                          items: attemptItems.map((String attempt) {
+                            return DropdownMenuItem<String>(
+                              value: attempt,
+                              child: Text(attempt),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedAttempt = newValue!;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 15), // Space between the columns
+
+                  // Grade to Pass
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        sectionTitle(title: 'Grade to Pass:'),
+                        TextField(
+                          controller: gradeController,
+                          decoration: InputDecoration(
+                            labelText: 'Enter grade',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(5),
+                              borderSide: const BorderSide(color: Color(0xFFC1C3C5)),
+                            ),
+                            filled: true,
+                            fillColor: const Color(0xFFF4F6F9),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20), // Space below the entire Grade section
+
+              // Availability Section
+              sectionTitle(title: 'Availability'),
+              SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Allow Submissions Section
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: isSubmissionEnabled,
+                        onChanged: (value) {
+                          setState(() {
+                            isSubmissionEnabled = value!;
+                          });
+                        },
+                      ),
+                      Text('Allow Submissions'),
+                      SizedBox(width: 10),
+                      _buildDropdown(
+                        'Allow Submissions From Date:',
+                        selectedDaySubmission,
+                        selectedMonthSubmission,
+                        selectedYearSubmission,
+                        selectedHourSubmission,
+                        selectedMinuteSubmission,
+                        isSubmissionEnabled,
+                        (String? newValue) {
+                          setState(() {
+                            selectedDaySubmission = newValue!;
+                          });
+                        },
+                        (String? newValue) {
+                          setState(() {
+                            selectedMonthSubmission = newValue!;
+                          });
+                        },
+                        (String? newValue) {
+                          setState(() {
+                            selectedYearSubmission = newValue!;
+                          });
+                        },
+                        (String? newValue) {
+                          setState(() {
+                            selectedHourSubmission = newValue!;
+                          });
+                        },
+                        (String? newValue) {
+                          setState(() {
+                            selectedMinuteSubmission = newValue!;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  // Due Date Section
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: isDueDateEnabled,
+                        onChanged: (value) {
+                          setState(() {
+                            isDueDateEnabled = value!;
+                          });
+                        },
+                      ),
+                      Text('Enable Due Date'),
+                      SizedBox(width: 10),
+                      _buildDropdown(
+                        'Due Date:',
+                        selectedDayDue,
+                        selectedMonthDue,
+                        selectedYearDue,
+                        selectedHourDue,
+                        selectedMinuteDue,
+                        isDueDateEnabled,
+                        (String? newValue) {
+                          setState(() {
+                            selectedDayDue = newValue!;
+                          });
+                        },
+                        (String? newValue) {
+                          setState(() {
+                            selectedMonthDue = newValue!;
+                          });
+                        },
+                        (String? newValue) {
+                          setState(() {
+                            selectedYearDue = newValue!;
+                          });
+                        },
+                        (String? newValue) {
+                          setState(() {
+                            selectedHourDue = newValue!;
+                          });
+                        },
+                        (String? newValue) {
+                          setState(() {
+                            selectedMinuteDue = newValue!;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 16),
+
+              // Action Buttons
+              Directionality(
+                textDirection: TextDirection.ltr,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center, // Center the buttons
+                  children: [
+                    ElevatedButton(
+                      onPressed: () async {
+                        var quizid = await MoodleApiSingleton().createQuiz(
+                          selectedCourse,
+                          widget.quiz.name ?? 'Quiz Name',
+                          widget.quiz.description ?? 'Quiz Description',
+                        );
+                        print('Quiz ID: $quizid');
+                        var categoryid = await MoodleApiSingleton()
+                            .importQuizQuestions(selectedCourse, quizasxml);
+                        print('Category ID: $categoryid');
+                        var randomresult = await MoodleApiSingleton()
+                            .addRandomQuestions(categoryid.toString(),
+                                quizid.toString(), quizQuestionsController.text);
+                        print('Random Result: $randomresult');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF7D6CE2), // Match the color
+                        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15), // Match the padding
+                      ),
+                      child: const Text(
+                        'Send to Moodle',
+                        style: TextStyle(color: Colors.white), // Adjust text color if needed
+                      ),
+                    ),
+                    SizedBox(width: 10), // Space between buttons
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: const Color(0xFFB0B3B5), // Darker background color
+                        foregroundColor: Colors.white, // Change text color to white for better contrast
+                        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15), // Add padding for better visibility
+                      ),
+                      child: const Text(
+                        'Back to Edit Questions',
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            SizedBox(height: 30),
-
-// Assuming 'courses' is now a regular list of Course objects, not a Future.
-            sectionTitle(title: 'Course Name'),
-            _buildCourseDropdown(),
-
-            SizedBox(height: 15),
-
-            sectionTitle(title: 'Quiz Name'),
-            SizedBox(height: 15),
-            TextField(
-              controller: quizNameController,
-              decoration: InputDecoration(
-                labelText: 'Quiz name',
-                border: OutlineInputBorder(),
-              ),
-              enabled: false,
-            ),
-            SizedBox(height: 15),
-
-            sectionTitle(title: 'Number of Questions'),
-            SizedBox(height: 15),
-            TextField(
-              controller: quizQuestionsController,
-              decoration: InputDecoration(
-                labelText: 'Number of questions',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 15),
-
-            sectionTitle(title: 'Availability'),
-            SizedBox(height: 15),
-            // Submission Date
-            Directionality(
-              textDirection: TextDirection.ltr,
-              child: Row(
-                children: [
-                  Checkbox(
-                      value: isSubmissionEnabled,
-                      onChanged: (value) {
-                        setState(() {
-                          isSubmissionEnabled = value!;
-                        });
-                      }),
-                  Text('Enable'),
-                  SizedBox(width: 10),
-                  _buildDropdown(
-                      'Allow Submissions From Date:',
-                      selectedDaySubmission,
-                      selectedMonthSubmission,
-                      selectedYearSubmission,
-                      selectedHourSubmission,
-                      selectedMinuteSubmission,
-                      isSubmissionEnabled, (String? newValue) {
-                    setState(() {
-                      selectedDaySubmission = newValue!;
-                    });
-                  }, (String? newValue) {
-                    setState(() {
-                      selectedMonthSubmission = newValue!;
-                    });
-                  }, (String? newValue) {
-                    setState(() {
-                      selectedYearSubmission = newValue!;
-                    });
-                  }, (String? newValue) {
-                    setState(() {
-                      selectedHourSubmission = newValue!;
-                    });
-                  }, (String? newValue) {
-                    setState(() {
-                      selectedMinuteSubmission = newValue!;
-                    });
-                  }),
-                ],
-              ),
-            ),
-            SizedBox(height: 16),
-
-            // Due Date
-            Directionality(
-              textDirection: TextDirection.ltr,
-              child: Row(
-                children: [
-                  Checkbox(
-                    value: isDueDateEnabled,
-                    onChanged: (value) {
-                      setState(() {
-                        isDueDateEnabled = value!;
-                      });
-                    },
-                  ),
-                  Text('Enable'),
-                  SizedBox(width: 10),
-                  _buildDropdown(
-                      'Due Date:',
-                      selectedDayDue,
-                      selectedMonthDue,
-                      selectedYearDue,
-                      selectedHourDue,
-                      selectedMinuteDue,
-                      isDueDateEnabled, (String? newValue) {
-                    setState(() {
-                      selectedDayDue = newValue!;
-                    });
-                  }, (String? newValue) {
-                    setState(() {
-                      selectedMonthDue = newValue!;
-                    });
-                  }, (String? newValue) {
-                    setState(() {
-                      selectedYearDue = newValue!;
-                    });
-                  }, (String? newValue) {
-                    setState(() {
-                      selectedHourDue = newValue!;
-                    });
-                  }, (String? newValue) {
-                    setState(() {
-                      selectedMinuteDue = newValue!;
-                    });
-                  }),
-                ],
-              ),
-            ),
-            SizedBox(height: 16),
-
-            // Grading Section
-            sectionTitle(title: 'Grade'),
-            SizedBox(height: 15),
-
-            sectionTitle(title: 'Grade Categories:'),
-            DropdownButton<String>(
-              value: selectedCategory,
-              icon: Icon(Icons.keyboard_arrow_down),
-              items: categoryItems.map((String item) {
-                return DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(item),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedCategory = newValue!;
-                });
-              },
-            ),
-            SizedBox(height: 16),
-
-            sectionTitle(title: 'Grade to Pass:'),
-            TextField(
-              controller: gradeController,
-              decoration: InputDecoration(
-                labelText: 'Enter grade',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 16),
-
-            sectionTitle(title: 'Attempts Allowed:'),
-            DropdownButton<String>(
-              value: selectedAttempt,
-              icon: Icon(Icons.keyboard_arrow_down),
-              items: attemptItems.map((String attempt) {
-                return DropdownMenuItem<String>(
-                  value: attempt,
-                  child: Text(attempt),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedAttempt = newValue!;
-                });
-              },
-            ),
-            SizedBox(height: 16),
-
-            sectionTitle(title: 'Grading Method:'),
-            DropdownButton<String>(
-              value: selectedGradingMethod,
-              icon: Icon(Icons.keyboard_arrow_down),
-              items: gradingMethodItems.map((String method) {
-                return DropdownMenuItem<String>(
-                  value: method,
-                  child: Text(method),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedGradingMethod = newValue!;
-                });
-              },
-            ),
-            SizedBox(height: 16),
-
-            Directionality(
-              textDirection: TextDirection.ltr,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () async {
-                      var quizid = await MoodleApiSingleton().createQuiz(
-                        selectedCourse,
-                        widget.quiz.name ?? 'Quiz Name',
-                        widget.quiz.description ?? 'Quiz Description',
-                      );
-                      print('Quiz ID: $quizid');
-                      var categoryid = await MoodleApiSingleton()
-                          .importQuizQuestions(selectedCourse, quizasxml);
-                      print('Category ID: $categoryid');
-                      var randomresult = await MoodleApiSingleton()
-                          .addRandomQuestions(categoryid.toString(),
-                              quizid.toString(), quizQuestionsController.text);
-                      print('Random Result: $randomresult');
-                    },
-                    child: Text(
-                      'Send to Moodle',
-                      textDirection: TextDirection.ltr,
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Back to quiz action
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                      'Go back to update quiz',
-                      textDirection: TextDirection.ltr,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+              SizedBox(height: 20), // Space between buttons and the next section
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 
   // Dropdown Builder
@@ -434,15 +495,13 @@ class QuizMoodleState extends State<QuizMoodle> {
           children: [
             _buildDropdownButton(days, selectedDay, onDayChanged, isEnabled),
             SizedBox(width: 8),
-            _buildDropdownButton(
-                months, selectedMonth, onMonthChanged, isEnabled),
+            _buildDropdownButton(months, selectedMonth, onMonthChanged, isEnabled),
             SizedBox(width: 8),
             _buildDropdownButton(years, selectedYear, onYearChanged, isEnabled),
             SizedBox(width: 8),
             _buildDropdownButton(hours, selectedHour, onHourChanged, isEnabled),
             SizedBox(width: 8),
-            _buildDropdownButton(
-                minutes, selectedMinute, onMinuteChanged, isEnabled),
+            _buildDropdownButton(minutes, selectedMinute, onMinuteChanged, isEnabled),
             SizedBox(width: 8),
           ],
         ),
