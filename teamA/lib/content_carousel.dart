@@ -78,7 +78,7 @@ class _ContentState extends State<ContentCarousel> {
       return Padding(
           padding: EdgeInsets.symmetric(vertical: 10),
           child: ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: 200), //testing width
+              constraints: BoxConstraints(maxHeight: 250), //testing width
               child: CarouselView(
                 backgroundColor: Theme.of(context).primaryColor,
                 itemExtent: 400,
@@ -190,9 +190,7 @@ class CarouselCard extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: SingleChildScrollView(
-                child: Text(information),
-              )
+              child: Text(information),
             ), 
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -200,7 +198,7 @@ class CarouselCard extends StatelessWidget {
             ),
             Spacer(), // Pushes the buttons to the bottom
           ],
-        ),
+        )
       ),
     );
   }
