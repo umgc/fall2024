@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 
-/// AudioScreen widget provides the main interface for audio recording.
+// AudioScreen widget provides the main interface for audio recording.
 class AudioScreen extends StatefulWidget {
   const AudioScreen({super.key});
 
@@ -15,37 +15,34 @@ class AudioScreen extends StatefulWidget {
 }
 
 class _AudioScreenState extends State<AudioScreen> {
-  /// Flags to track if recording or playback is currently in progress.
+  // Flags to track if recording or playback is currently in progress.
   bool _isRecording = false;
-
-  /// Variable to track the duration of the current recording.
-  Duration _duration = const Duration(seconds: 0);
-
-  /// This variable will store the path where the recorded audio will be saved.
-  String? _pathToSaveRecording;
-
-  /// Timer is used to update the duration of the recording in real-time.
 
   late FlutterSoundRecorder _recorder;
 
   String? _audioFilePath;
   String _transcription = 'Transcription will appear here...';
-  String _translatedText = 'Transcription will appear here...';
+  String _translatedText = 'Translation will appear here...';
   String _selectedLanguage = 'en'; // Default language
+  String _maskedTranscription = '';
+  String _summaryText = '';
 
-  String transcription = '';
   String transcriptionSummary = '';
+  String openAIKey = 'Enter API Key Here';
 
-  int? audioId;
+  // Variables to hold the translated UI text
+  String _transcriberTitleText = 'Transcriber';
+  String _summarizeButtonText = 'Summarize Transcription';
+  String _summaryLabelText = 'Summary:';
 
   @override
   void initState() {
     super.initState();
 
-    /// Initializing recorder and player instances.
+    // Initializing recorder and player instances.
     _recorder = FlutterSoundRecorder();
 
-    /// Setting up the recorder by checking permissions.
+    // Setting up the recorder by checking permissions.
     _startRecording();
   }
 
@@ -62,10 +59,7 @@ class _AudioScreenState extends State<AudioScreen> {
 
   Future<void> _startRecording() async {
     try {
-      // Request microphone permissions
       await requestPermissions();
-
-      // Open the recorder
       await _recorder.openRecorder();
 
       // Set the path for saving the recording
@@ -95,7 +89,6 @@ class _AudioScreenState extends State<AudioScreen> {
         _isRecording = false;
       });
 
-      // Print the file path after the recording is saved
       print('Recording saved to: $_audioFilePath');
 
       await transcribeAudio();
@@ -109,8 +102,7 @@ class _AudioScreenState extends State<AudioScreen> {
 
     var url = Uri.parse('https://api.openai.com/v1/audio/transcriptions');
     var request = http.MultipartRequest('POST', url)
-      ..headers['Authorization'] =
-          'Bearer Add Your Key Here'
+      ..headers['Authorization'] = 'Bearer $openAIKey'
       ..fields['model'] = 'whisper-1'
       ..fields['language'] = 'en'
       ..files.add(await http.MultipartFile.fromPath('file', _audioFilePath!));
@@ -125,8 +117,6 @@ class _AudioScreenState extends State<AudioScreen> {
       });
       print(parsedResponse);
       await saveTranscription(parsedResponse['text']);
-      await translateText(
-          _transcription); // Call the translate function after transcription
     } else {
       setState(() {
         _transcription = 'Failed to transcribe audio: ${response.statusCode}';
@@ -134,8 +124,85 @@ class _AudioScreenState extends State<AudioScreen> {
     }
   }
 
+// Function to convert number words to actual numbers
+  String convertWordsToNumbers(String transcription) {
+    Map<String, String> wordToNumberMap = {
+      'zero': '0',
+      'one': '1',
+      'two': '2',
+      'three': '3',
+      'four': '4',
+      'five': '5',
+      'six': '6',
+      'seven': '7',
+      'eight': '8',
+      'nine': '9',
+      'ten': '10',
+      'eleven': '11',
+      'twelve': '12',
+      'thirteen': '13',
+      'fourteen': '14',
+      'fifteen': '15',
+      'sixteen': '16',
+      'seventeen': '17',
+      'eighteen': '18',
+      'nineteen': '19',
+      'twenty': '20',
+      'thirty': '30',
+      'forty': '40',
+      'fifty': '50',
+      'sixty': '60',
+      'seventy': '70',
+      'eighty': '80',
+      'ninety': '90',
+      'hundred': '100',
+      'thousand': '1000',
+      'million': '1000000'
+    };
+
+    // Splitting the transcription into individual words, handling spaces and punctuation
+    List<String> words =
+        transcription.toLowerCase().split(RegExp(r'[\s,?.!]+'));
+
+    // Replacing words with their corresponding numbers
+    for (int i = 0; i < words.length; i++) {
+      if (wordToNumberMap.containsKey(words[i])) {
+        words[i] = wordToNumberMap[words[i]]!;
+      }
+    }
+
+    // Joining the words back together to form the final string with spaces
+    return words.join(' ');
+  }
+
   Future<void> saveTranscription(String? transcription) async {
     if (transcription == null) return;
+
+    // Convert number words to numbers
+    transcription = convertWordsToNumbers(transcription);
+
+    // Mask Social Security Numbers and other sensitive information
+    transcription = transcription.replaceAllMapped(
+      RegExp(r'\b(\d[- ]?){9}\b'),
+      (match) => '***-**-****',
+    );
+    transcription = transcription.replaceAllMapped(
+      RegExp(r'\b\d{13,16}\b'),
+      (match) => '**** **** **** ****',
+    );
+    transcription = transcription.replaceAllMapped(
+      RegExp(r'\b\d{8}\b'),
+      (match) => '********',
+    );
+    transcription = transcription.replaceAllMapped(
+      RegExp(r'\b\d{1,3}(,\d{3})+\b'),
+      (match) => match.group(0)!.replaceAll(RegExp(r'\d'), '*'),
+    );
+
+    _maskedTranscription = transcription; // Store the masked transcription
+
+    await translateText(
+        _maskedTranscription); // Use the masked transcription here
 
     // Get the current timestamp
     DateTime now = DateTime.now();
@@ -178,7 +245,7 @@ class _AudioScreenState extends State<AudioScreen> {
     await file.writeAsString(transcriptionWithTimestamp);
     print('Transcription saved to: $filePath');
 
-    // Read the contents of the file and print them
+    // Read the contents of the file
     final contents = await file.readAsString();
     print(contents);
   }
@@ -205,8 +272,7 @@ class _AudioScreenState extends State<AudioScreen> {
       translationUrl,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization':
-            'Bearer Add Your Key Here',
+        'Authorization': 'Bearer $openAIKey',
       },
       body: json.encode({
         'model': 'gpt-3.5-turbo',
@@ -240,31 +306,31 @@ class _AudioScreenState extends State<AudioScreen> {
     }
   }
 
+  Future<void> printCacheFiles() async {
+    try {
+      // Define the cache directory for the app
+      Directory cacheDir =
+          Directory('/data/user/0/comclearassist.clearassistapp/cache/');
 
-Future<void> printCacheFiles() async {
-  try {
-    // Define the cache directory for the app
-    Directory cacheDir = Directory('/data/user/0/comclearassist.clearassistapp/cache/');
+      // Check if the directory exists
+      if (await cacheDir.exists()) {
+        // List all files in the directory and its subdirectories
+        List<FileSystemEntity> files = cacheDir.listSync(recursive: true);
 
-    // Check if the directory exists
-    if (await cacheDir.exists()) {
-      // List all files in the directory and its subdirectories
-      List<FileSystemEntity> files = cacheDir.listSync(recursive: true);
-
-      // Print each file path
-      for (FileSystemEntity file in files) {
-        if (file is File) {  // Ensure it's a file before printing
-          print('File: ${file.path}');
+        // Print each file path
+        for (FileSystemEntity file in files) {
+          if (file is File) {
+            // Ensure it's a file before printing
+            print('File: ${file.path}');
+          }
         }
+      } else {
+        print('Cache directory does not exist.');
       }
-    } else {
-      print('Cache directory does not exist.');
+    } catch (e) {
+      print('Error reading cache directory: $e');
     }
-  } catch (e) {
-    print('Error reading cache directory: $e');
   }
-}
-
 
 // Helper method to get the language name based on the selected language code
   String _getLanguageName(String languageCode) {
@@ -290,23 +356,146 @@ Future<void> printCacheFiles() async {
     }
   }
 
+// Function to summarize and translate the text
+  Future<void> summarizeText(
+      String maskedTranscription, String selectedLanguage) async {
+    try {
+      // Send the transcription to OpenAI for summarization
+      final summaryResponse = await http.post(
+        Uri.parse('https://api.openai.com/v1/chat/completions'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $openAIKey', // Use the API key
+        },
+        body: jsonEncode({
+          'model': 'gpt-3.5-turbo',
+          'messages': [
+            {
+              'role': 'system',
+              'content': 'You are a helpful assistant that summarizes text.'
+            },
+            {
+              'role': 'user',
+              'content': 'Please summarize the following: $maskedTranscription'
+            },
+          ],
+        }),
+      );
+
+      if (summaryResponse.statusCode == 200) {
+        final summaryData = jsonDecode(summaryResponse.body);
+        String summaryText =
+            summaryData['choices'][0]['message']['content'].trim();
+
+        // Translate the summary into the selected language
+        final translatedSummary = await http.post(
+          Uri.parse('https://api.openai.com/v1/chat/completions'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $openAIKey',
+          },
+          body: jsonEncode({
+            'model': 'gpt-3.5-turbo',
+            'messages': [
+              {'role': 'system', 'content': 'You are a translation assistant.'},
+              {
+                'role': 'user',
+                'content': 'Translate this to $selectedLanguage: $summaryText'
+              },
+            ],
+          }),
+        );
+
+        if (translatedSummary.statusCode == 200) {
+          var translatedSummaryData = utf8.decode(translatedSummary.bodyBytes);
+          var translatedData = jsonDecode(translatedSummaryData);
+          String translatedText =
+              translatedData['choices'][0]['message']['content'].trim();
+
+          setState(() {
+            _summaryText =
+                translatedText; // Update the summary text with the translated version
+          });
+        } else {
+          throw Exception('Failed to translate summary.');
+        }
+      } else {
+        throw Exception('Failed to summarize transcription.');
+      }
+    } catch (error) {
+      setState(() {
+        _summaryText = 'Error: $error';
+      });
+    }
+  }
+
   @override
   void dispose() {
     _recorder.closeRecorder();
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 98, 167, 199),
-      appBar: AppBar(
-        title: Text(' Transcriber'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+ // Define the translations
+final Map<String, Map<String, String>> _translations = {
+  'en': {
+    'transcriber': 'Transcriber',
+    'summarize': 'Summarize Transcription',
+    'summary': 'Summary:',
+  },
+  'es': {
+    'transcriber': 'Transcriptor',
+    'summarize': 'Resumir Transcripción',
+    'summary': 'Resumen:',
+  },
+  'fr': {
+    'transcriber': 'Transcripteur',
+    'summarize': 'Résumer la Transcription',
+    'summary': 'Résumé:',
+  },
+  'pt': {
+    'transcriber': 'Transcritor',
+    'summarize': 'Resumir Transcrição',
+    'summary': 'Resumo:',
+  },
+  'de': {
+    'transcriber': 'Schriftführer',
+    'summarize': 'Transkription Zusammenfassen',
+    'summary': 'Zusammenfassung:',
+  },
+  'he': {
+    'transcriber': 'מתמלל',
+    'summarize': 'סכם תמלול',
+    'summary': 'סיכום:',
+  },
+  'zh': {
+    'transcriber': '转录器',
+    'summarize': '总结转录',
+    'summary': '总结:',
+  },
+  'ar': {
+    'transcriber': 'الناسخ',
+    'summarize': 'تلخيص النسخ',
+    'summary': 'الملخص:',
+  },
+  'hi': {
+    'transcriber': 'प्रतिलेखक',
+    'summarize': 'प्रतिलेखन का सारांश',
+    'summary': 'सारांश:',
+  },
+};
+
+
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: const Color.fromARGB(255, 98, 167, 199),
+    appBar: AppBar(
+      title: Text(_transcriberTitleText), // Dynamic transcriber text
+    ),
+    body: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SingleChildScrollView(
         child: Center(
-          // Center the Column within the available space
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -317,12 +506,11 @@ Future<void> printCacheFiles() async {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-              onPressed: () {
-                _isRecording ? _stopRecording() : _startRecording();
-                printCacheFiles(); // Call to print files after starting or stopping recording
-              },
-              child: Text(_isRecording ? 'Stop Recording' : 'Start Recording'),
-            ),
+                onPressed: () {
+                  _isRecording ? _stopRecording() : _startRecording();
+                },
+                child: Text(_isRecording ? 'Stop Recording' : 'Start Recording'),
+              ),
               SizedBox(height: 20),
               Text(
                 'Transcription:',
@@ -338,85 +526,96 @@ Future<void> printCacheFiles() async {
               SizedBox(height: 20),
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white, // Background color of the dropdown
-                  borderRadius: BorderRadius.circular(8), // Rounded corners
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2), // Shadow effect
+                      color: Colors.black.withOpacity(0.2),
                       blurRadius: 4,
-                      offset: Offset(0, 2), // Offset for the shadow
+                      offset: Offset(0, 2),
                     ),
                   ],
                 ),
-                padding: EdgeInsets.symmetric(
-                    horizontal: 12), // Padding inside the container
+                padding: EdgeInsets.symmetric(horizontal: 12),
                 child: DropdownButton<String>(
                   value: _selectedLanguage,
-                  dropdownColor:
-                      Colors.blue[100], // Background color of the dropdown menu
-                  icon:
-                      Icon(Icons.language, color: Colors.orange), // Icon color
-                  underline: SizedBox(), // Remove the default underline
+                  dropdownColor: Colors.blue[100],
+                  icon: Icon(Icons.language, color: Colors.orange),
+                  underline: SizedBox(),
                   items: [
                     DropdownMenuItem<String>(
                       value: 'en',
-                      child: Text('English',
-                          style: TextStyle(color: Colors.orange)),
+                      child: Text('English', style: TextStyle(color: Colors.orange)),
                     ),
                     DropdownMenuItem<String>(
                       value: 'es',
-                      child: Text('Español',
-                          style: TextStyle(color: Colors.orange)),
+                      child: Text('Español', style: TextStyle(color: Colors.orange)),
                     ),
                     DropdownMenuItem<String>(
                       value: 'fr',
-                      child: Text('Français',
-                          style: TextStyle(color: Colors.orange)),
+                      child: Text('Français', style: TextStyle(color: Colors.orange)),
                     ),
                     DropdownMenuItem<String>(
                       value: 'pt',
-                      child: Text('Português',
-                          style: TextStyle(color: Colors.orange)),
+                      child: Text('Português', style: TextStyle(color: Colors.orange)),
                     ),
                     DropdownMenuItem<String>(
                       value: 'de',
-                      child: Text('Deutsch',
-                          style: TextStyle(color: Colors.orange)),
+                      child: Text('Deutsch', style: TextStyle(color: Colors.orange)),
                     ),
                     DropdownMenuItem<String>(
                       value: 'he',
-                      child: Text('עברית',
-                          style: TextStyle(color: Colors.orange)), // Hebrew
+                      child: Text('עברית', style: TextStyle(color: Colors.orange)),
                     ),
                     DropdownMenuItem<String>(
                       value: 'zh',
-                      child: Text('中文',
-                          style: TextStyle(color: Colors.orange)), // Mandarin
+                      child: Text('中文', style: TextStyle(color: Colors.orange)),
                     ),
                     DropdownMenuItem<String>(
                       value: 'ar',
-                      child: Text('العربية',
-                          style: TextStyle(color: Colors.orange)), // Arabic
+                      child: Text('العربية', style: TextStyle(color: Colors.orange)),
                     ),
                     DropdownMenuItem<String>(
                       value: 'hi',
-                      child: Text('हिन्दी',
-                          style: TextStyle(color: Colors.orange)), // Hindi
+                      child: Text('हिन्दी', style: TextStyle(color: Colors.orange)),
                     ),
                   ],
                   onChanged: (String? newValue) async {
                     setState(() {
                       _selectedLanguage = newValue!;
+                      _transcriberTitleText = _translations[_selectedLanguage]!['transcriber']!;
+                      _summarizeButtonText = _translations[_selectedLanguage]!['summarize']!;
+                      _summaryLabelText = _translations[_selectedLanguage]!['summary']!;
                     });
-                    await translateText(
-                        _transcription); // Translate text when language changes
+                    // Translate the transcription and summarize it
+                    await translateText(_maskedTranscription);
                   },
                 ),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () async {
+                  await summarizeText(_maskedTranscription, _selectedLanguage);
+                },
+                child: Text(_summarizeButtonText), // Dynamic summarize button text
+              ),
+              SizedBox(height: 20),
+              Text(
+                _summaryLabelText, // Dynamic summary label
+                style: TextStyle(fontSize: 20),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 10),
+              Text(
+                _summaryText, // Display the summary here
+                style: TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
