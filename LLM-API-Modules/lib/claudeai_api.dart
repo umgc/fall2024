@@ -25,6 +25,7 @@ class ClaudeAiAPI {
     return ({
       'anthropic-version': '2023-06-01',
       'content-type': 'application/json',
+      'anthropic-dangerous-direct-browser-access': 'true',
       'x-api-key': claudeAiKey,
     });
   }
