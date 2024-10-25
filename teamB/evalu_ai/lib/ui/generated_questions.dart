@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intelligrade/api/llm/openai_api.dart';
 import 'package:intelligrade/controller/model/beans.dart';
 import 'package:intelligrade/ui/assignment_form.dart';
-//import 'package:intelligrade/ui/dashboard_page.dart';
-import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
-import 'package:intelligrade/api/llm/openai_api.dart';
 //import 'package:intelligrade/ui/custom_navigation_bar.dart';
 //import 'package:intelligrade/ui/header.dart';
 import 'package:intelligrade/ui/send_quiz_to_moodle.dart';
@@ -21,7 +19,7 @@ class GeneratedQuestionsPage extends StatefulWidget {
 class _GeneratedQuestionsPageState extends State<GeneratedQuestionsPage> {
   late Quiz myQuiz;
   final TextEditingController _textController = TextEditingController();
-  var apikey = dotenv.env['OPENAI_API_KEY'];
+  var apikey = dotenv.env['OPENAI_API_KEY'];//OPENAI
   late OpenAiLLM openai;
   bool _isLoading = false;
 
@@ -54,7 +52,8 @@ class _GeneratedQuestionsPageState extends State<GeneratedQuestionsPage> {
 ),
       body: Column(
         children: [
-          Padding(
+          // the following was deleted from the code to deleted the prompt text box on top of the questions page
+         /* Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: _textController,
@@ -63,13 +62,17 @@ class _GeneratedQuestionsPageState extends State<GeneratedQuestionsPage> {
                 border: OutlineInputBorder(),
               ),
             ),
-          ),
+          ),*/
           Expanded(
             child: ListView.builder(
               itemCount: myQuiz.questionList.length,
               itemBuilder: (context, index) {
                 var question = myQuiz.questionList[index];
-                return Dismissible(
+                // This code is revised 
+                //return Dismissible(
+                return Padding(//added to provide space between each questions. 
+                  padding: const EdgeInsets.symmetric(vertical: 8.0), // Add vertical spacing
+                  child: Dismissible(
                   key: Key(question.toString()),
                   background: Stack(
                     children: [
@@ -106,7 +109,7 @@ class _GeneratedQuestionsPageState extends State<GeneratedQuestionsPage> {
                         _isLoading = true;
                       });
                       var result = await openai
-                          // .postToLlm(promptstart + question.toString());
+                          // .postToLlm(promptstart + question.toString());//  
                           .postToLlm(promptstart + question.type.toString());
 
                       setState(() {
@@ -119,7 +122,7 @@ class _GeneratedQuestionsPageState extends State<GeneratedQuestionsPage> {
                           question = Quiz.fromXmlString(result).questionList[0];
                           question.setName = 'Question ${index + 1}';
                           myQuiz.questionList[index] = question.copyWith(
-                              isFavorite: !question.isFavorite);
+                           ); //isFavorite: !question.isFavorite);// deleted
                         });
                       }
                       return false;
@@ -151,26 +154,31 @@ class _GeneratedQuestionsPageState extends State<GeneratedQuestionsPage> {
                         ? Theme.of(context).colorScheme.onSecondary
                         : Theme.of(context).colorScheme.onSecondaryContainer,
                   ),
+                  )
                 );
               },
             ),
           ),
-          Row(
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => QuizMoodle(quiz: myQuiz)
+          Directionality(
+                textDirection: TextDirection.ltr,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center, // Center the buttons
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => QuizMoodle(quiz: myQuiz)
+                          ),
+                        );
+                      },
+                      child: const Text('Send to Moodle Set up'),
                     ),
-                  );
-                },
-                child: const Text('Send to Moodle Set up'),
-              ),
-            
-            ],
-          )
+                  ],
+                ) 
+          ),
+          SizedBox(height: 20), 
         ],
       ),
     );
