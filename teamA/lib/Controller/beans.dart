@@ -669,7 +669,7 @@ class Submission {
 
 class Participant {
   final int id;
-  final String username;
+  // final String username;
   final String fullname;
   final String firstname;
   final String lastname;
@@ -677,7 +677,7 @@ class Participant {
 
   Participant({
     required this.id,
-    required this.username,
+    // required this.username,
     required this.fullname,
     required this.firstname,
     required this.lastname,
@@ -696,7 +696,7 @@ class Participant {
 
     return Participant(
       id: json['id'] as int,
-      username: json['username'] as String,
+      // username: json['username'] as String,
       fullname: json['fullname'] as String,
       firstname: json['firstname'] as String,
       lastname: json['lastname'] as String,
