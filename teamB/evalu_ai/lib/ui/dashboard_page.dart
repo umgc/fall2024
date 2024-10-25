@@ -20,6 +20,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
   List<Course> courses = [];
   List<Assignment> essays = [];
   List<Quiz> quizzes = [];
+  var assignments = [];
 
   @override
   void initState() {
@@ -46,8 +47,9 @@ class _DashBoardPageState extends State<DashBoardPage> {
     try{
       courses.forEach((course) {
         Course? selectedCourse = course;
-        essays = [...selectedCourse!.essays!];
-        quizzes = [...selectedCourse!.quizzes!];
+        essays = [...?selectedCourse.essays ?? []];
+        quizzes = [...?selectedCourse.quizzes ?? []];
+        assignments = [...quizzes, ...essays];
       });
     } catch (e) {
       debugPrint('Error fetching assignments: $e');
@@ -91,7 +93,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
                 ),
                 child: CustomNavigationBar(selectedIndex: selectedIndex),
               ),
-              (essays.isEmpty  && quizzes.isEmpty)
+              (assignments.isEmpty)
                   ? Expanded(
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
@@ -108,7 +110,111 @@ class _DashBoardPageState extends State<DashBoardPage> {
                         ],
                       ),
                     )
-                  : Text("It Worked!"),//get the rest starting on line 93 of essay_display_page
+                  : Expanded(
+                    child: Center(
+                     child: ListView.builder(
+                      itemCount: (10),
+                      itemBuilder: (context, index) {
+                        var assignment = assignments[index];
+                        if(assignment is Assignment) {
+                          //handle like essay
+                          return Card(
+                            margin: EdgeInsets.symmetric(vertical: 3),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              assignment.name,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            SizedBox(height: 5),
+                                            Text(assignment.description),
+                                          ],
+                                        ),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pushReplacementNamed(
+                                            context, 
+                                            '/assignmentDetails',
+                                            arguments: {
+                                              'selectedIndex': selectedIndex,
+                                              'assignment': assignment, // Pass the actual Assignment object
+                                            },
+                                          );
+                                        },
+                                        child: Text('View Details'),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        } else {
+                          //handle like quiz
+                          return Card(
+                            margin: EdgeInsets.symmetric(vertical: 10),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              assignment.name,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            SizedBox(height: 5),
+                                            Text(assignment.description),
+                                          ],
+                                        ),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pushReplacementNamed(
+                                            context, 
+                                            '/assignmentDetails',
+                                            arguments: {
+                                              'selectedIndex': selectedIndex,
+                                              'assignment': assignment, // Pass the actual Assignment object
+                                            },
+                                          );
+                                        },
+                                        child: Text('View Details'),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                     ),
+                    ),
+                  )
             ],
           );
         }));
