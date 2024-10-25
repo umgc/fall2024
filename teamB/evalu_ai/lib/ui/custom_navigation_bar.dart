@@ -119,6 +119,10 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
                 arguments: index);
             break;
           case 6:
+            Navigator.pushReplacementNamed(context, '/chatbot',
+                arguments: index);
+            break;
+          case 7:
             // Add navigation logic for Chatbot Assistance here
             break;
         }
