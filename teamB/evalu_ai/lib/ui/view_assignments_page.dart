@@ -272,7 +272,7 @@ class _ViewAssignmentsPage extends State<ViewAssignmentsPage> {
                         if(assignment is Assignment) {
                           //handle like essay
                           return Card(
-                            margin: EdgeInsets.symmetric(vertical: 10),
+                            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
@@ -319,7 +319,7 @@ class _ViewAssignmentsPage extends State<ViewAssignmentsPage> {
                         } else {
                           //handle like quiz
                           return Card(
-                            margin: EdgeInsets.symmetric(vertical: 10),
+                            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(

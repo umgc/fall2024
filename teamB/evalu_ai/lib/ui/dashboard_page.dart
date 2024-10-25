@@ -119,7 +119,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
                         if(assignment is Assignment) {
                           //handle like essay
                           return Card(
-                            margin: EdgeInsets.symmetric(vertical: 3),
+                            margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
@@ -132,6 +132,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
+                                            SizedBox(width: 5),
                                             Text(
                                               assignment.name,
                                               style: TextStyle(
@@ -166,7 +167,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
                         } else {
                           //handle like quiz
                           return Card(
-                            margin: EdgeInsets.symmetric(vertical: 10),
+                            margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
