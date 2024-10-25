@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
+import 'package:intelligrade/ui/dashboard_page.dart';
 
 import 'package:intelligrade/controller/main_controller.dart';
 import 'package:intelligrade/controller/model/beans.dart';
@@ -117,6 +118,11 @@ class _GradingPageState extends State<GradingPage> {
                   ElevatedButton (
                     onPressed: () {
                       Navigator.of(context).pop();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => DashBoardPage(),
+                          ),
+                      );
                     },
                     child: const Text('Close'),
                   ),
@@ -157,6 +163,11 @@ class _GradingPageState extends State<GradingPage> {
                   ElevatedButton (
                     onPressed: () {
                       Navigator.of(context).pop();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => DashBoardPage(),
+                          ),
+                      );
                     },
                     child: const Text('Close'),
                   ),
@@ -187,6 +198,11 @@ class _GradingPageState extends State<GradingPage> {
                   ElevatedButton (
                     onPressed: () {
                       Navigator.of(context).pop();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => DashBoardPage(),
+                          ),
+                      );
                     },
                     child: const Text('Close'),
                   ),
