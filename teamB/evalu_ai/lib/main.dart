@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intelligrade/controller/model/beans.dart';
 import 'package:intelligrade/ui/assignment_details_page.dart';
 import 'package:intelligrade/ui/assignment_form.dart';
 import 'package:intelligrade/ui/chat_screen.dart';
@@ -43,7 +44,15 @@ class MyApp extends StatelessWidget {
             '/create': (context) => const CreateAssignmentScreen(),
             '/dashboard': (context) => const DashBoardPage(),
             '/viewAssignments': (context) => const ViewAssignmentsPage(),
-            '/assignemntDetails': (context) => const AssignmentDetailsPage(),
+            '/assignmentDetails': (context) {
+                 final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+                  final int selectedIndex = args['selectedIndex'] as int; // Ensure this is of type int
+                  final dynamic assignment = args['assignment'] as dynamic; // Ensure this is your Assignment type
+
+                  return AssignmentDetailsPage(
+                    assignment: assignment,
+                  );
+              },
             '/generateEssay': (context) => const GenerateEssayPage(),
             '/gradeEssay': (context) => const GradeEssayPage(),
             '/compileCode': (context) => const CodeCompilerPage(),
