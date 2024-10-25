@@ -201,13 +201,11 @@ class _GradingPageState extends State<GradingPage> {
   @override
   void initState() {
     super.initState();
-    MainController().getCourses().then((result) {
-      courses = result;
-      for (var item in courses) {
-        print(item.fullName);
-      }
+    List<Course>? courseList = MoodleApiSingleton().moodleCourses;
+    if (courseList != null) {
+      courses = courseList;
       setState((){});
-    });
+    }
   }
 
   Future<void> pickStudentFile() async {
@@ -321,9 +319,12 @@ class _GradingPageState extends State<GradingPage> {
               }).toList(),
               onChanged: (value) async {
                 int? assignmentID = _selectedAssignment!.id;
-                _submissions = await MoodleApiSingleton().getAssignmentSubmissions(assignmentID!);
-                setState(() {
-                  _selectedParticipant = value;
+                MoodleApiSingleton().getAssignmentSubmissions(assignmentID!).then((result) {
+                  Iterable<Submission> usersSubmissions = result.where((submission) => submission.userid == value?.id);
+                  _submissions = usersSubmissions;
+                  setState((){
+                    _selectedParticipant = value;
+                  });
                 });
               },
             ),
