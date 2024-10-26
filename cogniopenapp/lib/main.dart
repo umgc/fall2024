@@ -4,6 +4,7 @@ import 'package:cogniopenapp/src/s3_connection.dart';
 import 'package:cogniopenapp/src/utils/directory_manager.dart';
 import 'package:cogniopenapp/src/utils/logger.dart';
 import 'package:cogniopenapp/src/utils/permission_manager.dart';
+import 'package:cogniopenapp/ui/global_settings.dart';
 import 'package:cogniopenapp/ui/home_screen.dart';
 import 'package:cogniopenapp/ui/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ void main() async {
   await dotenv.load(fileName: ".env");
   await DirectoryManager.instance.initializeDirectories();
   await DataService.instance.initializeData();
+  await GlobalSettings.loadBackgroundPath();
   initializeData();
   runApp(const MyApp());
 }

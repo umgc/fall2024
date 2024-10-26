@@ -1,6 +1,7 @@
 import 'package:cogniopenapp/ui/reusable/custom_title.dart';
 import 'package:cogniopenapp/ui/settings_screen.dart';
 import 'package:flutter/material.dart';
+import 'global_settings.dart';
 import 'home_screen_content.dart';
 import 'assistant_screen.dart';
 import 'gallery_screen.dart';
@@ -16,7 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   // List of pages to switch between with the bottom navigation bar
-  static const List<Widget> _widgetOptions = <Widget>[
+  static final List<Widget> _widgetOptions = <Widget>[
     HomeScreenContent(),
     AssistantScreen(),
     GalleryScreen(),
@@ -44,9 +45,9 @@ class _HomeScreenState extends State<HomeScreen> {
         title: CustomTitle(),
       ),
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/images/background.jpg"),
+            image: AssetImage(GlobalSettings.backgroundPath.value),
             fit: BoxFit.cover,
           ),
         ),

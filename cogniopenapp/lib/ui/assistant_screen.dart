@@ -304,17 +304,13 @@ class ChatMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var virtualAssistantIcon = Image.asset(
-      'assets/icons/virtual_assistant.png',
-      width: 25.0,
-      height: 25.0,
-    );
     IconButton speakerButton = IconButton(
       icon: const Icon(IconData(0xe6c5, fontFamily: 'MaterialIcons')),
       onPressed: () {
         toggleTTS(messageText);
       },
     );
+
     const TextStyle messageStyle = TextStyle(
       color: Colors.white,
       fontSize: 16.0,
@@ -346,17 +342,28 @@ class ChatMessage extends StatelessWidget {
           widthFactor: 0.85,
           child: ListTile(
             textColor: Colors.white,
-            leading: isUserMessage ? null : virtualAssistantIcon,
+            leading: null,
             minLeadingWidth: 25,
             title: Text(
               isUserMessage ? "User:" : "ClearAssist Remote Assistant (Cara):",
               style: titleStyle,
             ),
-            subtitle: Text(
-              messageText,
-              style: messageStyle,
+            subtitle: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    messageText,
+                    style: messageStyle,
+                  ),
+                ),
+                if (!isUserMessage)
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: speakerButton,
+                  ),
+              ],
             ),
-            trailing: isUserMessage ? null : speakerButton,
             horizontalTitleGap: 16,
             minVerticalPadding: 16,
           ),

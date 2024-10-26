@@ -8,7 +8,23 @@ import 'package:cogniopenapp/ui/reusable/custom_title.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'global_settings.dart';
+
 class SettingsScreen extends StatefulWidget {
+  void onThemeChanged(String theme) {
+    String newBackgroundPath;
+
+    if (theme == "Blue") {
+      newBackgroundPath = "assets/images/background.jpg";
+    } else if (theme == "Pink") {
+      newBackgroundPath = "assets/images/pink_background.png";
+    } else {
+      newBackgroundPath = "assets/images/grey_background.jpg";
+    }
+
+    GlobalSettings.setBackgroundPath(newBackgroundPath); // Update global path
+  }
+
   const SettingsScreen({super.key});
 
   @override
@@ -20,6 +36,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _darkModeEnabled = false;
   String _selectedLanguage = 'English';
   bool _locationAccess = false;
+  String _selectedTheme = 'Blue'; // Added to manage theme selection
 
   @override
   void initState() {
@@ -78,6 +95,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onChanged: (String? newValue) {
                   setState(() {
                     _selectedLanguage = newValue!;
+                  });
+                },
+              ),
+            ),
+            const Divider(color: Colors.black54, height: 25, thickness: 2),
+            _buildSettingsCard(
+              icon: Icons.palette,
+              title: 'App Theme Color', // Theme setting added
+              trailing: DropdownButton<String>(
+                value: _selectedTheme,
+                dropdownColor: Colors.deepPurple,
+                style: Theme.of(context).textTheme.bodyMedium,
+                items: ['Blue', 'Pink', 'Grey']
+                    .map<DropdownMenuItem<String>>(
+                        (String value) => DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    ))
+                    .toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedTheme = newValue!;
+                    _applyTheme(_selectedTheme); // Apply theme change
                   });
                 },
               ),
@@ -144,6 +184,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (_locationAccess) {
       await Permission.location.request();
     }
+  }
+
+  void _applyTheme(String selectedTheme) {
+    widget.onThemeChanged(selectedTheme); // Pass selected theme to parent
   }
 
   void _showAboutDialog() {

@@ -6,6 +6,7 @@ Author: Eyerusalme (Jerry)
 import 'package:cogniopenapp/src/utils/permission_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
+import 'global_settings.dart';
 import 'registration_screen.dart';
 import 'home_screen.dart';
 
@@ -49,9 +50,9 @@ class _LoginScreenState extends State<LoginScreen> {
         context); // Check to ensure location is enabled for tracking and media enhancement
     return Scaffold(
         body: Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage("assets/images/background.jpg"),
+          image: AssetImage(GlobalSettings.backgroundPath.value),
           fit: BoxFit.cover,
         ),
       ),

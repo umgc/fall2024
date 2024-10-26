@@ -98,6 +98,7 @@ dependencies:
   collection: ^1.17.2
   camera_platform_interface: ^2.6.0
   logging: ^1.2.0
+  shared_preferences: ^2.0.18
 
 
   intl: any
