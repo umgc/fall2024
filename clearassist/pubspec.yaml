@@ -28,7 +28,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependency_overrides:
-  http: ^1.1.0
+  http: ^1.2.2
 
 dependencies:
   flutter:
