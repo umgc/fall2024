@@ -1,6 +1,8 @@
 import 'package:clearassistapp/ui/reusable/custom_title.dart';
 import 'package:clearassistapp/ui/settings_screen.dart';
 import 'package:flutter/material.dart';
+import 'global_settings.dart';
+import 'home_screen_content.dart';
 import 'assistant_screen.dart';
 import 'gallery_screen.dart';
 import 'home_screen_content-new-user.dart';
@@ -16,7 +18,7 @@ class _HomeScreenState extends State<HomeScreenNewUser> {
   int _selectedIndex = 0;
 
   // List of pages to switch between with the bottom navigation bar
-  static const List<Widget> _widgetOptions = <Widget>[
+  static final List<Widget> _widgetOptions = <Widget>[
     HomeScreenContentNewUser(),
     AssistantScreen(),
     GalleryScreen(),
@@ -38,16 +40,16 @@ class _HomeScreenState extends State<HomeScreenNewUser> {
       appBar: AppBar(
         leading: null,
         automaticallyImplyLeading: false,
-        backgroundColor:
-            Colors.transparent, // Transparent background for the app bar
+        backgroundColor: Colors.black
+            .withAlpha(80), // Transparent background for the app bar
         elevation: 0, // Remove shadow
         centerTitle: true,
         title: CustomTitle(),
       ),
       body: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage("assets/images/background.jpg"),
+              image: AssetImage(GlobalSettings.backgroundPath.value),
               fit: BoxFit.cover,
             ),
           ),

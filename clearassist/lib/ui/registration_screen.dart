@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'onboardingScreen.dart';
+import 'global_settings.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -56,9 +57,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               const Text('Registration', style: TextStyle(color: Colors.white)),
         ),
         body: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage("assets/images/background.jpg"),
+              image: AssetImage(GlobalSettings.backgroundPath.value),
               fit: BoxFit.cover,
             ),
           ),

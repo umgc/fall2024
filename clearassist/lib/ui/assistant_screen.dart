@@ -243,7 +243,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
       OpenAI.apiKey = apiKeyEnv;
       String userName = "User"; // Default user name
       String prompt =
-          "You are an assistant for $userName, who has memory loss.";
+          "You are an assistant for $userName, who has memory loss. Do not output markdown.";
       if (widget.conversation != null) {
         String transcript = await getTranscript();
         if (transcript.isNotEmpty) {
@@ -251,10 +251,16 @@ class _AssistantScreenState extends State<AssistantScreen> {
               "\n$userName wants to talk about the following conversation: \n$transcript";
         }
       }
+      String testString =
+          "{\"reminders\": [  {\"title\": \"Doctor's Appointment\", \"date\": \"2024-10-22\", \"time\": \"10:00 AM\"},  {\"title\": \"Grocery Shopping\", \"date\": \"2024-10-21\", \"time\": \"2:00 PM\", \"completed\": false}],\"tasks\": [  {\"task\": \"Take Medication\", \"due_date\": \"2024-10-21\", \"completed\": false}],\"contacts\": {  \"daughter\": {\"name\": \"Sarah\", \"phone\": \"+1-555-123-4567\"},  \"doctor\": {\"name\": \"Dr. Smith\", \"phone\": \"+1-555-987-6543\"}},\"other_info\": {  \"location\": \"Home\", \"last_activity\": \"Watched TV\"}}";
+      prompt +=
+          "\n$userName's device has this information saved for you to recall: \n$testString";
       setState(() {
         this.prompt = prompt;
       });
-      _handleUserMessage("Say hello.", false);
+      _handleUserMessage(
+          "Say hello to the user and comment about upcoming reminders or contact info.",
+          false);
       return true;
     }
   }
@@ -263,8 +269,8 @@ class _AssistantScreenState extends State<AssistantScreen> {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              title: Text(title),
-              content: Text(message),
+              title: Text(title, style: TextStyle(color: Colors.black)),
+              content: Text(message, style: TextStyle(color: Colors.black)),
               actions: <Widget>[
                 TextButton(
                   child: const Text('OK'),
@@ -284,9 +290,6 @@ class _AssistantScreenState extends State<AssistantScreen> {
       _showAlert("Missing Transcript", "Transcript file could not be read.");
       return "";
     }
-      _showAlert("Missing Transcript", "Transcript file not found.");
-
-    return widget.conversation!.description ?? "";
   }
 }
 
@@ -304,17 +307,13 @@ class ChatMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var virtualAssistantIcon = Image.asset(
-      'assets/icons/virtual_assistant.png',
-      width: 25.0,
-      height: 25.0,
-    );
     IconButton speakerButton = IconButton(
       icon: const Icon(IconData(0xe6c5, fontFamily: 'MaterialIcons')),
       onPressed: () {
         toggleTTS(messageText);
       },
     );
+
     const TextStyle messageStyle = TextStyle(
       color: Colors.white,
       fontSize: 16.0,
@@ -346,17 +345,28 @@ class ChatMessage extends StatelessWidget {
           widthFactor: 0.85,
           child: ListTile(
             textColor: Colors.white,
-            leading: isUserMessage ? null : virtualAssistantIcon,
+            leading: null,
             minLeadingWidth: 25,
             title: Text(
               isUserMessage ? "User:" : "ClearAssist Remote Assistant (Cora):",
               style: titleStyle,
             ),
-            subtitle: Text(
-              messageText,
-              style: messageStyle,
+            subtitle: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    messageText,
+                    style: messageStyle,
+                  ),
+                ),
+                if (!isUserMessage)
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: speakerButton,
+                  ),
+              ],
             ),
-            trailing: isUserMessage ? null : speakerButton,
             horizontalTitleGap: 16,
             minVerticalPadding: 16,
           ),

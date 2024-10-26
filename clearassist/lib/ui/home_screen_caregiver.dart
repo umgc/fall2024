@@ -1,6 +1,7 @@
 import 'package:clearassistapp/ui/reusable/custom_title.dart';
 import 'package:flutter/material.dart';
 import 'home_screen_content_caregiver.dart';
+import 'global_settings.dart';
 
 class HomeScreenCaregiver extends StatefulWidget {
   const HomeScreenCaregiver({super.key});
@@ -44,9 +45,9 @@ class _HomeScreenCaregiverState extends State<HomeScreenCaregiver> {
         title: CustomTitle(),
       ),
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/images/background.jpg"),
+            image: AssetImage(GlobalSettings.backgroundPath.value),
             fit: BoxFit.cover,
           ),
         ),

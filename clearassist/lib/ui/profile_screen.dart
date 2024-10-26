@@ -7,6 +7,7 @@ import 'package:clearassistapp/ui/reusable/custom_title.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'global_settings.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -95,9 +96,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: CustomTitle(titleText: 'Profile'),
       ),
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/images/background.jpg"),
+            image: AssetImage(GlobalSettings.backgroundPath.value),
             fit: BoxFit.cover,
           ),
         ),

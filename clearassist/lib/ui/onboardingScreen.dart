@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../src/onboarding.dart';
 import 'home_screen.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'global_settings.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -43,7 +44,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             padding: const EdgeInsets.only(top: 40.0),
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage("assets/images/background.jpg"),
+                image: AssetImage(GlobalSettings.backgroundPath.value),
                 fit: BoxFit.cover,
               ),
               color: Colors.white,

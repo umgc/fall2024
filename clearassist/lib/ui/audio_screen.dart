@@ -496,7 +496,6 @@ class _AudioScreenState extends State<AudioScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 98, 167, 199),
       appBar: AppBar(
         title: Text(_transcriberTitleText), // Dynamic transcriber text
       ),

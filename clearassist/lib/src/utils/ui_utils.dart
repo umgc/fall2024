@@ -6,6 +6,8 @@ import 'package:clearassistapp/ui/settings_screen.dart';
 import 'package:clearassistapp/ui/video_screen.dart';
 import 'package:flutter/material.dart';
 
+import '../../ui/global_settings.dart';
+
 class UiUtils {
   static IconData getMediaIconData(MediaType mediaType) {
     switch (mediaType) {
@@ -66,7 +68,8 @@ class UiUtils {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const SettingsScreen()));
+                    builder: (context) => SettingsScreen())
+            );
           }
         });
   }
