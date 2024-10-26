@@ -69,7 +69,16 @@ class TeacherDashboard extends StatelessWidget {
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 12),
+            Text(
+              'Welcome, ${MoodleApiSingleton().moodleFirstName ?? 'User'}',
+              style: TextStyle(
+              fontSize: titleFontSize * 0.7,
+              fontWeight: FontWeight.normal,
+              color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -155,6 +164,15 @@ class TeacherDashboard extends StatelessWidget {
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
+              const SizedBox(height: 12),
+              Text(
+              'Welcome, ${MoodleApiSingleton().moodleFirstName ?? 'User'}',
+              style: TextStyle(
+              fontSize: titleFontSize * 0.7,
+              fontWeight: FontWeight.normal,
+              color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
               const SizedBox(height: 20),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,

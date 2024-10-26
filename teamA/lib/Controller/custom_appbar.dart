@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:learninglens_app/Api/moodle_api_singleton.dart';
 import 'package:learninglens_app/Views/dashboard.dart';
 import 'package:learninglens_app/Views/login_page.dart';
+import 'package:learninglens_app/Views/user_settings.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -44,36 +45,45 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
       actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.settings),
+          onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => UserSettings()),
+        );
+          },
+        ),
         Padding(
           padding: EdgeInsets.only(right: 10.0),
           child: InkWell(
-            onTap: () {
-              MoodleApiSingleton().logout();
-                Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => LoginApp()),
-                (route) => false,
-                );
-              print("Profile image clicked!");
-            },
-            child: Material(
-              color: Colors.transparent,
-              child: Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                ),
-                child: ClipOval(
-                  child: Image.network(
-                    userprofileurl,
-                    height: 50,
-                    width: 50,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
+        onTap: () {
+          MoodleApiSingleton().logout();
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => LoginApp()),
+            (route) => false,
+          );
+          print("Profile image clicked!");
+        },
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+          shape: BoxShape.circle,
             ),
+            child: ClipOval(
+          child: Image.network(
+            userprofileurl,
+            height: 50,
+            width: 50,
+            fit: BoxFit.cover,
+          ),
+            ),
+          ),
+        ),
           ),
         ),
       ],
@@ -83,4 +93,17 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   // This is required to implement PreferredSizeWidget
   @override
   Size get preferredSize => Size.fromHeight(kToolbarHeight);
+}
+
+
+class ThemeNotifier extends ChangeNotifier {
+  Color _primaryColor = Colors.deepPurple;
+
+  Color get primaryColor => _primaryColor;
+
+  void updateTheme(Color color) {
+    _primaryColor = color;
+    print('Theme updated to: $color');
+    notifyListeners();  // Notify listeners (like the whole app) to rebuild
+  }
 }

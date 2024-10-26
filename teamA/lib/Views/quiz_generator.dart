@@ -36,7 +36,7 @@ class _AssessmentState extends State<CreateAssessment> {
   bool isAdvancedModeOnGetFromGlobalVarsLater = false;
   final _formKey = GlobalKey<FormState>();
   String? selectedLLM, selectedSubject, selectedGradeLevel;
-  List<String> _gradeLevels = ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'];
+  List<String> _gradeLevels = ['9th','10th','11th','12th'];
   List<String> _subjects = ['Math', 'Science', 'Language Arts', 'Social Studies', 'Health', 'Art', 'Music'];
   bool _isLoading = false;
   _AssessmentState();

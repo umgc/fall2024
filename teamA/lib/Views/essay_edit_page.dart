@@ -99,65 +99,74 @@ Widget build(BuildContext context) {
     appBar: CustomAppBar(title: 'Edit Essay Rubric', userprofileurl: MoodleApiSingleton().moodleProfileImage ?? ''),  
     body: LayoutBuilder(
       builder: (context, constraints) {
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Container(
-            alignment: Alignment.topLeft, // Force the table to stay aligned to the left
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minWidth: 600, // Ensure the table never shrinks below 600px
-                maxWidth: constraints.maxWidth > 600 ? constraints.maxWidth : 600,
-              ),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Editable(
-                      key: _editableKey,
-                      tdEditableMaxLines: 100,
-                      trHeight: 100,
-                      columns: headers,
-                      rows: rows,
-                      showCreateButton: false,
-                      tdStyle: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      showSaveIcon: false,
-                      onRowSaved: (value) {
-                        print('rowsaved $value');
-                      },
-                      borderColor: Theme.of(context).colorScheme.primaryContainer,
-                      onSubmitted: (value) {
-                        print('onsubmitted: $value'); // You can grab this data to store anywhere
-                      },
-                    ),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start, // Align content to the top-left
+          children: [
+            SizedBox(height: 24.0),
+            
+            // Expanded is used for the Editable, wrapped with SingleChildScrollView for horizontal scrolling
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal, // Allow horizontal scrolling for the Editable
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minWidth: 600, // Ensure the table never shrinks below 600px
+                    maxWidth: constraints.maxWidth > 600 ? constraints.maxWidth : 600,
                   ),
-                  SizedBox(height: 20), // Add some spacing between the Editable and the button
-                  Center(
-                    child: ElevatedButton(
-                      child: const Text('Finish and Assign'),
-                      onPressed: () {
-                        String updatedJson = getUpdatedJson();
-                        // Navigate to the Essay Assignment Settings page with the updated JSON
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) =>
-                                EssayAssignmentSettings(updatedJson)));
-                        print(updatedJson); // You can now see the updated JSON in the console
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Navigate to the Essay Assignment Page')));
-                      },
+                  child: Editable(
+                    key: _editableKey,
+                    tdEditableMaxLines: 100,
+                    trHeight: 100,
+                    columns: headers,
+                    rows: rows,
+                    showCreateButton: false,
+                    tdStyle: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
+                    showSaveIcon: false,
+                    onRowSaved: (value) {
+                      print('rowsaved $value');
+                    },
+                    borderColor: Theme.of(context).colorScheme.primaryContainer,
+                    onSubmitted: (value) {
+                      print('onsubmitted: $value'); // You can grab this data to store anywhere
+                    },
                   ),
-                ],
+                ),
               ),
             ),
-          ),
+            
+            SizedBox(height: 20), // Add some spacing between the Editable and the button
+            
+            // Row for the Button outside the scrollable area
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center, // Center the button horizontally
+              children: [
+                ElevatedButton(
+                  child: const Text('Send to Moodle'),
+                  onPressed: () {
+                    String updatedJson = getUpdatedJson();
+                    // Navigate to the Essay Assignment Settings page with the updated JSON
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) =>
+                            EssayAssignmentSettings(updatedJson)));
+                    print(updatedJson); // You can now see the updated JSON in the console
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Data sent to Moodle')));
+                  },
+                ),
+              ],
+            ),
+            SizedBox(height: 20), // Optional additional spacing
+          ],
         );
       },
     ),
   );
 }
+
 
 
 

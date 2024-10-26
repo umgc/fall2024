@@ -1,7 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:learninglens_app/Controller/custom_appbar.dart';
 import 'package:learninglens_app/Views/assessments_view.dart';
+import 'package:provider/provider.dart';
 import 'Views/login_page.dart';
 import 'Views/dashboard.dart';
 import 'Views/send_essay_to_moodle.dart';
@@ -12,7 +14,13 @@ import 'Views/edit_questions.dart';
 
 void main() async{
   await dotenv.load();
-  runApp(MyApp());
+  // runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeNotifier(),
+      child: MyApp(),
+    ),
+  );
 }
 
 //click and drag for intuitiveness
@@ -35,9 +43,7 @@ class MyApp extends StatelessWidget {
       title: "Learning Lens",
       home: LoginApp(),
       theme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark
-        //colors will be handled later
+        colorScheme: ColorScheme.fromSeed(seedColor: Provider.of<ThemeNotifier>(context).primaryColor),
       ),
       scrollBehavior: CustomScrollBehavior(),
       routes: {

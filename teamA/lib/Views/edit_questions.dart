@@ -73,24 +73,30 @@ class EditQuestionsState extends State<EditQuestions> {
                   background: Stack(
                     children: [
                       Container(
-                        color: Colors.green,
+                        color: Theme.of(context).colorScheme.scrim,
                         child: Align(
                           alignment: Alignment.centerLeft,
-                          child: Padding(
+                            child: Padding(
                             padding: const EdgeInsets.only(left: 16),
-                            child: Icon(Icons.favorite),
+                            child: Icon(
+                              Icons.refresh,
+                              color: Theme.of(context).colorScheme.surface,
+                            ),
                           ),
                         ),
                       ),
                       if (_isLoading)
                         Center(
-                          child:
-                              CircularProgressIndicator(), // Spinner behind the item
+                            child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Theme.of(context).colorScheme.surface,
+                            ),
+                            ), // Spinner behind the item
                         ),
                     ],
                   ),
                   secondaryBackground: Container(
-                    color: Colors.red,
+                    color: Theme.of(context).colorScheme.error,
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Padding(
@@ -128,6 +134,7 @@ class EditQuestionsState extends State<EditQuestions> {
                           ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Deleted $Question'),
+                          duration: Duration(seconds: 2),
                           action: SnackBarAction(
                               label: 'Undo', onPressed: () => delete = false),
                         ),

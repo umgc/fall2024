@@ -1,22 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:learninglens_app/main.dart';
+// import 'package:learninglens_app/main.dart';
 import '/controller/main_controller.dart';
 import '/Views/dashboard.dart';
+
+// class LoginApp extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Learning Lens Login',
+//       // theme: ThemeData(
+//       //   useMaterial3: true,
+//       // ),
+//       debugShowCheckedModeBanner: false,
+//       scrollBehavior: CustomScrollBehavior(),
+//       home: const LoginScreen(),
+//     );
+//   }
+// }
 
 class LoginApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Learning Lens Login',
-      theme: ThemeData(
-        useMaterial3: true,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Login', style: Theme.of(context).textTheme.bodyMedium), // Use the theme from MyApp
       ),
-      debugShowCheckedModeBanner: false,
-      scrollBehavior: CustomScrollBehavior(),
-      home: const LoginScreen(),
+      body: const LoginScreen(), // Keep the rest of your widget tree
     );
   }
 }
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);

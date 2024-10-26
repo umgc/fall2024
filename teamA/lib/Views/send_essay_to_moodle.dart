@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:learninglens_app/Controller/custom_appbar.dart';
 import 'package:learninglens_app/Controller/beans.dart';
+import 'package:learninglens_app/Views/dashboard.dart';
 import 'dart:convert';
 import '../Api/moodle_api_singleton.dart';
 
@@ -463,6 +464,29 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                                   widget.updatedJson,
                                   description,
                                 );
+
+
+                      if (mounted) {
+                  
+                          final snackBar = SnackBar(
+                            content: Text('Assignment submitted successfully!'),
+                            duration: Duration(seconds: 2),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          await Future.delayed(snackBar.duration);
+                          if (mounted) {
+                            Navigator.pop(context);
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TeacherDashboard(),
+                              ),
+                            );
+                          }
+
+                          }
+
+
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(

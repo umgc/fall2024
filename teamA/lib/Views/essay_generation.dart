@@ -229,8 +229,8 @@ class _EssayGenerationState extends State<EssayGeneration>
                   // Standard/objective
                   TextBox(
                     label: "Standard / Objective",
-                    icon: Icons.mic,
-                    secondaryIcon: Icons.attachment,
+                    // icon: Icons.mic,
+                    // secondaryIcon: Icons.attachment,
                     initialValue: '',
                     onChanged: (newValue) {
                       _standardObjectiveController.text = newValue!;
@@ -241,8 +241,8 @@ class _EssayGenerationState extends State<EssayGeneration>
                   // Assignment description
                   TextBox(
                     label: "Assignment Description",
-                    icon: Icons.mic,
-                    secondaryIcon: Icons.attachment,
+                    // icon: Icons.mic,
+                    // secondaryIcon: Icons.attachment,
                     initialValue: '',
                     onChanged: (newValue) {
                       _assignmentDescriptionController.text = newValue!;
@@ -253,8 +253,8 @@ class _EssayGenerationState extends State<EssayGeneration>
                   // Additional customization
                   TextBox(
                     label: "Additional Customization for Rubric (Optional)",
-                    icon: Icons.mic,
-                    secondaryIcon: Icons.attachment,
+                    // icon: Icons.mic,
+                    // secondaryIcon: Icons.attachment,
                     initialValue: '',
                     onChanged: (newValue) {
                       _additionalCustomizationController.text = newValue!;
@@ -459,16 +459,16 @@ class Button extends StatelessWidget {
 class TextBox extends StatefulWidget {
   // Create stateful widget to maintain persistence in textboxes from events
   final String label;
-  final IconData icon;
-  final IconData secondaryIcon;
+  // final IconData icon;
+  // final IconData secondaryIcon;
   final String initialValue;
   final ValueChanged<String?> onChanged;
 
   const TextBox({
     Key? key,
     required this.label,
-    required this.icon,
-    required this.secondaryIcon,
+    // required this.icon,
+    // required this.secondaryIcon,
     required this.initialValue,
     required this.onChanged,
   }) : super(key: key);
@@ -504,14 +504,14 @@ class _TextBoxState extends State<TextBox> {
       controller: _controller, // Use the controller initialized in initState
       decoration: InputDecoration(
         labelText: widget.label,
-        prefixIcon: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(widget.icon),
-            SizedBox(height: 4),
-            Icon(widget.secondaryIcon),
-          ],
-        ),
+        // prefixIcon: Column(
+          // mainAxisAlignment: MainAxisAlignment.center,
+          // children: [
+          //   Icon(widget.icon),
+          //   SizedBox(height: 4),
+          //   Icon(widget.secondaryIcon),
+          // ],
+        // ),
       ),
     );
   }
