@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
+import 'global_settings.dart';
 
 // AudioScreen widget provides the main interface for audio recording.
 class AudioScreen extends StatefulWidget {
@@ -284,7 +285,7 @@ class _AudioScreenState extends State<AudioScreen> {
         'Authorization': 'Bearer $openAIKey',
       },
       body: json.encode({
-        'model': 'gpt-3.5-turbo',
+        'model': 'gpt-4o-mini',
         'messages': [
           {'role': 'system', 'content': 'You are a translation assistant.'},
           {
@@ -377,7 +378,7 @@ class _AudioScreenState extends State<AudioScreen> {
           'Authorization': 'Bearer $openAIKey', // Use the API key
         },
         body: jsonEncode({
-          'model': 'gpt-3.5-turbo',
+          'model': 'gpt-4o-mini',
           'messages': [
             {
               'role': 'system',
@@ -404,7 +405,7 @@ class _AudioScreenState extends State<AudioScreen> {
             'Authorization': 'Bearer $openAIKey',
           },
           body: jsonEncode({
-            'model': 'gpt-3.5-turbo',
+            'model': 'gpt-4o-mini',
             'messages': [
               {'role': 'system', 'content': 'You are a translation assistant.'},
               {
@@ -496,149 +497,158 @@ class _AudioScreenState extends State<AudioScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_transcriberTitleText), // Dynamic transcriber text
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  _isRecording ? 'Recording...' : 'Press to Start Recording',
-                  style: TextStyle(fontSize: 24),
-                  textAlign: TextAlign.center,
+        appBar: AppBar(
+          title: Text(_transcriberTitleText), // Dynamic transcriber text
+        ),
+        body: Container(
+          height: MediaQuery.sizeOf(context).height,
+          decoration: BoxDecoration(
+              image: DecorationImage(
+            image: AssetImage(GlobalSettings.backgroundPath.value),
+            fit: BoxFit.cover,
+          )),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      _isRecording
+                          ? 'Recording...'
+                          : 'Press to Start Recording',
+                      style: TextStyle(fontSize: 24),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        _isRecording ? _stopRecording() : _startRecording();
+                        printCacheFiles(); // Call to print files after starting or stopping recording
+                      },
+                      child: Text(
+                          _isRecording ? 'Stop Recording' : 'Start Recording'),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      'Transcription:',
+                      style: TextStyle(fontSize: 20),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      _translatedText, // Show translated text here
+                      style: TextStyle(fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 20),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: DropdownButton<String>(
+                        value: _selectedLanguage,
+                        dropdownColor: Colors.blue[100],
+                        icon: Icon(Icons.language, color: Colors.orange),
+                        underline: SizedBox(),
+                        items: [
+                          DropdownMenuItem<String>(
+                            value: 'en',
+                            child: Text('English',
+                                style: TextStyle(color: Colors.orange)),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: 'es',
+                            child: Text('Español',
+                                style: TextStyle(color: Colors.orange)),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: 'fr',
+                            child: Text('Français',
+                                style: TextStyle(color: Colors.orange)),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: 'pt',
+                            child: Text('Português',
+                                style: TextStyle(color: Colors.orange)),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: 'de',
+                            child: Text('Deutsch',
+                                style: TextStyle(color: Colors.orange)),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: 'he',
+                            child: Text('עברית',
+                                style: TextStyle(color: Colors.orange)),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: 'zh',
+                            child: Text('中文',
+                                style: TextStyle(color: Colors.orange)),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: 'ar',
+                            child: Text('العربية',
+                                style: TextStyle(color: Colors.orange)),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: 'hi',
+                            child: Text('हिन्दी',
+                                style: TextStyle(color: Colors.orange)),
+                          ),
+                        ],
+                        onChanged: (String? newValue) async {
+                          setState(() {
+                            _selectedLanguage = newValue!;
+                            _transcriberTitleText = _translations[
+                                _selectedLanguage]!['transcriber']!;
+                            _summarizeButtonText =
+                                _translations[_selectedLanguage]!['summarize']!;
+                            _summaryLabelText =
+                                _translations[_selectedLanguage]!['summary']!;
+                          });
+                          // Translate the transcription and summarize it
+                          await translateText(_maskedTranscription);
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await summarizeText(
+                            _maskedTranscription, _selectedLanguage);
+                      },
+                      child: Text(
+                          _summarizeButtonText), // Dynamic summarize button text
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      _summaryLabelText, // Dynamic summary label
+                      style: TextStyle(fontSize: 20),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      _summaryText, // Display the summary here
+                      style: TextStyle(fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    _isRecording ? _stopRecording() : _startRecording();
-                    printCacheFiles(); // Call to print files after starting or stopping recording
-                  },
-                  child:
-                      Text(_isRecording ? 'Stop Recording' : 'Start Recording'),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Transcription:',
-                  style: TextStyle(fontSize: 20),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 10),
-                Text(
-                  _translatedText, // Show translated text here
-                  style: TextStyle(fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 20),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: DropdownButton<String>(
-                    value: _selectedLanguage,
-                    dropdownColor: Colors.blue[100],
-                    icon: Icon(Icons.language, color: Colors.orange),
-                    underline: SizedBox(),
-                    items: [
-                      DropdownMenuItem<String>(
-                        value: 'en',
-                        child: Text('English',
-                            style: TextStyle(color: Colors.orange)),
-                      ),
-                      DropdownMenuItem<String>(
-                        value: 'es',
-                        child: Text('Español',
-                            style: TextStyle(color: Colors.orange)),
-                      ),
-                      DropdownMenuItem<String>(
-                        value: 'fr',
-                        child: Text('Français',
-                            style: TextStyle(color: Colors.orange)),
-                      ),
-                      DropdownMenuItem<String>(
-                        value: 'pt',
-                        child: Text('Português',
-                            style: TextStyle(color: Colors.orange)),
-                      ),
-                      DropdownMenuItem<String>(
-                        value: 'de',
-                        child: Text('Deutsch',
-                            style: TextStyle(color: Colors.orange)),
-                      ),
-                      DropdownMenuItem<String>(
-                        value: 'he',
-                        child: Text('עברית',
-                            style: TextStyle(color: Colors.orange)),
-                      ),
-                      DropdownMenuItem<String>(
-                        value: 'zh',
-                        child:
-                            Text('中文', style: TextStyle(color: Colors.orange)),
-                      ),
-                      DropdownMenuItem<String>(
-                        value: 'ar',
-                        child: Text('العربية',
-                            style: TextStyle(color: Colors.orange)),
-                      ),
-                      DropdownMenuItem<String>(
-                        value: 'hi',
-                        child: Text('हिन्दी',
-                            style: TextStyle(color: Colors.orange)),
-                      ),
-                    ],
-                    onChanged: (String? newValue) async {
-                      setState(() {
-                        _selectedLanguage = newValue!;
-                        _transcriberTitleText =
-                            _translations[_selectedLanguage]!['transcriber']!;
-                        _summarizeButtonText =
-                            _translations[_selectedLanguage]!['summarize']!;
-                        _summaryLabelText =
-                            _translations[_selectedLanguage]!['summary']!;
-                      });
-                      // Translate the transcription and summarize it
-                      await translateText(_maskedTranscription);
-                    },
-                  ),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () async {
-                    await summarizeText(
-                        _maskedTranscription, _selectedLanguage);
-                  },
-                  child: Text(
-                      _summarizeButtonText), // Dynamic summarize button text
-                ),
-                SizedBox(height: 20),
-                Text(
-                  _summaryLabelText, // Dynamic summary label
-                  style: TextStyle(fontSize: 20),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 10),
-                Text(
-                  _summaryText, // Display the summary here
-                  style: TextStyle(fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }

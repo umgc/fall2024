@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // For formatting dates
 import 'package:path_provider/path_provider.dart';
+import 'global_settings.dart';
 
 void main() {
   runApp(MyApp());
@@ -151,7 +152,10 @@ class _CalendarPageState extends State<CalendarPage> {
         style: TextStyle(color: Colors.black),
         decoration: InputDecoration(labelText: "Create Reminder"));
     AlertDialog message = AlertDialog(
-      title: Text("createAlert"),
+      title: Text(
+        "createAlert",
+        style: TextStyle(color: Colors.black),
+      ),
       content: Text("Message"),
       actions: [
         // Widget btn=TextButton(child: Text(""),
@@ -197,18 +201,24 @@ class _CalendarPageState extends State<CalendarPage> {
         ),
       );
     }
-
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          _buildDayHeaders(),
-          Table(
-            children: _buildCalendarRows(dayButtons),
+    return Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(GlobalSettings.backgroundPath.value),
+            fit: BoxFit.cover,
           ),
-        ],
-      ),
-    );
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              _buildDayHeaders(),
+              Table(
+                children: _buildCalendarRows(dayButtons),
+              ),
+            ],
+          ),
+        ));
   }
 
   // Build a row of day headers (Mon, Tue, etc.)

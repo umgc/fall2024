@@ -1,6 +1,7 @@
 import 'package:clearassistapp/ui/home_screen.dart';
 import 'package:clearassistapp/ui/home_screen_caregiver.dart';
 import 'package:flutter/material.dart';
+import 'global_settings.dart';
 
 class HomeScreenContentLoginMain extends StatefulWidget {
   const HomeScreenContentLoginMain({super.key});
@@ -40,7 +41,13 @@ class HomeScreenContentNewUserBody extends StatelessWidget {
         context.findAncestorStateOfType<_HomeScreenContentUserState>()!;
 
     return Container(
-      color: Colors.transparent, // Set container background to transparent
+      decoration: BoxDecoration(
+          border: Border.all(width: 1),
+          image: DecorationImage(
+            image: AssetImage(GlobalSettings.backgroundPath.value),
+            fit: BoxFit.cover,
+          )),
+      // color: Colors.transparent, // Set container background to transparent
       child: Column(
         children: [
           const Padding(

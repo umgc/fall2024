@@ -39,16 +39,16 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true,
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        leading: null,
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-        title: CustomTitle(),
-      ),
+      // extendBody: true,
+      // extendBodyBehindAppBar: true,
+      // appBar: AppBar(
+      //   leading: null,
+      //   automaticallyImplyLeading: false,
+      //   backgroundColor: Colors.transparent,
+      //   elevation: 0,
+      //   centerTitle: true,
+      //   title: CustomTitle(),
+      // ),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
