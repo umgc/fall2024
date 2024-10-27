@@ -6,12 +6,12 @@ import 'package:provider/provider.dart';
 
 class UserSettings extends StatefulWidget {
   @override
-  _UserSettingsState createState() => _UserSettingsState();
+  UserSettingsState createState() => UserSettingsState();
 }
 
-class _UserSettingsState extends State<UserSettings> {
+class UserSettingsState extends State<UserSettings> {
   void _pickColor() async {
-    Color? pickedColor = await showDialog(
+    await showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(

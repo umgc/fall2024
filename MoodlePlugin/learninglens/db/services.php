@@ -64,12 +64,22 @@ $functions = [
         ],   
         'local_learninglens_write_rubric_grades' => [
         'classname'   => 'local_learninglens\external\write_rubric_grades',
-        'description' => 'Gets rubric grades for a specific submission.',
+        'description' => 'Sets rubric grades for a specific submission.',
         'type'        => 'write',
         'ajax'        => true,
         'capabilities'=> 'mod/assign:grade',
         'services'    => [
             MOODLE_OFFICIAL_MOBILE_SERVICE,
             ]
-        ],  
+        ],    
+        'local_learninglens_write_grades' => [
+        'classname'   => 'local_learninglens\external\write_grades',
+        'description' => 'Sets grades for a specific submission.',
+        'type'        => 'write',
+        'ajax'        => true,
+        'capabilities'=> 'mod/assign:grade',
+        'services'    => [
+            MOODLE_OFFICIAL_MOBILE_SERVICE,
+            ]
+    ],  
 ];

@@ -86,7 +86,6 @@ class import_questions extends external_api {
         // return $retval;
 
         // Return Category ID
-        $tempvar = $qformat->category->id;
         return array('categoryid' => $qformat->category->id);
         
     }
