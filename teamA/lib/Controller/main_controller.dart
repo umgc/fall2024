@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../Api/moodle_api_singleton.dart';
-import '../Api/llm_api.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import '../Controller/beans.dart';
+import 'package:learninglens_app/Controller/beans.dart';
 
 class MainController 
 {
@@ -39,6 +37,18 @@ class MainController
       return false;
     }
   }
+
+  Future<bool> checkIfTeacher() async {
+  Future<bool> isTeacher = MoodleApiSingleton().isUserTeacher(MoodleApiSingleton().moodleCourses ?? []);
+  if (await isTeacher) {
+    print('The user is a teacher in at least one course.');
+    return true;
+  } else {
+    print('The user is not a teacher in any course.');
+    return false;
+  }
+}
+
 
   void logoutFromMoodle() 
   {

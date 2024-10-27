@@ -1,26 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:learninglens_app/Api/moodle_api_singleton.dart';
-import 'package:learninglens_app/main.dart';
+// import 'package:learninglens_app/main.dart';
 import '/controller/main_controller.dart';
 import '/Views/dashboard.dart';
+
+// class LoginApp extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Learning Lens Login',
+//       // theme: ThemeData(
+//       //   useMaterial3: true,
+//       // ),
+//       debugShowCheckedModeBanner: false,
+//       scrollBehavior: CustomScrollBehavior(),
+//       home: const LoginScreen(),
+//     );
+//   }
+// }
 
 class LoginApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Learning Lens Login',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple.shade200,
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Login', style: Theme.of(context).textTheme.bodyMedium), // Use the theme from MyApp
       ),
-      debugShowCheckedModeBanner: false,
-      scrollBehavior: CustomScrollBehavior(),
-      home: const LoginScreen(),
+      body: const LoginScreen(), // Keep the rest of your widget tree
     );
   }
 }
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -34,6 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _moodleURLController = TextEditingController();
+  bool _isLoading = false;
 
   void _showLoginFailedDialog() {
     showDialog(
@@ -58,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -147,26 +157,37 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 32),
                     SizedBox(
                       width: 246,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          var wasSuccessful =
-                              await LoginScreen.controller.loginToMoodle(
-                            _usernameController.text,
-                            _passwordController.text,
-                            _moodleURLController.text,
-                          );
-                          if (wasSuccessful) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => TeacherDashboard()),
-                            );
-                          } else {
-                            _showLoginFailedDialog();
-                          }
-                        },
-                        child: const Text('Login'),
-                      ),
+                      child: _isLoading
+                          ? CircularProgressIndicator() // Show spinner when loading
+                          : ElevatedButton(
+                              onPressed: () async {
+                                setState(() {
+                                  _isLoading = true; // Start loading
+                                });
+                                var wasSuccessful = await LoginScreen
+                                    .controller
+                                    .loginToMoodle(
+                                  _usernameController.text,
+                                  _passwordController.text,
+                                  _moodleURLController.text,
+                                );
+                                setState(() {
+                                  _isLoading = false; // Stop loading
+                                });
+
+                                if (wasSuccessful) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            TeacherDashboard()),
+                                  );
+                                } else {
+                                  _showLoginFailedDialog();
+                                }
+                              },
+                              child: const Text('Login'),
+                            ),
                     ),
                     const SizedBox(height: 16),
                   ],
@@ -268,28 +289,37 @@ class _LoginScreenState extends State<LoginScreen> {
                             SizedBox(
                               width: constraints.maxWidth *
                                   0.6, // Relative sizing for buttons
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  var wasSuccessful = await LoginScreen
-                                      .controller
-                                      .loginToMoodle(
-                                    _usernameController.text,
-                                    _passwordController.text,
-                                    _moodleURLController.text,
-                                  );
-                                  if (wasSuccessful) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              TeacherDashboard()),
-                                    );
-                                  } else {
-                                    _showLoginFailedDialog();
-                                  }
-                                },
-                                child: const Text('Login'),
-                              ),
+                              child: _isLoading
+                                  ? CircularProgressIndicator() // Show spinner when loading
+                                  : ElevatedButton(
+                                      onPressed: () async {
+                                        setState(() {
+                                          _isLoading = true; // Start loading
+                                        });
+                                        var wasSuccessful = await LoginScreen
+                                            .controller
+                                            .loginToMoodle(
+                                          _usernameController.text,
+                                          _passwordController.text,
+                                          _moodleURLController.text,
+                                        );
+                                        setState(() {
+                                          _isLoading = false; // Stop loading
+                                        });
+
+                                        if (wasSuccessful) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    TeacherDashboard()),
+                                          );
+                                        } else {
+                                          _showLoginFailedDialog();
+                                        }
+                                      },
+                                      child: const Text('Login'),
+                                    ),
                             ),
                           ],
                         ),

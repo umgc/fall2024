@@ -39,6 +39,9 @@ public static function execute_parameters(): external_function_parameters {
             'courseid' => new external_value(PARAM_INT, 'ID of the course'),
             'name' => new external_value(PARAM_TEXT, 'Name of the quiz'),
             'intro' => new external_value(PARAM_RAW, 'Introductory text for the quiz'),
+            'sectionid' => new external_value(PARAM_INT, 'Section ID', VALUE_DEFAULT, 1),
+            'timeopen'  => new external_value(PARAM_TEXT, 'Time when the quiz opens', VALUE_DEFAULT, '0'),
+            'timeclose' => new external_value(PARAM_TEXT, 'Time when the quiz closes', VALUE_DEFAULT, '0'),
         )
     );
 }
@@ -51,7 +54,7 @@ public static function execute_returns(): external_single_structure {
     );
 }
 
-public static function execute($courseid, $name, $intro): array {
+public static function execute($courseid, $name, $intro, $sectionid=1, $timeopen='0', $timeclose='0'): array {
     global $DB, $USER;
 
     // validate params
@@ -59,6 +62,9 @@ public static function execute($courseid, $name, $intro): array {
         'courseid' => $courseid,
         'name' => $name,
         'intro' => $intro,
+        'sectionid' => $sectionid,
+        'timeopen' => $timeopen,
+        'timeclose' => $timeclose
     ));
 
     // set context
@@ -74,13 +80,13 @@ public static function execute($courseid, $name, $intro): array {
     $module->course = $params['courseid'];
     $module->module = $DB->get_field('modules', 'id', array('name' => 'quiz'));
     $module->instance = 0;
-    $module->section = 0; 
+    $module->section = $params['sectionid']; 
     $module->visible = 1;
     $module->visibleold = 1;
     $module->groupmode = 0;
     $module->groupingid = 0;
     $module->completion = 0;
-    $module->idnumber = 1;
+    $module->idnumber = $params['sectionid'];
     $module->added = time();
 
     // add the course module
@@ -93,7 +99,12 @@ public static function execute($courseid, $name, $intro): array {
     $module->id = $module->coursemodule;
 
     // add course module to section
-    \course_add_cm_to_section($params['courseid'], $module->id, 0);
+    \course_add_cm_to_section($params['courseid'], $module->id, $params['sectionid']);
+
+
+    // Convert date strings to Unix timestamps
+    $timeopen = strtotime($params['timeopen']); // Convert '12 January 2024' to Unix timestamp
+    $timeclose = strtotime($params['timeclose']); 
 
     // create the quiz module
     $quiz = new \stdClass();
@@ -101,8 +112,8 @@ public static function execute($courseid, $name, $intro): array {
     $quiz->name = $params['name'];
     $quiz->intro = '<p>' . $params['intro'] . '</p>';
     $quiz->introformat = FORMAT_HTML;
-    $quiz->timeopen = 0;
-    $quiz->timeclose = 0;
+    $quiz->timeopen = $timeopen;
+    $quiz->timeclose = $timeclose;
     $quiz->preferredbehaviour = 'deferredfeedback';
     $quiz->attempts = 0;
     $quiz->grade = 0;

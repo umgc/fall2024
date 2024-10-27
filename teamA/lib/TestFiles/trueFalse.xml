@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <quiz>
+  <question type="category">
+      <category>
+      <text>Pythagorean Theorem</text>
+      </category>
+  </question>
   <question type="truefalse">
     <name><text>Pythagorean Theorem Question 1</text></name>
     <questiontext format="html"><text>The Pythagorean theorem states that in a right triangle, the square of the hypotenuse is equal to the sum of the squares of the other two sides.</text></questiontext>

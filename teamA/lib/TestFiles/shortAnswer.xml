@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <quiz>
+  <question type="category">
+      <category>
+      <text>Pythagorean Theorem</text>
+      </category>
+  </question>
   <question type="shortanswer">
     <name><text>Pythagorean Theorem Question 1</text></name>
     <questiontext><text>What is the length of the hypotenuse of a right triangle if the lengths of the two legs are 9 and 12?</text></questiontext>
