@@ -235,6 +235,7 @@ class _EssayGenerationState extends State<EssayGeneration>
                     onChanged: (newValue) {
                       _standardObjectiveController.text = newValue!;
                     },
+                    maxLines: 2,
                   ),
                   const SizedBox(height: 16),
 
@@ -247,6 +248,7 @@ class _EssayGenerationState extends State<EssayGeneration>
                     onChanged: (newValue) {
                       _assignmentDescriptionController.text = newValue!;
                     },
+                    maxLines: 2,
                   ),
                   const SizedBox(height: 16),
 
@@ -259,6 +261,7 @@ class _EssayGenerationState extends State<EssayGeneration>
                     onChanged: (newValue) {
                       _additionalCustomizationController.text = newValue!;
                     },
+                    maxLines: 2,
                   ),
 
                   const SizedBox(height: 16),
@@ -438,7 +441,7 @@ class Button extends StatelessWidget {
     } else if (type == "essay") {
       return Button._(
         type,
-        "Generate Essay",
+        "Generate Rubric",
         onPressed: onPressed,
       );
     } else {
@@ -463,21 +466,23 @@ class TextBox extends StatefulWidget {
   // final IconData secondaryIcon;
   final String initialValue;
   final ValueChanged<String?> onChanged;
+  final int maxLines;
 
   const TextBox({
-    Key? key,
+    super.key,
     required this.label,
     // required this.icon,
     // required this.secondaryIcon,
     required this.initialValue,
     required this.onChanged,
-  }) : super(key: key);
+    this.maxLines = 1,
+  });
 
   @override
-  _TextBoxState createState() => _TextBoxState();
+  TextBoxState createState() => TextBoxState();
 }
 
-class _TextBoxState extends State<TextBox> {
+class TextBoxState extends State<TextBox> {
   // State within
   late TextEditingController _controller;
 
@@ -502,6 +507,7 @@ class _TextBoxState extends State<TextBox> {
   Widget build(BuildContext context) {
     return TextField(
       controller: _controller, // Use the controller initialized in initState
+      maxLines: widget.maxLines,
       decoration: InputDecoration(
         labelText: widget.label,
         // prefixIcon: Column(
