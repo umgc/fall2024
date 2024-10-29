@@ -80,20 +80,25 @@ Future<bool> isUserTeacher(List<Course> moodleCourses) async {
     final courseId = course.id;
 
     // Step 2: Check the user's roles in each course
-    final getRolesUrl = Uri.parse('$moodleURL?wsfunction=core_role_get_roles_in_context&moodlewsrestformat=json');
-    final rolesResponse = await http.post(getRolesUrl, body: {
+    // final getRolesUrl = Uri.parse('$moodleURL/?wsfunction=core_role_get_roles_in_context&moodlewsrestformat=json');
+    final rolesResponse = await http.post(Uri.parse(moodleURL + serverUrl), body:  {
       'wstoken': _userToken,
-      'userid': 'me',  // 'me' to indicate the current user based on the token
+      'wsfunction': 'core_enrol_get_enrolled_users',
       'courseid': courseId.toString(),
+      'moodlewsrestformat': 'json',
     });
 
     if (rolesResponse.statusCode == 200) {
-      List<dynamic> roles = json.decode(rolesResponse.body);
+      List<dynamic> users = json.decode(rolesResponse.body);
 
-      // Check if the user has a teacher role (id 3 = editingteacher, 4 = teacher)
-      for (var role in roles) {
-        if (role['roleid'] == 3 || role['roleid'] == 4) {
-          return true; // User is a teacher in at least one course
+ // Check if the specified user is in the list and has teacher roles
+      for (var user in users) {
+        if (user['username'].toString() == moodleUserName) {
+          for (var role in user['roles']) {
+            if (role['roleid'] == 3 || role['roleid'] == 4) {
+              return true; // User is a teacher in this course
+            }
+          }
         }
       }
     } else {
@@ -103,6 +108,7 @@ Future<bool> isUserTeacher(List<Course> moodleCourses) async {
 
   return false; // User is not a teacher in any course
 }
+
 
 
   // Log out of Moodle by deleting the stored user token.
