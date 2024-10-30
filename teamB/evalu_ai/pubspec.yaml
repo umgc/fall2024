@@ -50,6 +50,8 @@ dependencies:
   collection: ^1.18.0
   flutter_quill: ^10.5.14
   editable: ^2.0.0
+  flutter_html: ^3.0.0-beta.2
+
 
 dev_dependencies:
   test: ^1.24.0
