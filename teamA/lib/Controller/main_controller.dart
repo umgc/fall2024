@@ -26,7 +26,8 @@ class MainController
     {
       await moodleApi.login(username, password, moodleURL);
       isLoggedIn = true;
-      return true;
+
+      return checkIfTeacher();
     } catch (e) 
     {
       if (kDebugMode) 
