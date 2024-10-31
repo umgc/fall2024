@@ -42,22 +42,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 12.0),
           child: Container(
             padding: const EdgeInsets.only(top: 40.0),
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(GlobalSettings.backgroundPath.value),
-                fit: BoxFit.cover,
-              ),
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10.0),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: Offset(0, 3),
-                ),
-              ],
-            ),
             child: OnboardingUI(
               functionality: _functionality,
               flutterTts: flutterTts, // Pass the FlutterTts instance here

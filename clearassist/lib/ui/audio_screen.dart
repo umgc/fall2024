@@ -497,16 +497,12 @@ class _AudioScreenState extends State<AudioScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
         appBar: AppBar(
           title: Text(_transcriberTitleText), // Dynamic transcriber text
         ),
-        body: Container(
+        body: SizedBox(
           height: MediaQuery.sizeOf(context).height,
-          decoration: BoxDecoration(
-              image: DecorationImage(
-            image: AssetImage(GlobalSettings.backgroundPath.value),
-            fit: BoxFit.cover,
-          )),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView(

@@ -39,22 +39,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // extendBody: true,
-      // extendBodyBehindAppBar: true,
-      // appBar: AppBar(
-      //   leading: null,
-      //   automaticallyImplyLeading: false,
-      //   backgroundColor: Colors.transparent,
-      //   elevation: 0,
-      //   centerTitle: true,
-      //   title: CustomTitle(),
-      // ),
+      backgroundColor: Colors.transparent,
       body: Container(
         decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(GlobalSettings.backgroundPath.value),
-            fit: BoxFit.cover,
-          ),
+          color: Colors.transparent, // Set background to transparent
         ),
         child: SafeArea(
           child: PageStorage(
@@ -68,14 +56,15 @@ class _HomeScreenState extends State<HomeScreen> {
           canvasColor: Colors.transparent,
           primaryColor: Colors.white,
           textTheme: Theme.of(context).textTheme.copyWith(
-                bodyMedium: TextStyle(color: Colors.white),
-                bodySmall: TextStyle(color: Colors.white),
-                labelLarge: TextStyle(color: Colors.white),
-                labelMedium: TextStyle(color: Colors.white),
-                labelSmall: TextStyle(color: Colors.white),
-              ),
+            bodyMedium: TextStyle(color: Colors.white),
+            bodySmall: TextStyle(color: Colors.white),
+            labelLarge: TextStyle(color: Colors.white),
+            labelMedium: TextStyle(color: Colors.white),
+            labelSmall: TextStyle(color: Colors.white),
+          ),
         ),
         child: BottomNavigationBar(
+          backgroundColor: Colors.transparent,
           type: BottomNavigationBarType.fixed,
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
@@ -115,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: Colors.white, // Customize the background color
           shape: RoundedRectangleBorder(
             borderRadius:
-                BorderRadius.all(Radius.circular(20.0)), // Rounded corners
+            BorderRadius.all(Radius.circular(20.0)), // Rounded corners
           ),
           title: Text(
             'Logout',
@@ -156,3 +145,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+

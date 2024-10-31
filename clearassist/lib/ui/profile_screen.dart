@@ -95,147 +95,139 @@ class _ProfileScreenState extends State<ProfileScreen> {
         leading: const BackButton(color: Colors.white),
         title: CustomTitle(titleText: 'Profile'),
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(GlobalSettings.backgroundPath.value),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Center(
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
-            child: Container(
-              padding: const EdgeInsets.all(20.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: SingleChildScrollView(
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      TextFormField(
-                        controller: _firstNameController,
-                        decoration: InputDecoration(labelText: 'First Name'),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter your first name';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: _lastNameController,
-                        decoration: InputDecoration(labelText: 'Last Name'),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter your last name';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: _emailController,
-                        decoration: InputDecoration(labelText: 'Email Address'),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter your email';
-                          }
-                          if (!RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                              .hasMatch(value)) {
-                            return 'Please enter a valid email address';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: _phoneController,
-                        decoration: InputDecoration(labelText: 'Phone Number'),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter your phone number';
-                          }
-                          if (!RegExp(
-                                  r"^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$")
-                              .hasMatch(value)) {
-                            return 'Please enter a valid phone number';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: _emergencyFirstNameController,
-                        decoration:
-                            InputDecoration(labelText: 'Emergency First Name'),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter the emergency first name';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: _emergencyLastNameController,
-                        decoration:
-                            InputDecoration(labelText: 'Emergency Last Name'),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter the emergency last name';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: _emergencyPhoneController,
-                        decoration: InputDecoration(
-                            labelText: 'Emergency Phone Number'),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter the emergency phone number';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () async {
-                              if (_formKey.currentState!.validate()) {
-                                String userData =
-                                    '${_firstNameController.text}, ${_lastNameController.text}, ${_emailController.text}, $_biometricAuth, ${_phoneController.text}, ${_emergencyFirstNameController.text}, ${_emergencyLastNameController.text}, ${_emergencyPhoneController.text}';
-                                await writeUserData(userData);
-                                Navigator.pushReplacementNamed(
-                                    context, '/homeScreen');
-                              }
-                            },
-                            child: const Text('Save'),
+      body: Center(
+        child: Padding(
+          padding:
+              const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+          child: Container(
+            padding: const EdgeInsets.all(20.0),
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(20.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            child: SingleChildScrollView(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _firstNameController,
+                      decoration: InputDecoration(labelText: 'First Name'),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter your first name';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: _lastNameController,
+                      decoration: InputDecoration(labelText: 'Last Name'),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter your last name';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: _emailController,
+                      decoration: InputDecoration(labelText: 'Email Address'),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter your email';
+                        }
+                        if (!RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                            .hasMatch(value)) {
+                          return 'Please enter a valid email address';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: _phoneController,
+                      decoration: InputDecoration(labelText: 'Phone Number'),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter your phone number';
+                        }
+                        if (!RegExp(
+                                r"^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$")
+                            .hasMatch(value)) {
+                          return 'Please enter a valid phone number';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: _emergencyFirstNameController,
+                      decoration:
+                          InputDecoration(labelText: 'Emergency First Name'),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter the emergency first name';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: _emergencyLastNameController,
+                      decoration:
+                          InputDecoration(labelText: 'Emergency Last Name'),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter the emergency last name';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: _emergencyPhoneController,
+                      decoration: InputDecoration(
+                          labelText: 'Emergency Phone Number'),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter the emergency phone number';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              String userData =
+                                  '${_firstNameController.text}, ${_lastNameController.text}, ${_emailController.text}, $_biometricAuth, ${_phoneController.text}, ${_emergencyFirstNameController.text}, ${_emergencyLastNameController.text}, ${_emergencyPhoneController.text}';
+                              await writeUserData(userData);
+                              Navigator.pushReplacementNamed(
+                                  context, '/homeScreen');
+                            }
+                          },
+                          child: const Text('Save'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
                           ),
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                            ),
-                            child: const Text('Cancel'),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                          child: const Text('Cancel'),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),

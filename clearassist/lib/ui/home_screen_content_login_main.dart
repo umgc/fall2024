@@ -40,54 +40,45 @@ class HomeScreenContentNewUserBody extends StatelessWidget {
     _HomeScreenContentUserState homeScreenState =
         context.findAncestorStateOfType<_HomeScreenContentUserState>()!;
 
-    return Container(
-      decoration: BoxDecoration(
-          border: Border.all(width: 1),
-          image: DecorationImage(
-            image: AssetImage(GlobalSettings.backgroundPath.value),
-            fit: BoxFit.cover,
-          )),
-      // color: Colors.transparent, // Set container background to transparent
-      child: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16.0, 140, 16.0, 25),
-            child: Text(
-              'Are you a Primary User or a Care Giver?',
-              style: TextStyle(
-                fontSize: 25.0,
-                color: Colors.white,
+    return Column(
+      children: [
+        const Padding(
+          padding: EdgeInsets.fromLTRB(16.0, 140, 16.0, 25),
+          child: Text(
+            'Are you a Primary User or a Care Giver?',
+            style: TextStyle(
+              fontSize: 25.0,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        Expanded(
+          child: GridView.count(
+            crossAxisCount: 2,
+            crossAxisSpacing: 12.0,
+            mainAxisSpacing: 12.0,
+            childAspectRatio: 1.30,
+            padding: const EdgeInsets.all(26.0),
+            children: [
+              _buildElevatedButton(
+                homeScreenState: homeScreenState,
+                icon: Icon(Icons.person_2_sharp,
+                    size: iconSize, color: Colors.white),
+                text: 'Primary User',
+                screen: HomeScreen(),
               ),
-              textAlign: TextAlign.center,
-            ),
+              _buildElevatedButton(
+                homeScreenState: homeScreenState,
+                icon: Icon(Icons.person_3_sharp,
+                    size: iconSize, color: Colors.white),
+                text: 'Care Giver',
+                screen: HomeScreenCaregiver(),
+              ),
+            ],
           ),
-          Expanded(
-            child: GridView.count(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12.0,
-              mainAxisSpacing: 12.0,
-              childAspectRatio: 1.30,
-              padding: const EdgeInsets.all(26.0),
-              children: [
-                _buildElevatedButton(
-                  homeScreenState: homeScreenState,
-                  icon: Icon(Icons.person_2_sharp,
-                      size: iconSize, color: Colors.white),
-                  text: 'Primary User',
-                  screen: HomeScreen(),
-                ),
-                _buildElevatedButton(
-                  homeScreenState: homeScreenState,
-                  icon: Icon(Icons.person_3_sharp,
-                      size: iconSize, color: Colors.white),
-                  text: 'Care Giver',
-                  screen: HomeScreenCaregiver(),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

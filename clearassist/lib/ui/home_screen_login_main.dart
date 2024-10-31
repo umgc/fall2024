@@ -1,3 +1,4 @@
+import 'package:clearassistapp/ui/global_settings.dart';
 import 'package:flutter/material.dart';
 import 'home_screen_content_login_main.dart';
 
@@ -21,9 +22,9 @@ class _HomeScreenState extends State<HomeScreenLoginMain> {
         elevation: 0, // Remove shadow
       ),
       body: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage("assets/images/background.jpg"),
+              image: AssetImage(GlobalSettings.backgroundPath.value),
               fit: BoxFit.cover,
             ),
           ),

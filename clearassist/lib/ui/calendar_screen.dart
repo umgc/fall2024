@@ -201,24 +201,17 @@ class _CalendarPageState extends State<CalendarPage> {
         ),
       );
     }
-    return Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(GlobalSettings.backgroundPath.value),
-            fit: BoxFit.cover,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          _buildDayHeaders(),
+          Table(
+            children: _buildCalendarRows(dayButtons),
           ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              _buildDayHeaders(),
-              Table(
-                children: _buildCalendarRows(dayButtons),
-              ),
-            ],
-          ),
-        ));
+        ],
+      ),
+    );
   }
 
   // Build a row of day headers (Mon, Tue, etc.)

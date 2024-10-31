@@ -56,149 +56,141 @@ class _RegistrationScreenState extends State<RegistrationScreenCareGiver> {
           title: const Text('Care Giver Registration',
               style: TextStyle(color: Colors.white)),
         ),
-        body: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(GlobalSettings.backgroundPath.value),
-              fit: BoxFit.cover,
-            ),
-          ),
-          child: Center(
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
-              child: Container(
-                padding: const EdgeInsets.all(20.0),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: SingleChildScrollView(
-                  child: Form(
-                    key: _formKey,
-                    onChanged: () {
-                      setState(() {
-                        _isButtonActive =
-                            _firstNameController.text.isNotEmpty &&
-                                _lastNameController.text.isNotEmpty &&
-                                _emailController.text.isNotEmpty;
-                      });
-                    },
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          controller: _firstNameController,
-                          decoration: const InputDecoration(
-                            labelText: 'First Name',
-                            labelStyle: TextStyle(color: Colors.black),
-                            filled: true,
-                            fillColor: Colors.white,
+        body: Center(
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+            child: Container(
+              padding: const EdgeInsets.all(20.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  onChanged: () {
+                    setState(() {
+                      _isButtonActive =
+                          _firstNameController.text.isNotEmpty &&
+                              _lastNameController.text.isNotEmpty &&
+                              _emailController.text.isNotEmpty;
+                    });
+                  },
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _firstNameController,
+                        decoration: const InputDecoration(
+                          labelText: 'First Name',
+                          labelStyle: TextStyle(color: Colors.black),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        style: TextStyle(color: Colors.black),
+                        cursorColor: Colors.black,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter your first name';
+                          }
+                          return null;
+                        },
+                      ),
+                      TextFormField(
+                        controller: _lastNameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Last Name',
+                          labelStyle: TextStyle(color: Colors.black),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        style: TextStyle(color: Colors.black),
+                        cursorColor: Colors.black,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter your last name';
+                          }
+                          return null;
+                        },
+                      ),
+                      TextFormField(
+                        controller: _emailController,
+                        decoration: const InputDecoration(
+                          labelText: 'Email Address',
+                          labelStyle: TextStyle(color: Colors.black),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        style: TextStyle(color: Colors.black),
+                        cursorColor: Colors.black,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter your email';
+                          }
+                          if (!RegExp(
+                                  r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                              .hasMatch(value)) {
+                            return 'Please enter a valid email address';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          const Text("Use Biometric Authentication"),
+                          Switch(
+                            value: _useFaceID,
+                            onChanged: (value) {
+                              setState(() {
+                                _useFaceID = value;
+                              });
+                            },
                           ),
-                          style: TextStyle(color: Colors.black),
-                          cursorColor: Colors.black,
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Please enter your first name';
-                            }
-                            return null;
-                          },
-                        ),
-                        TextFormField(
-                          controller: _lastNameController,
-                          decoration: const InputDecoration(
-                            labelText: 'Last Name',
-                            labelStyle: TextStyle(color: Colors.black),
-                            filled: true,
-                            fillColor: Colors.white,
-                          ),
-                          style: TextStyle(color: Colors.black),
-                          cursorColor: Colors.black,
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Please enter your last name';
-                            }
-                            return null;
-                          },
-                        ),
-                        TextFormField(
-                          controller: _emailController,
-                          decoration: const InputDecoration(
-                            labelText: 'Email Address',
-                            labelStyle: TextStyle(color: Colors.black),
-                            filled: true,
-                            fillColor: Colors.white,
-                          ),
-                          style: TextStyle(color: Colors.black),
-                          cursorColor: Colors.black,
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Please enter your email';
-                            }
-                            if (!RegExp(
-                                    r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                                .hasMatch(value)) {
-                              return 'Please enter a valid email address';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            const Text("Use Biometric Authentication"),
-                            Switch(
-                              value: _useFaceID,
-                              onChanged: (value) {
-                                setState(() {
-                                  _useFaceID = value;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        ElevatedButton(
-                          onPressed: _isButtonActive
-                              ? () async {
-                                  if (_formKey.currentState!.validate()) {
-                                    String userData =
-                                        '${_firstNameController.text}, ${_lastNameController.text}, ${_emailController.text}, ${_useFaceID.toString()}';
-                                    print("User Data: $userData");
-                                    await writeUserData(userData);
-                                    Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const OnboardingScreen()));
-                                  }
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: _isButtonActive
+                            ? () async {
+                                if (_formKey.currentState!.validate()) {
+                                  String userData =
+                                      '${_firstNameController.text}, ${_lastNameController.text}, ${_emailController.text}, ${_useFaceID.toString()}';
+                                  print("User Data: $userData");
+                                  await writeUserData(userData);
+                                  Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const OnboardingScreen()));
                                 }
-                              : null,
-                          child: const Text("Create Account"),
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            TextButton(
-                              onPressed: () {},
-                              child: const Text("Privacy Policy"),
-                            ),
-                            TextButton(
-                              onPressed: () {},
-                              child: const Text("Terms and Conditions"),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                              }
+                            : null,
+                        child: const Text("Create Account"),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          TextButton(
+                            onPressed: () {},
+                            child: const Text("Privacy Policy"),
+                          ),
+                          TextButton(
+                            onPressed: () {},
+                            child: const Text("Terms and Conditions"),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),

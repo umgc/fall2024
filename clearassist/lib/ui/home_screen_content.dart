@@ -81,13 +81,6 @@ class HomeScreenContentBody extends StatelessWidget {
                 ),
                 _buildElevatedButton(
                   homeScreenState: homeScreenState,
-                  icon: Icon(Icons.handshake_outlined,
-                      size: iconSize, color: Colors.white),
-                  text: 'Virtual Assistant',
-                  screen: AssistantScreen(),
-                ),
-                _buildElevatedButton(
-                  homeScreenState: homeScreenState,
                   icon: Icon(Icons.calendar_view_month,
                       size: iconSize, color: Colors.white),
                   text: 'Calendar',

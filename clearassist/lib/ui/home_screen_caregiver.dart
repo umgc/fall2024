@@ -34,6 +34,7 @@ class _HomeScreenCaregiverState extends State<HomeScreenCaregiver> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -44,18 +45,10 @@ class _HomeScreenCaregiverState extends State<HomeScreenCaregiver> {
         centerTitle: true,
         title: CustomTitle(),
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(GlobalSettings.backgroundPath.value),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: SafeArea(
-          child: PageStorage(
-            bucket: PageStorageBucket(),
-            child: _widgetOptions[_selectedIndex],
-          ),
+      body: SafeArea(
+        child: PageStorage(
+          bucket: PageStorageBucket(),
+          child: _widgetOptions[_selectedIndex],
         ),
       ),
       bottomNavigationBar: Theme(
