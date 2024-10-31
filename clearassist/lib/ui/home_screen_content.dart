@@ -1,5 +1,3 @@
-import 'package:clearassistapp/ui/assistant_screen.dart';
-import 'package:clearassistapp/ui/home_screen.dart';
 import 'package:flutter/material.dart';
 import '../src/utils/contact_display.dart';
 import 'calendar_screen.dart';

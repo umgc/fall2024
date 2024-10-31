@@ -10,7 +10,6 @@ import 'global_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 //import 'registration_screen.dart';
-import 'home_screen.dart';
 //import 'home_screen_content-new-user.dart';
 
 class LoginScreen extends StatefulWidget {

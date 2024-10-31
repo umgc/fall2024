@@ -1,12 +1,6 @@
 import 'package:clearassistapp/src/database/model/media_type.dart';
-import 'package:clearassistapp/src/utils/permission_manager.dart';
-import 'package:clearassistapp/ui/assistant_screen.dart';
-import 'package:clearassistapp/ui/home_screen.dart';
-import 'package:clearassistapp/ui/settings_screen.dart';
-import 'package:clearassistapp/ui/video_screen.dart';
 import 'package:flutter/material.dart';
 
-import '../../ui/global_settings.dart';
 
 class UiUtils {
   static IconData getMediaIconData(MediaType mediaType) {

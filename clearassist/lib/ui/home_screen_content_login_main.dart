@@ -1,8 +1,6 @@
 import 'package:clearassistapp/ui/home_screen.dart';
 import 'package:clearassistapp/ui/home_screen_caregiver.dart';
-import 'package:clearassistapp/ui/reusable/custom_title.dart';
 import 'package:flutter/material.dart';
-import 'global_settings.dart';
 
 class HomeScreenContentLoginMain extends StatefulWidget {
   const HomeScreenContentLoginMain({super.key});

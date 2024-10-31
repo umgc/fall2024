@@ -1,7 +1,6 @@
 import 'package:clearassistapp/ui/reusable/custom_title.dart';
 import 'package:flutter/material.dart';
 import 'home_screen_content_caregiver.dart';
-import 'global_settings.dart';
 
 class HomeScreenCaregiver extends StatefulWidget {
   const HomeScreenCaregiver({super.key});

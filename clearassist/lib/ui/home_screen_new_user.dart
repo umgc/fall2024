@@ -2,7 +2,6 @@ import 'package:clearassistapp/ui/reusable/custom_title.dart';
 import 'package:clearassistapp/ui/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'global_settings.dart';
-import 'home_screen_content.dart';
 import 'assistant_screen.dart';
 import 'gallery_screen.dart';
 import 'home_screen_content-new-user.dart';

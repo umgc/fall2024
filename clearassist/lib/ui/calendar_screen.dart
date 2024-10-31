@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // For formatting dates
 import 'package:path_provider/path_provider.dart';
-import 'global_settings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(MyApp());
@@ -55,22 +55,37 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   saveReminder(String reminderText, String frequency) {
+    print("testing value of $reminderText");
+    int? value = 0;
+    value = int.tryParse(reminderText);
+    String title1 = "";
+    String content1 = "";
+    print("reminder text $reminderText");
+
+    if (frequency == "select day") {
+      if (value != null) {
+        title1 = "Alert Saved";
+        content1 = "You will be reminded of text every $reminderText";
+      } else if (value == null) {
+        title1 = "Alert Not Saved";
+        content1 = "Please type a number between 1 and 31";
+      }
+    } else {
+      title1 = "Alert Saved";
+      content1 = "You will be reminded of $reminderText every $frequency";
+    }
     Widget btnOK = TextButton(
         onPressed: () {
-          saveReminderToFile(reminderText);
+          saveReminderToFile(reminderText, frequency);
           Navigator.of(context).pop();
         },
         child: Text("Close"));
-    Widget title = TextField(
-      decoration: InputDecoration(hintText: "Remind Every Day"),
-      cursorColor: Colors.white,
-      style: TextStyle(color: Colors.black),
-    );
+
     AlertDialog message = AlertDialog(
-      title: Text("Alert Saved!"),
+      title: Text(title1),
       titleTextStyle: TextStyle(color: Colors.black),
       contentTextStyle: TextStyle(color: Colors.black),
-      content: Text("You will be reminded of $reminderText every $frequency"),
+      content: Text(content1),
       actions: [
         // Widget btn=TextButton(child: Text("")
         btnOK,
@@ -83,15 +98,58 @@ class _CalendarPageState extends State<CalendarPage> {
         });
   }
 
-  saveReminderToFile(String reminderName) async {
-    Directory location = await getApplicationDocumentsDirectory();
-    final FileLocation = location;
-    File file = File("${FileLocation.path}/data.txt");
+ saveReminderToFile(String reminderName, String reminderfrequency) async {
+    DateTime currentDate = DateTime.now();
+    int currentTimeHour = DateTime.now().hour;
+    int currentTimeMinute = DateTime.now().minute;
+    int currentTimeSecond = DateTime.now().second;
+    String currentTimeString = ("$currentTimeHour:$currentTimeMinute:$currentTimeSecond");
+    String currentDateText = "${currentDate.month}-${currentDate.day}-${currentDate.year}";
+    final local = await SharedPreferences.getInstance();
+    local.setString("reminderText", reminderName);
+    local.setString("frequency", reminderfrequency);
+    final Directory location = await getApplicationDocumentsDirectory();
+    String path = "${location.path}/textFile.txt";
+    final File textFile = File(
+        '${location.path}/${currentTimeString}_${reminderName}_$currentDateText.txt');
+    await textFile.writeAsString("Test");
     print("Save Data");
-    print("Save into ${FileLocation.path}");
-    file.writeAsString("test");
+    print("Saved to: $path");
   }
 
+  create_Alert(String? text) {
+    int? option = 1;
+    final TextEditingController reminderName = TextEditingController();
+    String? chosenDay;
+    Widget btnOK = TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text("Close"));
+
+    Widget remDayText = TextField(
+      readOnly: true,
+      cursorColor: Colors.white,
+      style: TextStyle(color: Colors.black),
+    );
+
+    AlertDialog message = AlertDialog(
+      titleTextStyle: TextStyle(color: Colors.black),
+      contentTextStyle: TextStyle(color: Colors.black),
+      title: Text("Alert"),
+      content: Text(text!),
+      actions: [
+        // Widget btn=TextButton(child: Text(""),
+        remDayText,
+        btnOK,
+      ],
+    );
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return message;
+        });
+  }
   createAlert() {
     int? option = 1;
     final TextEditingController reminderName = TextEditingController();
@@ -176,7 +234,32 @@ class _CalendarPageState extends State<CalendarPage> {
         });
   }
 
+  loadReminder() async {
+    final local = await SharedPreferences.getInstance();
+    String? reminderName = "", reminderfrequency = "";
+    DateTime currentDate = DateTime.now();
+    print("Current Day: ${currentDate.day}");
+    print("Current Month: ${currentDate.month}");
+    print("Current Year: ${currentDate.year}");
+    reminderName = local.getString("reminderText");
+    reminderfrequency = local.getString("frequency");
+    if (reminderfrequency != null &&
+        reminderfrequency.contains("day") == true) {
+      create_Alert(reminderName);
+    } else if (reminderfrequency != null &&
+        reminderfrequency.contains("month") == true &&
+        (currentDate.day == 1 || currentDate.day == 28)) {
+      create_Alert(reminderName);
+    }
+//         else if (reminderfrequency != null &&
+//         reminderfrequency.contains("month") == true&&(currentDate.day==1 || currentDate.day==28)) {
+// create_Alert(reminderName);
+//         }
+    print("Save Data");
+  }
+
   Widget _buildCalendar() {
+    loadReminder();
     int daysInMonth =
         DateUtils.getDaysInMonth(_currentDate.year, _currentDate.month);
     int firstDayOfWeek =

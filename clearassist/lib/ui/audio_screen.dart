@@ -6,7 +6,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
-import 'global_settings.dart';
 
 // AudioScreen widget provides the main interface for audio recording.
 class AudioScreen extends StatefulWidget {

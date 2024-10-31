@@ -1,11 +1,8 @@
-import 'package:clearassistapp/ui/reusable/custom_title.dart';
 import 'package:clearassistapp/ui/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'home_screen_content.dart';
-import 'global_settings.dart';
 import 'assistant_screen.dart';
-import 'gallery_screen.dart';
-import 'login_screen.dart'; // Import the login screen for navigation
+// Import the login screen for navigation
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

@@ -32,8 +32,8 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
-  bool _darkModeEnabled = false;
-  String _selectedLanguage = 'English';
+  final bool _darkModeEnabled = false;
+  final String _selectedLanguage = 'English';
   bool _locationAccess = false;
   String _selectedTheme = 'Blue'; // Added to manage theme selection
 

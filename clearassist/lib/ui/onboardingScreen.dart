@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../src/onboarding.dart';
 import 'home_screen.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'global_settings.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
