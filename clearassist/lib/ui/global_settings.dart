@@ -19,4 +19,21 @@ class GlobalSettings {
     await prefs.setString('backgroundPath', path);
     backgroundPath.value = path;
   }
+
+  // Widget that provides a responsive background image based on backgroundPath
+  static Widget assetBackground() {
+    return ValueListenableBuilder<String>(
+      valueListenable: backgroundPath,
+      builder: (context, path, child) {
+        return Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(path),
+              fit: BoxFit.cover,
+            ),
+          ),
+        );
+      },
+    );
+  }
 }

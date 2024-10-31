@@ -21,14 +21,12 @@ class _HomeScreenState extends State<HomeScreenLoginMain> {
             Colors.transparent, // Transparent background for the app bar
         elevation: 0, // Remove shadow
       ),
-      body: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(GlobalSettings.backgroundPath.value),
-              fit: BoxFit.cover,
-            ),
-          ),
-          child: SafeArea(child: HomeScreenContentLoginMain())),
+      body: Stack(
+          children: [
+            GlobalSettings.assetBackground(),
+            SafeArea(child: HomeScreenContentLoginMain())
+          ]
+      ),
     );
   }
 }
