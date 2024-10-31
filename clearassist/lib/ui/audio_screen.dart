@@ -496,155 +496,140 @@ class _AudioScreenState extends State<AudioScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          title: Text(_transcriberTitleText), // Dynamic transcriber text
-        ),
-        body: SizedBox(
-          height: MediaQuery.sizeOf(context).height,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      _isRecording
-                          ? 'Recording...'
-                          : 'Press to Start Recording',
-                      style: TextStyle(fontSize: 24),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        _isRecording ? _stopRecording() : _startRecording();
-                        printCacheFiles(); // Call to print files after starting or stopping recording
-                      },
-                      child: Text(
-                          _isRecording ? 'Stop Recording' : 'Start Recording'),
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      'Transcription:',
-                      style: TextStyle(fontSize: 20),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      _translatedText, // Show translated text here
-                      style: TextStyle(fontSize: 16),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 20),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 4,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: DropdownButton<String>(
-                        value: _selectedLanguage,
-                        dropdownColor: Colors.blue[100],
-                        icon: Icon(Icons.language, color: Colors.orange),
-                        underline: SizedBox(),
-                        items: [
-                          DropdownMenuItem<String>(
-                            value: 'en',
-                            child: Text('English',
-                                style: TextStyle(color: Colors.orange)),
-                          ),
-                          DropdownMenuItem<String>(
-                            value: 'es',
-                            child: Text('Español',
-                                style: TextStyle(color: Colors.orange)),
-                          ),
-                          DropdownMenuItem<String>(
-                            value: 'fr',
-                            child: Text('Français',
-                                style: TextStyle(color: Colors.orange)),
-                          ),
-                          DropdownMenuItem<String>(
-                            value: 'pt',
-                            child: Text('Português',
-                                style: TextStyle(color: Colors.orange)),
-                          ),
-                          DropdownMenuItem<String>(
-                            value: 'de',
-                            child: Text('Deutsch',
-                                style: TextStyle(color: Colors.orange)),
-                          ),
-                          DropdownMenuItem<String>(
-                            value: 'he',
-                            child: Text('עברית',
-                                style: TextStyle(color: Colors.orange)),
-                          ),
-                          DropdownMenuItem<String>(
-                            value: 'zh',
-                            child: Text('中文',
-                                style: TextStyle(color: Colors.orange)),
-                          ),
-                          DropdownMenuItem<String>(
-                            value: 'ar',
-                            child: Text('العربية',
-                                style: TextStyle(color: Colors.orange)),
-                          ),
-                          DropdownMenuItem<String>(
-                            value: 'hi',
-                            child: Text('हिन्दी',
-                                style: TextStyle(color: Colors.orange)),
-                          ),
-                        ],
-                        onChanged: (String? newValue) async {
-                          setState(() {
-                            _selectedLanguage = newValue!;
-                            _transcriberTitleText = _translations[
-                                _selectedLanguage]!['transcriber']!;
-                            _summarizeButtonText =
-                                _translations[_selectedLanguage]!['summarize']!;
-                            _summaryLabelText =
-                                _translations[_selectedLanguage]!['summary']!;
-                          });
-                          // Translate the transcription and summarize it
-                          await translateText(_maskedTranscription);
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () async {
-                        await summarizeText(
-                            _maskedTranscription, _selectedLanguage);
-                      },
-                      child: Text(
-                          _summarizeButtonText), // Dynamic summarize button text
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      _summaryLabelText, // Dynamic summary label
-                      style: TextStyle(fontSize: 20),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      _summaryText, // Display the summary here
-                      style: TextStyle(fontSize: 16),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
+    return SizedBox(
+      height: MediaQuery.of(context).size.height,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildTranscriptionStatus(),
+                const SizedBox(height: 20),
+                _buildRecordingButton(),
+                const SizedBox(height: 20),
+                _buildSectionTitle('Transcription:'),
+                const SizedBox(height: 10),
+                _buildTranslatedText(),
+                const SizedBox(height: 20),
+                _buildLanguageDropdown(),
+                const SizedBox(height: 20),
+                _buildSummarizeButton(),
+                const SizedBox(height: 20),
+                _buildSectionTitle(_summaryLabelText),
+                const SizedBox(height: 10),
+                _buildSummaryText(),
+              ],
             ),
           ),
-        ));
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTranscriptionStatus() {
+    return Text(
+      _isRecording ? 'Recording...' : 'Press to Start Recording',
+      style: const TextStyle(fontSize: 24),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  Widget _buildRecordingButton() {
+    return ElevatedButton(
+      onPressed: () {
+        _isRecording ? _stopRecording() : _startRecording();
+        printCacheFiles();
+      },
+      child: Text(_isRecording ? 'Stop Recording' : 'Start Recording'),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(fontSize: 20),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  Widget _buildTranslatedText() {
+    return Text(
+      _translatedText,
+      style: const TextStyle(fontSize: 16),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  Widget _buildLanguageDropdown() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: DropdownButton<String>(
+        value: _selectedLanguage,
+        dropdownColor: Colors.blue[100],
+        icon: const Icon(Icons.language, color: Colors.orange),
+        underline: const SizedBox(),
+        items: _languageItems(),
+        onChanged: (String? newValue) async {
+          setState(() {
+            _selectedLanguage = newValue!;
+            _transcriberTitleText = _translations[_selectedLanguage]!['transcriber']!;
+            _summarizeButtonText = _translations[_selectedLanguage]!['summarize']!;
+            _summaryLabelText = _translations[_selectedLanguage]!['summary']!;
+          });
+          await translateText(_maskedTranscription);
+        },
+      ),
+    );
+  }
+
+  List<DropdownMenuItem<String>> _languageItems() {
+    const languages = {
+      'en': 'English',
+      'es': 'Español',
+      'fr': 'Français',
+      'pt': 'Português',
+      'de': 'Deutsch',
+      'he': 'עברית',
+      'zh': '中文',
+      'ar': 'العربية',
+      'hi': 'हिन्दी',
+    };
+
+    return languages.entries
+        .map((entry) => DropdownMenuItem<String>(
+      value: entry.key,
+      child: Text(entry.value, style: const TextStyle(color: Colors.orange)),
+    ))
+        .toList();
+  }
+
+  Widget _buildSummarizeButton() {
+    return ElevatedButton(
+      onPressed: () async {
+        await summarizeText(_maskedTranscription, _selectedLanguage);
+      },
+      child: Text(_summarizeButtonText),
+    );
+  }
+
+  Widget _buildSummaryText() {
+    return Text(
+      _summaryText,
+      style: const TextStyle(fontSize: 16),
+      textAlign: TextAlign.center,
+    );
   }
 }

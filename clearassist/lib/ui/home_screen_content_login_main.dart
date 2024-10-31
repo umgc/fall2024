@@ -1,5 +1,6 @@
 import 'package:clearassistapp/ui/home_screen.dart';
 import 'package:clearassistapp/ui/home_screen_caregiver.dart';
+import 'package:clearassistapp/ui/reusable/custom_title.dart';
 import 'package:flutter/material.dart';
 import 'global_settings.dart';
 
@@ -16,10 +17,8 @@ class _HomeScreenContentUserState extends State<HomeScreenContentLoginMain> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor:
-          Colors.transparent, // Set scaffold background to transparent
-      body: _currentScreen,
+    return Container(
+      child: _currentScreen,
     );
   }
 
