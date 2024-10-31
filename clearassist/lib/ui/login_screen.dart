@@ -52,6 +52,8 @@ class _LoginScreenState extends State<LoginScreen> {
     PermissionManager.checkIfLocationServiceIsActive(
         context); // Check to ensure location is enabled for tracking and media enhancement
     return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.transparent,
         body: Container(
       decoration: BoxDecoration(
         image: DecorationImage(
@@ -199,7 +201,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     style:
                         ElevatedButton.styleFrom(backgroundColor: Colors.red),
                     child: Text(
-                      'HomeScreen(Test)',
+                      'HomeScreen (Test)',
                       style: TextStyle(color: Colors.indigo[900]),
                     ), // This is for testing purpose
                   ),

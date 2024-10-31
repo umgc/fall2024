@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreenNewUser> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       extendBody: true, // Extend the body behind the bottom navigation bar
       extendBodyBehindAppBar: true, // Extend the body behind the app bar
       appBar: AppBar(
@@ -75,6 +76,7 @@ class _HomeScreenState extends State<HomeScreenNewUser> {
               ),
         ),
         child: BottomNavigationBar(
+          backgroundColor: Colors.black.withOpacity(.4),
           type: BottomNavigationBarType.fixed,
           currentIndex: _selectedIndex, // Set the current index
           onTap: _onItemTapped, // Handle tab switching
