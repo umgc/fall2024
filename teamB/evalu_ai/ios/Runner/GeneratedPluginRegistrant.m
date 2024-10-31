@@ -12,10 +12,10 @@
 @import file_picker;
 #endif
 
-#if __has_include(<flutter_keyboard_visibility_temp_fork/FlutterKeyboardVisibilityPlugin.h>)
-#import <flutter_keyboard_visibility_temp_fork/FlutterKeyboardVisibilityPlugin.h>
+#if __has_include(<flutter_keyboard_visibility/FlutterKeyboardVisibilityPlugin.h>)
+#import <flutter_keyboard_visibility/FlutterKeyboardVisibilityPlugin.h>
 #else
-@import flutter_keyboard_visibility_temp_fork;
+@import flutter_keyboard_visibility;
 #endif
 
 #if __has_include(<image_picker_ios/FLTImagePickerPlugin.h>)
@@ -30,10 +30,10 @@
 @import path_provider_foundation;
 #endif
 
-#if __has_include(<quill_native_bridge_ios/QuillNativeBridgePlugin.h>)
-#import <quill_native_bridge_ios/QuillNativeBridgePlugin.h>
+#if __has_include(<quill_native_bridge/QuillNativeBridgePlugin.h>)
+#import <quill_native_bridge/QuillNativeBridgePlugin.h>
 #else
-@import quill_native_bridge_ios;
+@import quill_native_bridge;
 #endif
 
 #if __has_include(<shared_preferences_foundation/SharedPreferencesPlugin.h>)

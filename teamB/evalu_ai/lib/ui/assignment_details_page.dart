@@ -6,6 +6,7 @@ import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
 import 'package:intelligrade/controller/main_controller.dart';
 import 'package:intelligrade/controller/model/beans.dart';
 import 'package:intelligrade/ui/header.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:intelligrade/ui/custom_navigation_bar.dart';
 import 'package:intelligrade/ui/view_submissions.dart';
 
@@ -93,6 +94,10 @@ class _AssignmentDetailsPage extends State<AssignmentDetailsPage> {
       });
     }
 
+  }
+
+  bool containsHtmlTags(String text) {
+    return RegExp(r"<[^>]*>").hasMatch(text);
   }
 
   /*
@@ -244,15 +249,24 @@ class _AssignmentDetailsPage extends State<AssignmentDetailsPage> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(
-                                              assignment.name,
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
+                                            containsHtmlTags(assignment.name)
+                                                  ? Html(data: assignment.name)
+                                                  : Text(
+                                                      assignment.name,
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
                                             SizedBox(height: 5),
-                                            Text(assignment.description),
+                                            containsHtmlTags(
+                                                      assignment.description)
+                                                  ? Html(
+                                                      data: assignment
+                                                          .description)
+                                                  : Text(
+                                                      assignment.description),
                                           ],
                                         ),
                                       ),
@@ -278,15 +292,23 @@ class _AssignmentDetailsPage extends State<AssignmentDetailsPage> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(
-                                              question.name,
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
+                                            containsHtmlTags(assignment.name)
+                                                  ? Html(data: question.name)
+                                                  : Text(
+                                                      question.name,
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
                                             SizedBox(height: 5),
-                                            Text(question.type),
+                                            containsHtmlTags(
+                                                      question.type)
+                                                  ? Html(
+                                                      data: question.type)
+                                                  : Text(
+                                                      question.type),
                                           ],
                                         ),
                                       ),
