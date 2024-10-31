@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
-import 'package:intelligrade/ui/dashboard_page.dart';
+import 'package:intelligrade/ui/essay_display_page.dart';
+import 'package:intelligrade/ui/grade_essay_page.dart';
 import '/controller/model/beans.dart';
 import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
 import 'dart:convert';
@@ -465,7 +466,7 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                           Future.delayed(Duration(seconds: 2), () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) => DashBoardPage(),
+                                builder: (context) => GradeEssayPage(),
                               ),
                             );
                           });

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:intelligrade/api/moodle/moodle_api_singleton.dart';
 import '/controller/model/beans.dart';
 import 'view_submissions.dart';
@@ -9,28 +10,27 @@ class EssayManagerPage extends StatefulWidget {
 }
 
 class EssayManagerPageState extends State<EssayManagerPage> {
-  Course? selectedCourse; // Course object to handle selected course
+  Course? selectedCourse;
   List<Course> courses = [];
   List<Assignment> assignments = [];
 
   @override
   void initState() {
     super.initState();
-    fetchCourses(); // Fetch courses on page load
+    fetchCourses();
   }
 
-  // Fetch courses from the controller
   Future<void> fetchCourses() async {
     try {
       List<Course>? courseList = MoodleApiSingleton().moodleCourses;
       setState(() {
         courses = courseList ?? [];
-        selectedCourse = null; // No auto-selection; the user selects a course.
+        selectedCourse = null;
       });
     } catch (e) {
       debugPrint('Error fetching courses: $e');
       setState(() {
-        selectedCourse = null; // Handle the empty case
+        selectedCourse = null;
       });
     }
   }
@@ -44,9 +44,13 @@ class EssayManagerPageState extends State<EssayManagerPage> {
     } catch (e) {
       debugPrint('Error fetching courses: $e');
       setState(() {
-        selectedCourse = null; // Handle the empty case
+        selectedCourse = null;
       });
     }
+  }
+
+  bool containsHtmlTags(String text) {
+    return RegExp(r"<[^>]*>").hasMatch(text);
   }
 
   @override
@@ -85,66 +89,73 @@ class EssayManagerPageState extends State<EssayManagerPage> {
             ),
             SizedBox(height: 20),
             Expanded(
-                child: selectedCourse == null
-                    ? Center(
-                        child:
-                            Text('Please select a course to view assignments.'),
-                      )
-                    : ListView.builder(
-                        itemCount: assignments.length,
-                        itemBuilder: (context, index) {
-                          Assignment assignment = assignments[index];
-                          return Card(
-                            margin: EdgeInsets.symmetric(vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              assignment.name,
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            SizedBox(height: 5),
-                                            Text(assignment.description),
-                                          ],
-                                        ),
+              child: selectedCourse == null
+                  ? Center(
+                      child:
+                          Text('Please select a course to view assignments.'),
+                    )
+                  : ListView.builder(
+                      itemCount: assignments.length,
+                      itemBuilder: (context, index) {
+                        Assignment assignment = assignments[index];
+                        return Card(
+                          margin: EdgeInsets.symmetric(vertical: 10),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          containsHtmlTags(assignment.name)
+                                              ? Html(data: assignment.name)
+                                              : Text(
+                                                  assignment.name,
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                          SizedBox(height: 5),
+                                          containsHtmlTags(
+                                                  assignment.description)
+                                              ? Html(
+                                                  data: assignment.description)
+                                              : Text(assignment.description),
+                                        ],
                                       ),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  SubmissionList(
-                                                assignmentId:
-                                                    assignment.id!.toInt(),
-                                                courseId: selectedCourse!.id
-                                                    .toString(),
-                                              ),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                SubmissionList(
+                                              assignmentId:
+                                                  assignment.id!.toInt(),
+                                              courseId:
+                                                  selectedCourse!.id.toString(),
                                             ),
-                                          );
-                                        },
-                                        child: Text('View Submissions'),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                                          ),
+                                        );
+                                      },
+                                      child: Text('View Submissions'),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                          );
-                        },
-                      )),
+                          ),
+                        );
+                      },
+                    ),
+            ),
           ],
         ),
       ),

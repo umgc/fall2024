@@ -72,11 +72,20 @@ class EssayEditorState extends State<EssayEditor> {
     ];
 
     for (int i = 0; i < levels.length; i++) {
-      headers.add({
-        "title": '${levels[i]['score']}',
-        'index': i + 2,
-        'key': 'level_$i'
-      });
+      print(headers.toString());
+      if (levels[i]['score'] == 1) {
+        headers.add({
+          "title": '${levels[i]['score']} point',
+          'index': i + 2,
+          'key': 'level_$i'
+        });
+      } else {
+        headers.add({
+          "title": '${levels[i]['score']} points',
+          'index': i + 2,
+          'key': 'level_$i'
+        });
+      }
     }
 
     // Step 2: Build rows by mapping each criterion and its levels dynamically

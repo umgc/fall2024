@@ -184,65 +184,65 @@ Additional Customization: ${_additionalCustomizationController.text}
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
-          // Using Row to split screen into two sections
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             // Left Column
             Expanded(
-              flex:
-                  2, // This controls the space for the left side, bigger ratio
+              flex: 2,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   const Text("Essay Generator", style: TextStyle(fontSize: 24)),
                   const SizedBox(height: 16),
 
-                  // Grade Level Dropdown
-                  GradeLevelDropdown(
-                    selectedGradeLevel: _selectedGradeLevel, // Current value
-                    onChanged:
-                        _handleGradeLevelChanged, // Update selected value
+                  // Row for Dropdowns
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: GradeLevelDropdown(
+                          selectedGradeLevel: _selectedGradeLevel,
+                          onChanged: _handleGradeLevelChanged,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: PointScaleDropdown(
+                          selectedPointScale: _selectedPointScale,
+                          onChanged: _handlePointScaleChanged,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          decoration: InputDecoration(labelText: 'Desired LLM'),
+                          value: selectedLLM,
+                          onChanged: _handleLLMChanged,
+                          items: <String>['Perplexity', 'OpenAI', 'Claude']
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-
-                  // Point Scale Dropdown
-                  PointScaleDropdown(
-                    selectedPointScale: _selectedPointScale, // Current value
-                    onChanged:
-                        _handlePointScaleChanged, // Update selected value
-                  ),
-                  const SizedBox(height: 16),
-
-                  // LLM Selection Dropdown
-                  DropdownButtonFormField<String>(
-                    decoration: InputDecoration(labelText: 'Desired LLM'),
-                    value: selectedLLM,
-                    onChanged: _handleLLMChanged,
-                    items: <String>['Perplexity', 'OpenAI', 'Claude']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
 
                   const SizedBox(height: 16),
-                  // Standard/Objective TextBox
                   TextBox(
                     label: "Standard / Objective",
                     controller: _standardObjectiveController,
                   ),
                   const SizedBox(height: 16),
 
-                  // Assignment Description TextBox
                   TextBox(
                     label: "Assignment Description",
                     controller: _assignmentDescriptionController,
                   ),
                   const SizedBox(height: 16),
 
-                  // Additional Customization TextBox
                   TextBox(
                     label: "Additional Customization for Rubric (Optional)",
                     controller: _additionalCustomizationController,
@@ -250,13 +250,12 @@ Additional Customization: ${_additionalCustomizationController.text}
 
                   const SizedBox(height: 16),
 
-                  // Generate Essay Button
                   ElevatedButton(
                     onPressed: _isLoading
-                        ? null // Disable button when loading
+                        ? null
                         : () {
                             setState(() {
-                              _isLoading = true; // Start loading
+                              _isLoading = true;
                             });
 
                             final result = getSelectedResponses();
@@ -269,17 +268,18 @@ Additional Customization: ${_additionalCustomizationController.text}
                               );
                             }).whenComplete(() {
                               setState(() {
-                                _isLoading = false; // End loading
+                                _isLoading = false;
                               });
                             });
                           },
-                    child: Text(
-                        _isLoading ? 'Generating Essay...' : 'Generate Essay'),
+                    child: Text(_isLoading
+                        ? 'Generating Rubric...'
+                        : 'Generate Rubric'),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 32), // Adds space between the two columns
+            const SizedBox(width: 32),
           ],
         ),
       ),
@@ -336,10 +336,12 @@ class TextBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller, // Use the persistent controller
+      controller: controller,
       decoration: InputDecoration(
         labelText: label,
       ),
+      maxLines: null,
+      keyboardType: TextInputType.multiline,
     );
   }
 }
