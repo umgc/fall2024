@@ -54,7 +54,7 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
-  saveReminder(String reminderText, String frequency) {
+  saveReminder(String reminderText, String frequency, String? day) {
     print("testing value of $reminderText");
     int? value = 0;
     value = int.tryParse(reminderText);
@@ -76,7 +76,7 @@ class _CalendarPageState extends State<CalendarPage> {
     }
     Widget btnOK = TextButton(
         onPressed: () {
-          saveReminderToFile(reminderText, frequency);
+          saveReminderToFile(reminderText, frequency, day);
           Navigator.of(context).pop();
         },
         child: Text("Close"));
@@ -98,16 +98,21 @@ class _CalendarPageState extends State<CalendarPage> {
         });
   }
 
- saveReminderToFile(String reminderName, String reminderfrequency) async {
+  saveReminderToFile(
+      String reminderName, String reminderfrequency, String? day) async {
+    print("Selected day: $day");
     DateTime currentDate = DateTime.now();
     int currentTimeHour = DateTime.now().hour;
     int currentTimeMinute = DateTime.now().minute;
     int currentTimeSecond = DateTime.now().second;
-    String currentTimeString = ("$currentTimeHour:$currentTimeMinute:$currentTimeSecond");
-    String currentDateText = "${currentDate.month}-${currentDate.day}-${currentDate.year}";
+    String currentTimeString =
+        ("$currentTimeHour:$currentTimeMinute:$currentTimeSecond");
+    String currentDateText =
+        "${currentDate.month}-${currentDate.day}-${currentDate.year}";
     final local = await SharedPreferences.getInstance();
     local.setString("reminderText", reminderName);
     local.setString("frequency", reminderfrequency);
+    local.setString("Day", day!);
     final Directory location = await getApplicationDocumentsDirectory();
     String path = "${location.path}/textFile.txt";
     final File textFile = File(
@@ -150,7 +155,8 @@ class _CalendarPageState extends State<CalendarPage> {
           return message;
         });
   }
-  createAlert() {
+
+  createAlert(String? dayNumber) {
     int? option = 1;
     final TextEditingController reminderName = TextEditingController();
     Widget btnOK = TextButton(
@@ -160,12 +166,12 @@ class _CalendarPageState extends State<CalendarPage> {
         child: Text("Close"));
     Widget btnOKDay = TextButton(
         onPressed: () {
-          saveReminder(reminderName.text, "day");
+          saveReminder(reminderName.text, "day", dayNumber);
         },
         child: Text("OK"));
     Widget btnOKMonth = TextButton(
         onPressed: () {
-          saveReminder(reminderName.text, "month");
+          saveReminder(reminderName.text, "month", dayNumber);
         },
         child: Text("OK"));
     Widget btnDayText = TextField(
@@ -237,18 +243,20 @@ class _CalendarPageState extends State<CalendarPage> {
   loadReminder() async {
     final local = await SharedPreferences.getInstance();
     String? reminderName = "", reminderfrequency = "";
+    String? day = "";
     DateTime currentDate = DateTime.now();
     print("Current Day: ${currentDate.day}");
     print("Current Month: ${currentDate.month}");
     print("Current Year: ${currentDate.year}");
     reminderName = local.getString("reminderText");
     reminderfrequency = local.getString("frequency");
+    day = local.getString("Day");
     if (reminderfrequency != null &&
         reminderfrequency.contains("day") == true) {
       create_Alert(reminderName);
     } else if (reminderfrequency != null &&
         reminderfrequency.contains("month") == true &&
-        (currentDate.day == 1 || currentDate.day == 28)) {
+        (currentDate.day == 1 || currentDate.day <= int.parse(day!))) {
       create_Alert(reminderName);
     }
 //         else if (reminderfrequency != null &&
@@ -278,7 +286,8 @@ class _CalendarPageState extends State<CalendarPage> {
         ElevatedButton(
           onPressed: () {
             // TODO: Fill in on click method for each day button
-            createAlert();
+
+            createAlert(day.toString());
           },
           child: Text('$day'),
         ),
