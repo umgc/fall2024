@@ -312,6 +312,12 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                         hintText: 'Enter description here.',
                         border: InputBorder.none,
                       ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Description cannot be empty';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   SizedBox(height: 20),
@@ -428,10 +434,7 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                           onPressed: () async {
                             // Validate the form before submitting
                             if (_formKey.currentState!.validate() &&
-                                _quillController.document
-                                    .toPlainText()
-                                    .trim()
-                                    .isNotEmpty &&
+                                _descriptionController.text.trim().isNotEmpty &&
                                 _validateAvailabilityDates()) {
                               var api = MoodleApiSingleton();
                               bool? token = api.isLoggedIn();
@@ -446,8 +449,7 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                                     _assignmentNameController.text;
                                 String sectionNumber =
                                     _assignmentSectionController.text;
-                                String description =
-                                    _quillController.document.toPlainText();
+                                String description = _descriptionController.text.trim();
                                 String dueDate =
                                     '$selectedDayDue $selectedMonthDue $selectedYearDue $selectedHourDue:$selectedMinuteDue';
                                 String allowSubmissionFrom =
