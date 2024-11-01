@@ -61,6 +61,7 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
 
   TextEditingController _assignmentNameController = TextEditingController();
   TextEditingController _assignmentSectionController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
   // Quill Editor controller
   final quill.QuillController _quillController = quill.QuillController.basic();
@@ -303,17 +304,14 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    child: Column(
-                      children: [
-                        quill.QuillToolbar.simple(controller: _quillController),
-                        Expanded(
-                          child: quill.QuillEditor(
-                            controller: _quillController,
-                            scrollController: ScrollController(),
-                            focusNode: FocusNode(),
-                          ),
-                        ),
-                      ],
+                    child: TextFormField(
+                      controller: _descriptionController,
+                      maxLines: null, // Allows multiline input
+                      expands: true,
+                      decoration: InputDecoration(
+                        hintText: 'Enter description here.',
+                        border: InputBorder.none,
+                      ),
                     ),
                   ),
                   SizedBox(height: 20),
