@@ -41,7 +41,7 @@ class EditQuestionsState extends State<EditQuestions> {
     myQuiz.description = CreateAssessment.descriptionController.text;
 
     promptstart =
-        'Create a question that is compatible with Moodle XML import. Be a bit creative in how you design the question and answers, making sure it is engaging but still on the subject of $subject and related to $topic. Make sure the XML specification is included, and the question is wrapped in the quiz XML element required by Moodle. Each answer should have feedback that fits the Moodle XML format, and avoid using HTML elements within a CDATA field. The quiz should be challenging and thought-provoking, but appropriate for high school students who speak English. The quesiton typ shoud be ';
+        'Create a question that is compatible with Moodle XML import. Be a bit creative in how you design the question and answers, making sure it is engaging but still on the subject of $subject and related to $topic. Make sure the XML specification is included, and the question is wrapped in the quiz XML element required by Moodle. Each answer should have feedback that fits the Moodle XML format, and avoid using HTML elements within a CDATA field. The quiz should be challenging and thought-provoking, but appropriate for high school students who speak English. The Moodle question type should be  ';
   }
 
   @override
@@ -53,16 +53,6 @@ class EditQuestionsState extends State<EditQuestions> {
   ),
       body: Column(
         children: [
-          // Padding(
-          //   padding: const EdgeInsets.all(8.0),
-          //   child: TextField(
-          //     controller: _textController,
-          //     decoration: InputDecoration(
-          //       labelText: 'Prompt: ${myQuiz.promptUsed}',
-          //       border: OutlineInputBorder(),
-          //     ),
-          //   ),
-          // ),
           Expanded(
             child: ListView.builder(
               itemCount: myQuiz.questionList.length,

@@ -16,14 +16,25 @@ class UserSettingsState extends State<UserSettings> {
       builder: (context) => AlertDialog(
         title: Text(
           'Pick a theme color',
-          style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+          style: TextStyle(color: Theme.of(context).colorScheme.inversePrimary),
         ),
         content: SingleChildScrollView(
-          child: BlockPicker(
-            pickerColor: Provider.of<ThemeNotifier>(context, listen: false).primaryColor,
-            onColorChanged: (color) {
-              Provider.of<ThemeNotifier>(context, listen: false).updateTheme(color); // Update global theme
-            },
+          child: SizedBox(
+            width: 300,
+            height: 50,
+            child: BlockPicker(
+              pickerColor: Provider.of<ThemeNotifier>(context, listen: false).primaryColor,
+              onColorChanged: (color) {
+                Provider.of<ThemeNotifier>(context, listen: false).updateTheme(color); // Update global theme
+              },
+                  availableColors: [
+              Colors.red,
+              Colors.green,
+              Colors.blue,
+              Colors.orange,
+              Colors.purple,
+            ], 
+            ),
           ),
         ),
         actions: <Widget>[
