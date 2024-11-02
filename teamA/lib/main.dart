@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
         '/EditQuestions': (context) => EditQuestions(''),
         // '/create': (context) => const CreatePage(),
         '/dashboard': (context) => TeacherDashboard(),
-        '/send_essay_to_moodle': (context) => EssayAssignmentSettings(''),
+        //'/send_essay_to_moodle': (context) => EssayAssignmentSettings(''),
         '/assessments': (context) => AssessmentsView(),
         // '/viewExams': (context) => const ViewExamPage(),
         // '/settings': (context) => Setting(themeModeNotifier: _themeModeNotifier)

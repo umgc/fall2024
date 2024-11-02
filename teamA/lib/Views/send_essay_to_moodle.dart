@@ -8,8 +8,9 @@ import '../Api/moodle_api_singleton.dart';
 
 class EssayAssignmentSettings extends StatefulWidget {
   final String updatedJson;
+  final String description;
 
-  EssayAssignmentSettings(this.updatedJson);
+  EssayAssignmentSettings(this.updatedJson, this.description);
 
   @override
   EssayAssignmentSettingsState createState() => EssayAssignmentSettingsState();
@@ -61,10 +62,7 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
 
   TextEditingController _assignmentNameController = TextEditingController();
   TextEditingController _assignmentSectionController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-
-  // Quill Editor controller
-  final quill.QuillController _quillController = quill.QuillController.basic();
+  TextEditingController _descriptionController = TextEditingController();
 
   // List of courses fetched from the controller
   List<Course> courses = [];
@@ -75,6 +73,7 @@ class EssayAssignmentSettingsState extends State<EssayAssignmentSettings> {
     super.initState();
     fetchCourses(); // Fetch courses on page load
     populateHeadersAndRows();
+    _descriptionController = TextEditingController(text: widget.description);
   }
 
   // Fetch courses from the controller

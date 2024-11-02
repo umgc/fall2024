@@ -406,7 +406,7 @@ class _EssayGenerationState extends State<EssayGeneration>
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    EssayEditPage(rubricasjson),
+                                    EssayEditPage(rubricasjson, _assignmentDescriptionController.text),
                               ),
                             );
                           }

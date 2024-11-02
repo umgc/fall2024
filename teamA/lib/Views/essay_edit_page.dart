@@ -8,7 +8,9 @@ import 'send_essay_to_moodle.dart'; // Import for JSON encoding
 
 class EssayEditPage extends StatefulWidget {
   final String jsonData;
-  EssayEditPage(this.jsonData);
+  final String description;
+  
+  EssayEditPage(this.jsonData, this.description);
   
   @override
   EssayEditPageState createState() => EssayEditPageState(); // Public State class
@@ -151,7 +153,7 @@ Widget build(BuildContext context) {
                     // Navigate to the Essay Assignment Settings page with the updated JSON
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) =>
-                            EssayAssignmentSettings(updatedJson)));
+                            EssayAssignmentSettings(updatedJson, widget.description)));
                     print(updatedJson); // You can now see the updated JSON in the console
                     ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Data sent to Moodle')));
