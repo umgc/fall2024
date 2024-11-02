@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:learninglens_app/Controller/custom_appbar.dart';
 import 'package:learninglens_app/Controller/beans.dart';
 import 'package:learninglens_app/Views/dashboard.dart';

@@ -6,7 +6,6 @@ import 'package:learninglens_app/Views/assessments_view.dart';
 import 'package:provider/provider.dart';
 import 'Views/login_page.dart';
 import 'Views/dashboard.dart';
-import 'Views/send_essay_to_moodle.dart';
 import 'Views/essay_generation.dart';
 import 'Views/quiz_generator.dart';
 import 'Views/edit_questions.dart';
