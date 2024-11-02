@@ -1,3 +1,4 @@
+import 'package:clearassistapp/ui/global_settings.dart';
 import 'package:flutter/material.dart';
 
 class TourScreen extends StatelessWidget {
@@ -7,6 +8,7 @@ class TourScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context){
     return Scaffold(
+      backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: const Color(0x00440000),
@@ -15,14 +17,11 @@ class TourScreen extends StatelessWidget {
             color: Colors.black54
         ),
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/images/background.jpg"),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: const ImageSliderScreen(),
+      body: Stack(
+        children: [
+          GlobalSettings.assetBackground(),
+          ImageSliderScreen(),
+        ],
       ),
     );
   }
@@ -64,6 +63,7 @@ class _ImageSliderScreenState extends State<ImageSliderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Stack(
         alignment: Alignment.bottomCenter,
         children: [

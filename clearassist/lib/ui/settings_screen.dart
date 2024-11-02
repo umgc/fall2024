@@ -51,18 +51,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: ListView(
           children: [
             const SizedBox(height: 20),
-            _buildSettingsCard(
-              icon: Icons.notifications,
-              title: 'Enable Notifications',
-              trailing: Switch(
-                value: _notificationsEnabled,
-                onChanged: (value) {
-                  setState(() {
-                    _notificationsEnabled = value;
-                  });
-                },
-              ),
-            ),
             // const Divider(color: Colors.black54, height: 25, thickness: 2),
             // _buildSettingsCard(
             //   icon: Icons.language,
@@ -85,7 +73,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             //     },
             //   ),
             // ),
-            const Divider(color: Colors.black54, height: 25, thickness: 2),
             _buildSettingsCard(
               icon: Icons.palette,
               title: 'App Theme Color', // Theme setting added
@@ -106,20 +93,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _applyTheme(_selectedTheme); // Apply theme change
                   });
                   setState(() {});
-                },
-              ),
-            ),
-            const Divider(color: Colors.black54, height: 25, thickness: 2),
-            _buildSettingsCard(
-              icon: Icons.location_on,
-              title: 'Location Access',
-              trailing: Switch(
-                value: _locationAccess,
-                onChanged: (value) {
-                  setState(() {
-                    _locationAccess = value;
-                  });
-                  _requestLocationPermission();
                 },
               ),
             ),

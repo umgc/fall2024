@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import '../src/onboarding.dart';
+import 'global_settings.dart';
 import 'home_screen.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
@@ -25,7 +26,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0x00440000),
+      backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
       extendBody: true,
       appBar: AppBar(
@@ -36,17 +37,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         title:
             const Text('Onboarding', style: TextStyle(color: Colors.black54)),
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 12.0),
-          child: Container(
-            padding: const EdgeInsets.only(top: 40.0),
-            child: OnboardingUI(
-              functionality: _functionality,
-              flutterTts: flutterTts, // Pass the FlutterTts instance here
+      body: Stack(
+        children: [
+          GlobalSettings.assetBackground(),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 12.0),
+              child: Container(
+                padding: const EdgeInsets.only(top: 40.0),
+                child: OnboardingUI(
+                  functionality: _functionality,
+                  flutterTts: flutterTts, // Pass the FlutterTts instance here
+                ),
+              ),
             ),
-          ),
-        ),
+          )
+        ],
       ),
     );
   }

@@ -72,9 +72,9 @@ class HomeScreenContentBody extends StatelessWidget {
                 ),
                 _buildElevatedButton(
                   homeScreenState: homeScreenState,
-                  icon: Icon(Icons.analytics,
+                  icon: Icon(Icons.book,
                       size: iconSize, color: Colors.white),
-                  text: 'Analytics',
+                  text: 'History',
                   screen: HomeScreenContent(),
                 ),
                 _buildElevatedButton(

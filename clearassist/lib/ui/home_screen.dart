@@ -1,5 +1,6 @@
 import 'package:clearassistapp/ui/settings_screen.dart';
 import 'package:flutter/material.dart';
+import 'global_settings.dart';
 import 'home_screen_content.dart';
 import 'assistant_screen.dart';
 // Import the login screen for navigation
@@ -38,16 +39,16 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.transparent,
-      body: Container(
-        decoration: BoxDecoration(
-          color: Colors.transparent, // Set background to transparent
-        ),
-        child: SafeArea(
-          child: PageStorage(
-            bucket: PageStorageBucket(),
-            child: _widgetOptions[_selectedIndex],
-          ),
-        ),
+      body: Stack(
+        children: [
+          GlobalSettings.assetBackground(),
+          SafeArea(
+            child: PageStorage(
+              bucket: PageStorageBucket(),
+              child: _widgetOptions[_selectedIndex],
+            ),
+          )
+        ],
       ),
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(

@@ -43,7 +43,7 @@ class _RegistrationScreenState extends State<RegistrationScreenCareGiver> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color(0XFF880E4F),
+        backgroundColor: Colors.transparent,
         extendBodyBehindAppBar: true,
         extendBody: true,
         appBar: AppBar(

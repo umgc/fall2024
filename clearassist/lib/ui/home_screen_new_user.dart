@@ -46,19 +46,17 @@ class _HomeScreenState extends State<HomeScreenNewUser> {
         centerTitle: true,
         title: CustomTitle(),
       ),
-      body: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(GlobalSettings.backgroundPath.value),
-              fit: BoxFit.cover,
-            ),
-          ),
-          child: SafeArea(
+      body: Stack(
+        children: [
+          GlobalSettings.assetBackground(),
+          SafeArea(
             child: PageStorage(
               bucket: PageStorageBucket(), // Store the state of the pages
               child: _widgetOptions[_selectedIndex], // Show the selected screen
             ),
-          )),
+          )
+        ],
+      ),
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
           // Background color for the BottomNavigationBar
