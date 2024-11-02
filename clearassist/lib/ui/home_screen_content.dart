@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../src/utils/contact_display.dart';
 import 'calendar_screen.dart';
 import 'audio_screen.dart';
-import '../src/utils/sos_permissions.dart'; // Import SOS permissions utility
+import '../src/utils/sos_permissions.dart';
 
 class HomeScreenContent extends StatefulWidget {
   const HomeScreenContent({super.key});
