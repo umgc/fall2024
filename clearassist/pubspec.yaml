@@ -99,6 +99,7 @@ dependencies:
   flutter_sound: ^9.16.3
   http: ^1.2.2  
   shared_preferences: ^2.0.18
+  contacts_service: ^0.6.3
 
 
   intl: any
