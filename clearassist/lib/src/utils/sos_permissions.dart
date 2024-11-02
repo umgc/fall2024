@@ -1,8 +1,7 @@
 // sos_permissions.dart
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:contacts_service/contacts_service.dart'; // Ensure this is correctly installed
-import '../services/sendSMS.dart';
+import 'package:contacts_service/contacts_service.dart';
 
 /// Checks and requests SMS and Contacts permissions.
 Future<bool> checkAndRequestPermissions(BuildContext context) async {
@@ -15,7 +14,7 @@ Future<bool> checkAndRequestPermissions(BuildContext context) async {
   }
 }
 
-/// Retrieves emergency contacts labeled with "ICE" or "Emergency".
+/// Retrieves emergency contacts to send SOS to
 Future<List<String>> getEmergencyContactNumbers(BuildContext context) async {
   List<String> emergencyNumbers = [];
 
@@ -42,7 +41,7 @@ Future<List<String>> getEmergencyContactNumbers(BuildContext context) async {
   return emergencyNumbers;
 }
 
-/// Formats a phone number with +1 at the beginning, if not already present.
+/// Phone format should be +1########## - the +1 format is required.
 String? formatPhoneNumber(String? phoneNumber) {
   if (phoneNumber == null) return null;
   final cleanedNumber = phoneNumber.replaceAll(RegExp(r'[^0-9]'), '');
@@ -58,7 +57,7 @@ String? formatPhoneNumber(String? phoneNumber) {
   }
 }
 
-/// Sends the SOS SMS message to emergency contacts after ensuring permission.
+/// Sends the SOS SMS message to emergency contacts after ensuring permission.  Permissions are required and must be accepted by the user.
 Future<void> sendSosSms(BuildContext context) async {
   final emergencyNumbers = await getEmergencyContactNumbers(context);
   final message =
@@ -82,7 +81,7 @@ Future<void> sendSosSms(BuildContext context) async {
   }
 }
 
-/// Shows a dialog to inform the user about permission requirements.
+// Pop-up for permissions to user to enable permissions to send SMS - this is also important for security.
 void _showPermissionDeniedDialog(BuildContext context) {
   showDialog(
     context: context,
@@ -103,7 +102,7 @@ void _showPermissionDeniedDialog(BuildContext context) {
   );
 }
 
-/// Shows a dialog to direct the user to settings if permission is permanently denied.
+//To help avoid confusion this helps the user with the ability to know why sms may not work and this message could prompt them to go to settings and update their permission settings.
 void _showSettingsDialog(BuildContext context) {
   showDialog(
     context: context,
@@ -130,7 +129,7 @@ void _showSettingsDialog(BuildContext context) {
   );
 }
 
-/// Shows a confirmation dialog after a successful SOS message.
+//Exciting part after the SOS message is sent, this is a confirmation message!!!
 void _showSuccessDialog(BuildContext context) {
   showDialog(
     context: context,
@@ -150,7 +149,7 @@ void _showSuccessDialog(BuildContext context) {
   );
 }
 
-/// Shows an error dialog if the SOS message fails to send.
+//Communication to share errors when the SOS message is not sent.
 void _showErrorDialog(BuildContext context, String message) {
   showDialog(
     context: context,
