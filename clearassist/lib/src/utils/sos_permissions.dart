@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:contacts_service/contacts_service.dart';
+import '../services/sendSMS.dart';
 
 /// Checks and requests SMS and Contacts permissions.
 Future<bool> checkAndRequestPermissions(BuildContext context) async {
@@ -41,7 +42,7 @@ Future<List<String>> getEmergencyContactNumbers(BuildContext context) async {
   return emergencyNumbers;
 }
 
-/// Phone format should be +1########## - the +1 format is required.
+// Phone is E.164 - the +1 format is required.
 String? formatPhoneNumber(String? phoneNumber) {
   if (phoneNumber == null) return null;
   final cleanedNumber = phoneNumber.replaceAll(RegExp(r'[^0-9]'), '');
@@ -57,7 +58,8 @@ String? formatPhoneNumber(String? phoneNumber) {
   }
 }
 
-/// Sends the SOS SMS message to emergency contacts after ensuring permission.  Permissions are required and must be accepted by the user.
+// Sends the SOS SMS message to emergency contacts after ensuring permission.
+//Permissions are required and must be accepted by the user.
 Future<void> sendSosSms(BuildContext context) async {
   final emergencyNumbers = await getEmergencyContactNumbers(context);
   final message =
@@ -77,7 +79,7 @@ Future<void> sendSosSms(BuildContext context) async {
     }
     _showSuccessDialog(context);
   } else {
-    print("No emergency contacts found. SOS SMS not sent.");
+    print("No emergency contacts found. The SOS SMS was not sent.");
   }
 }
 
@@ -86,10 +88,10 @@ void _showPermissionDeniedDialog(BuildContext context) {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      title: const Text('Permissions Required',
+      title: const Text('Permissions Required to Send SMS/SOS',
           style: TextStyle(color: Colors.black)),
       content: const Text(
-        'Please enable SMS and Contacts permissions to use this feature.',
+        'Please enable SMS and Contacts permissions to use send SMS/SOS.',
         style: TextStyle(color: Colors.black),
       ),
       actions: <Widget>[
@@ -107,7 +109,7 @@ void _showSettingsDialog(BuildContext context) {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      title: const Text('SMS Permission Permanently Denied',
+      title: const Text('SMS Permission is Denied, please update your settings',
           style: TextStyle(color: Colors.black)),
       content: const Text(
           'Please enable SMS permissions from your device settings to use this feature.',

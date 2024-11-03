@@ -137,7 +137,7 @@ class HomeScreenContentBody extends StatelessWidget {
     );
   }
 
-  // Helper method to build the SOS button
+//Let's build the SOS Button
   Widget _buildSosButton({
     required BuildContext context,
     required _HomeScreenContentState homeScreenState,
@@ -153,7 +153,8 @@ class HomeScreenContentBody extends StatelessWidget {
         foregroundColor: Colors.white,
       ),
       onPressed: () {
-        sendSosSms(context); // Calls the SOS function from sos_permissions.dart
+        sendSosSms(
+            context); // Calls the SOS function from sos_permissions.dart - Leaving this here...
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
