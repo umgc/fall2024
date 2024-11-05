@@ -1,9 +1,9 @@
-// home_view.dart
 import 'package:flutter/material.dart';
-import '../src/utils/contact_display.dart';
-import 'calendar_screen.dart';
-import 'audio_screen.dart';
-import '../src/utils/sos_permissions.dart';
+import 'package:permission_handler/permission_handler.dart';
+import '../ui/audio_screen.dart';
+import '../ui/calendar_screen.dart';
+import '../src/utils/sos_permissions.dart'; // Updated SOS permissions utility
+import '../ui/emergency_contacts_screen.dart';
 
 class HomeScreenContent extends StatefulWidget {
   const HomeScreenContent({super.key});
@@ -23,7 +23,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
     );
   }
 
-  // Method to change the current screen
+  // Method to change the displayed screen
   void _setCurrentScreen(Widget screen) {
     setState(() {
       _currentScreen = screen;
@@ -89,7 +89,7 @@ class HomeScreenContentBody extends StatelessWidget {
                   homeScreenState: homeScreenState,
                   icon: Icons.contact_emergency,
                   label: 'Emergency Contacts',
-                  destinationScreen: const ContactDisplay(),
+                  destinationScreen: SelectEmergencyContactsScreen(),
                   iconSize: iconSize,
                 ),
                 _buildSosButton(
@@ -105,7 +105,7 @@ class HomeScreenContentBody extends StatelessWidget {
     );
   }
 
-  // Helper method to build a feature button
+  // Helper method to create a feature button
   Widget _buildFeatureButton({
     required BuildContext context,
     required _HomeScreenContentState homeScreenState,
@@ -137,7 +137,7 @@ class HomeScreenContentBody extends StatelessWidget {
     );
   }
 
-//Let's build the SOS Button
+  // Create the SOS button with permission checks and confirmation dialog.
   Widget _buildSosButton({
     required BuildContext context,
     required _HomeScreenContentState homeScreenState,
@@ -152,9 +152,14 @@ class HomeScreenContentBody extends StatelessWidget {
         backgroundColor: Colors.red.withAlpha(200),
         foregroundColor: Colors.white,
       ),
-      onPressed: () {
-        sendSosSms(
-            context); // Calls the SOS function from sos_permissions.dart - Leaving this here...
+      onPressed: () async {
+        bool permissionsGranted = await checkAndRequestPermissions(context);
+        if (!permissionsGranted) return;
+
+        bool confirmed = await _showSosConfirmationDialog(context);
+        if (confirmed) {
+          await _sendSosMessage(context);
+        }
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -169,5 +174,57 @@ class HomeScreenContentBody extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // Shows a confirmation dialog before initiating the SOS action.
+  Future<bool> _showSosConfirmationDialog(BuildContext context) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text(
+                'Confirm SOS Activation',
+                style: TextStyle(color: Colors.black),
+              ),
+              content: const Text(
+                'Are you sure you want to send an SOS message?',
+                style: TextStyle(color: Colors.black),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text(
+                    'Send SOS',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
+  // Sends the SOS message and provides feedback to the user.
+  Future<void> _sendSosMessage(BuildContext context) async {
+    try {
+      await sendSosSms(
+          context); // Initiate the SOS functionality from sos_permissions.dart.
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("SOS message sent successfully!")),
+      );
+    } catch (e) {
+      print("Error sending SOS message: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to send SOS message.")),
+      );
+    }
   }
 }
